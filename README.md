@@ -119,6 +119,17 @@ To get a local copy up and running follow these simple example steps.
 5. To open the .sln file, you need Visual Studio 2022 to run the .sln file. To use the Visual Studio Code editor check from list number 7
 6. With the Visual Studio 2022
       * Open the .sln file using Visual Studio 2022
+      * In the terminal or cmd command shell run the following command to install ef:
+        ```sh
+        dotnet tool install --global dotnet-ef --version 6.*
+        ```
+        * Run the database contexts by running the following commands in the command shell:
+        ```sh
+        dotnet ef database update --context ApplicationDbContext
+        ```
+        ```sh
+        dotnet ef database update --context AppIdentityDbContext
+        ```
       * Click the Start or Play button to run your endpoints
       * A Swagger Doc is opened, displaying every enpoints, select and test your endpoints
 7.  Using the Visual Studio Code Editor
@@ -126,7 +137,18 @@ To get a local copy up and running follow these simple example steps.
       * Next install the [.NET 6.0 SDK](https://dotnet.microsoft.com/en-us/download), ensure you install the .NET 6.0 Version
       * Open a terminal/command prompt and navigate to the project folder where you will run the app.
       * When the project folder is first opened in VS Code: A "Required assets to build and debug are missing. Add them?" notification appears at the bottom right of the window.
-      * Selct "Yes"
+      * Select "Yes"
+      * In the terminal or cmd command shell run the following command to install ef:
+        ```sh
+        dotnet tool install --global dotnet-ef --version 6.*
+        ```
+        * Run the database contexts by running the following commands in the command shell:
+        ```sh
+        dotnet ef database update --context ApplicationDbContext
+        ```
+        ```sh
+        dotnet ef database update --context AppIdentityDbContext
+        ```
       * Run the app by entering the following command in the command shell:
         ```sh
         dotnet run

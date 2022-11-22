@@ -27,9 +27,9 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/github_username/repo_name">
-    <!-- <img src="https://icons8.com/icon/XPQeTFPzdCTD/webpage" alt="Logo" width="80" height="80"> -->
-  </a>
+  <!-- <a href="https://github.com/github_username/repo_name">
+    <img src="https://icons8.com/icon/XPQeTFPzdCTD/webpage" alt="Logo" width="80" height="80">
+  </a> -->
 
 # REPUTATION MANAGEMENT
 
@@ -109,10 +109,10 @@ To get a local copy up and running follow these simple example steps.
 
 ### Installation
 
-1. Get the repo link at [https://github.com/workshopapps/reputationmanagement.web](https://github.com/workshopapps/reputationmanagement.web)
+1. Get the repo link at [https://github.com/workshopapps/reputationmanagement.be.web](https://github.com/workshopapps/reputationmanagement.be.web)
 2. Clone the repo
    ```sh
-   git clone https://github.com/workshopapps/reputationmanagement.web.git
+   git clone https://github.com/workshopapps/reputationmanagement.be.web.git
    ```
 3. Switch to the development branch (this is for developers)*
 4. Open the project folder, in the root path of the project, you will see a .sln file (src/src.sln)
@@ -140,7 +140,7 @@ To get a local copy up and running follow these simple example steps.
 
 David Okeke - davidokeke.c@gmail.com
 
-Project Link: [https://github.com/workshopapps/reputationmanagement.web](https://github.com/workshopapps/reputationmanagement.web)
+Project Link: [https://github.com/workshopapps/reputationmanagement.be.web](https://github.com/workshopapps/reputationmanagement.be.web)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -157,9 +157,6 @@ Project Link: [https://github.com/workshopapps/reputationmanagement.web](https:/
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
-[contributors-url]: https://github.com/workshopapps/reputationmanagement.web/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
-[forks-url]: https://github.com/workshopapps/reputationmanagement.web/network/members
-[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
-[stars-url]: https://github.com/workshopapps/reputationmanagement.web/stargazers
+[contributors-url]: https://github.com/workshopapps/reputationmanagement.be.web/graphs/contributors
+[forks-url]: https://github.com/workshopapps/reputationmanagement.be.web/network/members
+[stars-url]: https://github.com/workshopapps/reputationmanagement.be.web/stargazers

@@ -74,5 +74,19 @@ namespace src.Controllers
             return Ok(singleReview);
         }
 
+        [SwaggerOperation(Summary = "Returns all inconclusive reviews (statusType = inconclusive)")]
+        [HttpGet("inconclusiveReviews")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        public IActionResult GetAllInconclusiveReviews()
+        {
+            IEnumerable<Review>[] inconclusiveIsNull = new IEnumerable<Review>[] {};
+            IEnumerable<Review> inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
+            if (inconclusiveReviews == null || inconclusiveReviews.Count() < 1)
+            {
+                return Ok(inconclusiveIsNull);
+            }
+            return Ok(inconclusiveReviews);
+        }
+
     }
 }

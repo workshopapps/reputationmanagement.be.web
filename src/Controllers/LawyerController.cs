@@ -58,7 +58,7 @@ namespace src.Controllers
         }
 
 
-        [SwaggerOperation(Summary = "Get all reviews by Lawyer")]
+        [SwaggerOperation(Summary = "Get all reviews for Lawyer")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
         public ActionResult<IEnumerable<ReviewForDisplayDto>> GetAllReviews(int pageNumber = 0, int pageSize = 10)

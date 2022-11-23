@@ -9,6 +9,7 @@ namespace src.Services
     {
         public readonly ApplicationDbContext _context;
 
+        private static int maxPageSize = 100;
         public IQueryable<Review> Reviews => throw new NotImplementedException();
 
         public AzSqlReviewRepo(ApplicationDbContext context)
@@ -47,18 +48,25 @@ namespace src.Services
                 }
                 return review;
             }
-        
 
-        public IEnumerable<Review> GetReviews(int pageNumber = 0, int pageSize = 0)
+
+        public IEnumerable<Review> GetReviews(int pageNumber, int pageSize)
         {
-            var lawyerReviews = _context.Reviews.Select(codedSamurai => new Review()
-            {
-                ReviewId = codedSamurai.ReviewId,
-                Status = codedSamurai.Status,
-                ReviewString = codedSamurai.ReviewString,
 
-            }).ToListAsync();
-            return (IEnumerable<Review>)lawyerReviews;
+            int defaultPageSize = 10;
+            int defaultPageNumber = 0;
+
+            if (pageSize > maxPageSize || pageSize < 0)
+            {
+                pageSize = defaultPageSize;
+            }
+            int availableNumberOfPages = _context.Reviews.Count() / pageSize;
+            if (pageNumber > availableNumberOfPages)
+            {
+                pageNumber = defaultPageNumber;
+            }
+            var reviews = _context.Reviews.Skip((pageSize * pageNumber)).Take(pageSize);
+            return reviews;
         }
 
         public IEnumerable<Review> GetInconclusiveReviews()

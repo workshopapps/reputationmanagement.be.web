@@ -56,7 +56,19 @@ namespace src.Controllers
            var query = await _reviewRepo.GetAllSuccessfulReview();
            return Ok(query);
         }
-        
+
+
+        [SwaggerOperation(Summary = "Get all reviews for Lawyer")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        [HttpGet("reviews")]
+        public ActionResult<IEnumerable<ReviewForDisplayDto>> GetAllReviews(int pageNumber = 0, int pageSize = 10)
+        {
+            var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
+            var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
+            return Ok(reviewsToReturn);
+
+        }
+
 
         [HttpGet("reviews/{reviewId}")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
@@ -72,6 +84,20 @@ namespace src.Controllers
                 return NotFound();
 
             return Ok(singleReview);
+        }
+
+        [SwaggerOperation(Summary = "Returns all inconclusive reviews (statusType = inconclusive)")]
+        [HttpGet("inconclusiveReviews")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        public IActionResult GetAllInconclusiveReviews()
+        {
+            IEnumerable<Review>[] inconclusiveIsNull = new IEnumerable<Review>[] {};
+            IEnumerable<Review> inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
+            if (inconclusiveReviews == null || inconclusiveReviews.Count() < 1)
+            {
+                return Ok(inconclusiveIsNull);
+            }
+            return Ok(inconclusiveReviews);
         }
 
     }

@@ -56,7 +56,19 @@ namespace src.Controllers
            var query = await _reviewRepo.GetAllSuccessfulReview();
            return Ok(query);
         }
-        
+
+
+        [SwaggerOperation(Summary = "Get all reviews by Lawyer")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        [HttpGet("reviews")]
+        public ActionResult<IEnumerable<ReviewForDisplayDto>> GetAllReviews(int pageNumber = 0, int pageSize = 10)
+        {
+            var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
+            var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
+            return Ok(reviewsToReturn);
+
+        }
+
 
         [HttpGet("reviews/{reviewId}")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]

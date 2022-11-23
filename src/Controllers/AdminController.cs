@@ -1,7 +1,11 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
+using src.Models.Dtos;
+using src.Services;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace src.Controllers;
 
@@ -12,9 +16,15 @@ public class AdminController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public AdminController(UserManager<ApplicationUser> userManager)
+    private readonly IReviewRepository _reviewRepo;
+    private readonly IMapper _mapper;
+
+
+    public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper)
     {
         _userManager = userManager;
+        _reviewRepo = reviewRepository;
+        _mapper = mapper;
     }
 
     [HttpDelete("DeleteUser")]
@@ -33,5 +43,12 @@ public class AdminController : ControllerBase
 
         return BadRequest();
 
+    }
+    [SwaggerOperation(Summary = "Create a Review with this endpoint")]
+    [HttpPost("admin/create")]
+    public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
+    {
+        // use this to get user Id From request and 
+ 
     }
 }

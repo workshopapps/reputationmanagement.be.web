@@ -88,12 +88,7 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     public IActionResult GetAllInconclusiveReviews()
     {
-        IEnumerable<Review>[] inconclusiveIsNull = new IEnumerable<Review>[] { };
-        IEnumerable<Review> inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
-        if (inconclusiveReviews == null || inconclusiveReviews.Count() < 1)
-        {
-            return Ok(inconclusiveIsNull);
-        }
+        var inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
         return Ok(inconclusiveReviews);
     }
 
@@ -104,6 +99,20 @@ public class AdminController : ControllerBase
     {
         var resultModel = new List<SuccessfulReviewsDto>();
         var query = await _reviewRepo.GetAllSuccessfulReview();
+        return Ok(query);
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    [Route("Reveiws/Priority")]
+    public IActionResult GetreviewByPriority(PriorityType priority)
+    {
+       // var resultModel = new List<SuccessfulReviewsDto>();
+        var query = _reviewRepo.GetReviewByPropirity(priority);
+        if (query == null)
+        {
+            return NotFound();
+        }
         return Ok(query);
     }
 

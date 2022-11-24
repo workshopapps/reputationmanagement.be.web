@@ -45,12 +45,7 @@ namespace src.Services
                 {
                     throw new ArgumentNullException(nameof(id));
                 }
-                var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
-                if (review == null)
-                {
-
-                    throw new NullReferenceException("Data not found");
-                }
+            var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
                 return review;
             }
         
@@ -178,6 +173,16 @@ namespace src.Services
             return _context.Reviews;
         }
 
+        public IEnumerable<Review> GetReviewByPropirity(PriorityType priority)
+        {
+            if (priority == null)
+            {
+                return Enumerable.Empty<Review>();
+            }
+            
+                return _context.Reviews
+                .Where(x => x.Priority.Equals(priority));
+        }
 
     }
 }

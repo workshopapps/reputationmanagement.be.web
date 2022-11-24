@@ -11,6 +11,10 @@ using src.Services;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using src.Models.Dtos;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -112,6 +116,10 @@ builder.Services.AddSwaggerGen(c =>
         {securityScheme, new string[] { }}
     });
 });
+
+builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
+builder.Services.Configure<MailKitEmailSenderOptions>(
+    builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));
 
 var app = builder.Build();
 

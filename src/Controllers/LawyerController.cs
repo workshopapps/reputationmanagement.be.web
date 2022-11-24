@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
+using src.Helpers;
+using src.Models;
 using src.Models.Dtos;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,12 +21,14 @@ namespace src.Controllers
     {
         private readonly IReviewRepository _reviewRepo;
         private readonly IMapper _mapper;
+        private readonly IEmailSender _emailSender;
 
         public LawyerController(IReviewRepository reviewRepo,
-            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper)
+            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IEmailSender emailSender)
         {
             _reviewRepo = reviewRepo;
             _mapper = mapper;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -93,6 +99,24 @@ namespace src.Controllers
         {
             var inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
             return Ok(inconclusiveReviews);
+        }
+
+
+        [SwaggerOperation(Summary = "Send email to the reviewer")]
+        [HttpPost("email/create")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        public ActionResult SendEmail(EmailData emailData)
+        {
+            try
+            {
+                _emailSender.SendEmailWrapper(emailData);
+                return Ok();
+            }
+            catch(SmtpCommandException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
     }

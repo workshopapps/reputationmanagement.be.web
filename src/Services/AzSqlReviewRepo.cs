@@ -168,5 +168,20 @@ namespace src.Services
 
             return resultModel;
         }
+
+        public void CreateSaveReview(Review review)
+        {
+            if (review.UserId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(review));
+            }
+
+            if (review == null)
+            {
+                throw new ArgumentNullException(nameof(review));
+            }
+            _context.Reviews.Add(review);
+            _context.SaveChanges();
+        }
     }
 }

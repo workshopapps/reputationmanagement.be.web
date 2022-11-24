@@ -84,6 +84,21 @@ namespace src.Controllers
             return Ok(singleReview);
         }
 
+        [HttpPost("postreview")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        public IActionResult Postreview(Review review)
+        {
+            if (review == null)
+            {
+                return BadRequest("Review object is not passed or added");
+            }
+
+            _reviewRepo.CreateSaveReview(review);
+
+            return Ok("Review successfully added");
+            
+        }
+
         /// <summary>
         /// Deletes All Reviews Associated With this user
         /// </summary>

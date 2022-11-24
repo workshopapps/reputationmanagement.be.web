@@ -11,54 +11,48 @@ using System.Text;
 
 namespace src.Controllers
 {
-   
-        [Route("api/lawyer/auth")]
-        [ApiController]
-        public class LawyerAccountsController : ControllerBase
+    [Route("api/lawyer/auth")]
+    [ApiController]
+    public class LawyerAccountsController : ControllerBase
+    {
+        private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfigurationSection _jwtSettings;
+
+        public LawyerAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            private readonly IMapper _mapper;
-            private readonly UserManager<ApplicationUser> _userManager;
-            private readonly IConfigurationSection _jwtSettings;
-            public LawyerAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration)
+            _mapper = mapper;
+            _userManager = userManager;
+            _jwtSettings = configuration.GetSection("JwtSettings");
+        }
+
+        [HttpPost("create_account")]
+        public async Task<ActionResult> Register([FromBody] LawyerAccountForCreationDto lawyerAccountCreationModel)
+        {
+            var user = _mapper.Map<ApplicationUser>(lawyerAccountCreationModel);
+            var result = await _userManager.CreateAsync(user, lawyerAccountCreationModel.Password);
+            if (!result.Succeeded)
             {
-                _mapper = mapper;
-                _userManager = userManager;
-                _jwtSettings = configuration.GetSection("JwtSettings");
-            }
-            
-            [HttpPost("create_account")]
-            public async Task<ActionResult> Register([FromBody] LawyerAccountForCreationDto lawyerAccountCreationModel)
-            {
-                var user = _mapper.Map<ApplicationUser>(lawyerAccountCreationModel);
-                var result = await _userManager.CreateAsync(user, lawyerAccountCreationModel.Password);
-                if (!result.Succeeded)
+                var badResponse = "";
+                if (result.Errors.Any(x => x.Code == "PasswordTooShort"))
                 {
-                    
-                    var badResponse = $"Email: \"{lawyerAccountCreationModel.Email}\" is already taken.";
-                    return BadRequest(badResponse);
+                    badResponse = "The password is too short";
+                }
+                else if (result.Errors.Any(Error => Error.Code == "DuplicateEmail"))
+                {
+                    badResponse = $"Email: \"{lawyerAccountCreationModel.Email}\" is already taken.";
                 }
                 else
                 {
-                    await _userManager.AddToRoleAsync(user, "Lawyer");
-                    var newuser = await _userManager.FindByEmailAsync(lawyerAccountCreationModel.Email);
-                    if (newuser != null && await _userManager.CheckPasswordAsync(newuser, lawyerAccountCreationModel.Password))
-                    {
-                        var signingCredentials = GetSigningCredentials();
-                        var claims = GetClaims(user);
-                        var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
-                        var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-                        return Ok(token);
-                    }
+                    badResponse = result.Errors.FirstOrDefault().Description;
                 }
-                return Ok();
-        }
-            
-
-            [HttpPost("sign_in")]
-            public async Task<IActionResult> Login([FromBody] UserLoginModel userModel)
+                return BadRequest(badResponse);
+            }
+            else
             {
-                var user = await _userManager.FindByEmailAsync(userModel.Email);
-                if (user != null && await _userManager.CheckPasswordAsync(user, userModel.Password))
+                await _userManager.AddToRoleAsync(user, "Lawyer");
+                var newuser = await _userManager.FindByEmailAsync(lawyerAccountCreationModel.Email);
+                if (newuser != null && await _userManager.CheckPasswordAsync(newuser, lawyerAccountCreationModel.Password))
                 {
                     var signingCredentials = GetSigningCredentials();
                     var claims = GetClaims(user);
@@ -66,9 +60,24 @@ namespace src.Controllers
                     var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
                     return Ok(token);
                 }
-                return Unauthorized("Invalid Authentication");
             }
+            return Ok();
+        }
 
+        [HttpPost("sign_in")]
+        public async Task<IActionResult> Login([FromBody] UserLoginModel userModel)
+        {
+            var user = await _userManager.FindByEmailAsync(userModel.Email);
+            if (user != null && await _userManager.CheckPasswordAsync(user, userModel.Password))
+            {
+                var signingCredentials = GetSigningCredentials();
+                var claims = GetClaims(user);
+                var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
+                var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+                return Ok(token);
+            }
+            return Unauthorized("Invalid Authentication");
+        }
 
         private SigningCredentials GetSigningCredentials()
         {
@@ -76,6 +85,7 @@ namespace src.Controllers
             var secret = new SymmetricSecurityKey(key);
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }
+
         private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
         {
             var tokenOptions = new JwtSecurityToken(
@@ -86,6 +96,7 @@ namespace src.Controllers
             signingCredentials: signingCredentials);
             return tokenOptions;
         }
+
         private async Task<List<Claim>> GetClaims(ApplicationUser user)
         {
             var claims = new List<Claim>
@@ -99,7 +110,5 @@ namespace src.Controllers
             }
             return claims;
         }
-
     }
-    
 }

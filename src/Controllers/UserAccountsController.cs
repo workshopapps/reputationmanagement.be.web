@@ -34,7 +34,19 @@ namespace src.Controllers
             var result = await _userManager.CreateAsync(user, userModel.Password);
             if (!result.Succeeded)
             {
-                var badResponse = $"Email: \"{userModel.Email}\" is already taken.";
+                var badResponse = "";
+                if (result.Errors.Any(x => x.Code == "PasswordTooShort"))
+                {
+                    badResponse = "The password is too short";
+                }
+                else if (result.Errors.Any(Error => Error.Code == "DuplicateEmail"))
+                {
+                    badResponse = $"Email: \"{userModel.Email}\" is already taken.";
+                }
+                else
+                {
+                    badResponse = result.Errors.FirstOrDefault().Description;
+                }
                 return BadRequest(badResponse);
             }
             else
@@ -65,7 +77,8 @@ namespace src.Controllers
                 var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
                 return Ok(token);
             }
-            return Unauthorized("Invalid Authentication");
+
+            return BadRequest("Username and password don't match");
         }
 
         private SigningCredentials GetSigningCredentials()

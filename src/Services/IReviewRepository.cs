@@ -21,7 +21,7 @@ namespace src.Services
 
         // Add more CRUD
 
-        IEnumerable<Review> GetInconclusiveReviews();
+        IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews();
         
         Review UpdateReviewLawyer(ReviewForUpdateDTO review);
 

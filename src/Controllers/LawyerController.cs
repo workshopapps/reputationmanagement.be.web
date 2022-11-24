@@ -91,12 +91,7 @@ namespace src.Controllers
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         public IActionResult GetAllInconclusiveReviews()
         {
-            IEnumerable<Review>[] inconclusiveIsNull = new IEnumerable<Review>[] {};
-            IEnumerable<Review> inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
-            if (inconclusiveReviews == null || inconclusiveReviews.Count() < 1)
-            {
-                return Ok(inconclusiveIsNull);
-            }
+            var inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
             return Ok(inconclusiveReviews);
         }
 

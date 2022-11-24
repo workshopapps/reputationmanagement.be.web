@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using src.Data;
 using src.Entities;
 using src.Models.Dtos;
+using System.Collections;
 
 namespace src.Services
 {
@@ -66,13 +67,24 @@ namespace src.Services
             return (IEnumerable<Review>)lawyerReviews;
         }
 
-        public IEnumerable<Review> GetInconclusiveReviews()
+        public IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews()
         {
-            if (_context.Reviews == null)
+            var reviews = _context.Reviews
+                .Where(review => review.Status == StatusType.Inconclusive)
+                .Select(r => new ReviewForDisplayDto
+                {
+                    ReviewId= r.ReviewId,
+                    Email= r.Email,
+                    ReviewString= r.ReviewString,
+                    Status  = r.Status,
+                    TimeStamp = r.TimeStamp
+                }).ToList();
+
+            if (reviews == null)
             {
-                return Enumerable.Empty<Review>();
+                return Enumerable.Empty<ReviewForDisplayDto>();
             }
-            return _context.Reviews.Where(review => review.Status == StatusType.Inconclusive);
+            return reviews;
         }
 
         public void DeleteReview(Guid reviewId)

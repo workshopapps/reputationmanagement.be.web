@@ -21,6 +21,7 @@ namespace src.Entities
         [Required]
         public StatusType Status { get; set; }
         
+        public PriorityType Priority { get; set; } = PriorityType.NotUrgent;
     }
 
     public enum StatusType
@@ -29,5 +30,12 @@ namespace src.Entities
         Successful,
         Inconclusive, 
         Failed
+    }
+    public enum PriorityType
+    {
+        High,
+        Low,
+        Medium,
+        NotUrgent
     }
 }

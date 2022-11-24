@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
+using src.Models.Dtos;
 
 namespace src.Controllers;
 
@@ -34,4 +35,33 @@ public class AdminController : ControllerBase
         return BadRequest();
 
     }
+
+
+    [HttpPut("UpdateUserAccount")]
+    public async Task<IActionResult> UpdateUser(CustomerAccountForCreationDto userDetails)
+    {
+        var user = await _userManager.FindByEmailAsync(userDetails.Email);
+        if (user != null) {   
+            IdentityResult result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok("updated");
+            }
+        }
+        return Ok(user);
+    }
+
+    [HttpGet("GetUsers")]
+    public IActionResult GetUsers()
+    {
+        var user = _userManager.Users;
+        if (user != null)
+        {
+            return Ok(user);
+        }
+        return BadRequest();
+
+    }
 }
+
+//_mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);

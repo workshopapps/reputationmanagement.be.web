@@ -4,6 +4,11 @@ namespace src.Models.Dtos
 {
     public class CustomerAccountForCreationDto
     {
+        public CustomerAccountForCreationDto()
+        {
+            Roles = new List<string>();
+        }
+
         [Required]
         public string BusinessEntityName { get; set; }
 
@@ -14,5 +19,7 @@ namespace src.Models.Dtos
         [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+
+        public IList<string> Roles { get; set; }
     }
 }

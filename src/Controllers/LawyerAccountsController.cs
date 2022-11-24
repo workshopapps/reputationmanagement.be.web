@@ -33,11 +33,24 @@ namespace src.Controllers
                 var result = await _userManager.CreateAsync(user, lawyerAccountCreationModel.Password);
                 if (!result.Succeeded)
                 {
-                    return Ok(result.Errors);
+                    var badResponse = $"Email: \"{lawyerAccountCreationModel.Email}\" is already taken.";
+                    return BadRequest(badResponse);
                 }
-                await _userManager.AddToRoleAsync(user, "Lawyer");
-                return StatusCode(201);
-            }
+                else
+                {
+                    await _userManager.AddToRoleAsync(user, "Customer");
+                    var newuser = await _userManager.FindByEmailAsync(userModel.Email);
+                    if (newuser != null && await _userManager.CheckPasswordAsync(newuser, userModel.Password))
+                    {
+                        var signingCredentials = GetSigningCredentials();
+                        var claims = GetClaims(user);
+                        var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
+                        var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+                        return Ok(token);
+                    }
+                }
+            return Ok();
+        }
             
 
             [HttpPost("sign_in")]

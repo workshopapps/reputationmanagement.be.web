@@ -101,5 +101,20 @@ namespace src.Controllers
             return Ok();
         }
 
+        [SwaggerOperation(Summary = "Create Complaint for each User.")]
+        [HttpPost]
+        [Route("CreateComplaint")]
+        public IActionResult CreateComplaint(CreateUserComplainsDto complains)
+        {
+            if (complains == null)
+                return NoContent();
+
+            var query = _reviewRepo.PostUserComplains(complains);
+            if (query == null)
+                return NoContent();
+
+            return Ok(query);
+        }
+
     }
 }

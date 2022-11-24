@@ -26,5 +26,7 @@ namespace src.Services
         Review UpdateReviewLawyer(ReviewForUpdateDTO review);
 
         Task<List<SuccessfulReviewsDto>> GetAllSuccessfulReview();
+
+        Task<UserComplains> PostUserComplains(CreateUserComplainsDto model);
     }
 }

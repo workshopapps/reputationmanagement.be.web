@@ -10,5 +10,6 @@ namespace src.Models.Dtos
         public DateTime TimeStamp { get; set; }    
         public string ReviewString { get; set; }
         public StatusType Status { get; set; }
+        public PriorityType Priority { get; set; }
     }
 }

@@ -33,11 +33,27 @@ namespace src.Controllers
             {
                 var user = _mapper.Map<ApplicationUser>(userModel);
                 var result = await _userManager.CreateAsync(user, userModel.Password);
-                if (!result.Succeeded)
-                {
-                    return Ok(result.Errors);
-                }
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+            else
+            {
                 await _userManager.AddToRoleAsync(user, "Customer");
+                var newuser = await _userManager.FindByEmailAsync(userModel.Email);
+                if (newuser != null && await _userManager.CheckPasswordAsync(newuser, userModel.Password))
+                {
+                    var signingCredentials = GetSigningCredentials();
+                    var claims = GetClaims(user);
+                    var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
+                    var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+                    return Ok(token);
+                }
+                
+            }
+            
+                
+                
                 return StatusCode(201);
             }
 

@@ -7,9 +7,6 @@ on:
   pull_request:
     branches:
       - development
-      
-#env:
-#  DOTNET_VERSION: '6'   # set this to the .NET Core version to use
 
 jobs:
   publish:

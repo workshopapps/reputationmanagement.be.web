@@ -33,14 +33,15 @@ namespace src.Controllers
                 var result = await _userManager.CreateAsync(user, lawyerAccountCreationModel.Password);
                 if (!result.Succeeded)
                 {
+                    
                     var badResponse = $"Email: \"{lawyerAccountCreationModel.Email}\" is already taken.";
                     return BadRequest(badResponse);
                 }
                 else
                 {
-                    await _userManager.AddToRoleAsync(user, "Customer");
-                    var newuser = await _userManager.FindByEmailAsync(userModel.Email);
-                    if (newuser != null && await _userManager.CheckPasswordAsync(newuser, userModel.Password))
+                    await _userManager.AddToRoleAsync(user, "Lawyer");
+                    var newuser = await _userManager.FindByEmailAsync(lawyerAccountCreationModel.Email);
+                    if (newuser != null && await _userManager.CheckPasswordAsync(newuser, lawyerAccountCreationModel.Password))
                     {
                         var signingCredentials = GetSigningCredentials();
                         var claims = GetClaims(user);
@@ -49,7 +50,7 @@ namespace src.Controllers
                         return Ok(token);
                     }
                 }
-            return Ok();
+                return Ok();
         }
             
 

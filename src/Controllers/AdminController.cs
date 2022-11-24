@@ -45,10 +45,92 @@ public class AdminController : ControllerBase
 
     }
     [SwaggerOperation(Summary = "Create a Review with this endpoint")]
-    [HttpPost("admin/create")]
+    [HttpPost("create")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
     {
         // use this to get user Id From request and 
- 
+        var review = _reviewRepo.CreateReviews(reviewForCreationDto);
+        return Ok(review);
+    }
+
+    [SwaggerOperation(Summary = "Get all reviews for Admin")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    [HttpGet("reviews")]
+    public ActionResult GetAllReviews(int pageNumber = 0, int pageSize = 10)
+    {
+        var reviews = _reviewRepo.GetAllReviews(pageNumber, pageSize).ToList();
+       var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
+        return Ok(reviewsToReturn);
+
+    }
+
+
+    [SwaggerOperation(Summary = "Get a particular reviews for Admin")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    [HttpGet("reviews/{reviewId}")]
+     public IActionResult GetSingleReview(Guid reviewId)
+    {
+        if (reviewId == Guid.Empty)
+        {
+            return NotFound(reviewId);
+        }
+        Review singleReview = _reviewRepo.GetReviewById(reviewId);
+
+        if (singleReview == null)
+            return NotFound();
+
+        return Ok(singleReview);
+    }
+
+    [SwaggerOperation(Summary = "Returns all inconclusive reviews (statusType = inconclusive)")]
+    [HttpGet("inconclusiveReviews")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public IActionResult GetAllInconclusiveReviews()
+    {
+        IEnumerable<Review>[] inconclusiveIsNull = new IEnumerable<Review>[] { };
+        IEnumerable<Review> inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
+        if (inconclusiveReviews == null || inconclusiveReviews.Count() < 1)
+        {
+            return Ok(inconclusiveIsNull);
+        }
+        return Ok(inconclusiveReviews);
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    [Route("SuccessfulReview")]
+    public async Task<IActionResult> SuccessReview()
+    {
+        var resultModel = new List<SuccessfulReviewsDto>();
+        var query = await _reviewRepo.GetAllSuccessfulReview();
+        return Ok(query);
+    }
+
+    [SwaggerOperation(Summary = "Update a review by an Admin")]
+    [HttpPut]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    [Route("{reviewId}/update")]
+    public ActionResult UpdateReview([FromBody]  ReviewForUpdateDTO review)
+    {
+       
+    var reviews =  _reviewRepo.UpdateReviewLawyer( review);
+        if (review == null)
+        {
+            return NotFound();
+        }
+        return Ok("Review is successfully updated");
+    }
+
+    [SwaggerOperation(Summary = "delete a review by an Admin")]
+    [HttpDelete]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    [Route("{reviewId}/delete")]
+    public ActionResult DeleteReview (Guid reviewId)
+    {
+
+        _reviewRepo.DeleteReview(reviewId);
+        _reviewRepo.Save();
+        return Ok("Review is successfully deleted");
     }
 }

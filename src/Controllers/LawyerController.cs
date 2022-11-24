@@ -43,7 +43,11 @@ namespace src.Controllers
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         public ActionResult UpdateReview(ReviewForUpdateDTO review)
         {
-           _reviewRepo.UpdateReviewLawyer(review);
+           var reviews =_reviewRepo.UpdateReviewLawyer(review);
+            if (reviews == null)
+            {
+                return NotFound();
+            }
             return Ok("Review is successfully updated");
         }
         

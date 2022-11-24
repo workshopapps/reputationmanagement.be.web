@@ -23,8 +23,10 @@ namespace src.Services
 
         IEnumerable<Review> GetInconclusiveReviews();
         
-        Review UpdateReviewLawyer(ReviewForUpdateDTO review);
+        Review UpdateReviewLawyer( ReviewForUpdateDTO review);
 
         Task<List<SuccessfulReviewsDto>> GetAllSuccessfulReview();
+        ReviewForDisplayDto CreateReviews(ReviewForCreationDto review);
+        IEnumerable<Review> GetAllReviews(int pageNumber = 0, int pageSize = 0);
     }
 }

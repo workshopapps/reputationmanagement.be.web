@@ -61,7 +61,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get all reviews for Lawyer")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
-        public ActionResult<IEnumerable<ReviewForDisplayDto>> GetAllReviews(int pageNumber = 0, int pageSize = 10)
+        public ActionResult<IEnumerable<ReviewForDisplayDto>> GetAllReviews([FromQuery]int pageNumber = 0, [FromQuery]int pageSize = 10)
         {
             var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
             var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);

@@ -200,5 +200,25 @@ namespace src.Services
             _context.Reviews.Add(review);
             _context.SaveChanges();
         }
+
+        public async Task<IEnumerable<UpdatedRequestDTO>> GetUpdatedReviews(Guid UserId)
+        {
+            var reviews = await _context.Reviews
+                .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt)
+                .Select(r => new UpdatedRequestDTO
+                {
+                    ReviewId = r.ReviewId,
+                    Email = r.Email,
+                    ReviewString = r.ReviewString,
+                    Status = r.Status,
+                    TimeStamp = r.TimeStamp,
+                }).ToListAsync();
+
+            if (reviews == null)
+            {
+                return Enumerable.Empty<UpdatedRequestDTO>();
+            }
+            return reviews;
+        }
     }
 }

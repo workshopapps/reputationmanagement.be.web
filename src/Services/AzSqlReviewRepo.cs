@@ -17,9 +17,9 @@ namespace src.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-       
+
         public void AddReview(Review review)
-        {            
+        {
             if (review.UserId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(review));
@@ -30,24 +30,24 @@ namespace src.Services
                 throw new ArgumentNullException(nameof(review));
             }
             _context.Reviews.Add(review);
-          
+
         }
 
-       
-            public Review GetReviewById(Guid id)
-            {
-                if (id == Guid.Empty)
-                {
-                    throw new ArgumentNullException(nameof(id));
-                }
-                var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
-                if (review == null)
-                {
 
-                    throw new NullReferenceException("Data not found");
-                }
-                return review;
+        public Review GetReviewById(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(id));
             }
+            var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
+            if (review == null)
+            {
+
+                throw new NullReferenceException("Data not found");
+            }
+            return review;
+        }
 
 
         public IEnumerable<Review> GetReviews(int pageNumber, int pageSize)
@@ -133,7 +133,7 @@ namespace src.Services
 
             return reviewToUpdate;
         }
-        
+
         public async Task<List<SuccessfulReviewsDto>> GetAllSuccessfulReview()
         {
             var resultModel = new List<SuccessfulReviewsDto>();

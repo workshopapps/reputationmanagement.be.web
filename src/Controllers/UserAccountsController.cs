@@ -54,9 +54,7 @@ namespace src.Controllers
                     return Ok(token);
                 }
                 return Unauthorized("Invalid Authentication");
-            }
-
-
+            }    
         private SigningCredentials GetSigningCredentials()
         {
             var key = Encoding.UTF8.GetBytes(_jwtSettings.GetSection("securityKey").Value);

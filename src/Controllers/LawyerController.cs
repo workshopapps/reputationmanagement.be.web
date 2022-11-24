@@ -99,6 +99,5 @@ namespace src.Controllers
             }
             return Ok(inconclusiveReviews);
         }
-
     }
 }

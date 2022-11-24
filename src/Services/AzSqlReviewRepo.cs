@@ -127,6 +127,8 @@ namespace src.Services
 
             reviewToUpdate.ReviewString = review.ReviewString;
             reviewToUpdate.Status = review.Status;
+            reviewToUpdate.UpdatedAt = DateTime.Now;
+
             _context.SaveChanges();
 
             return reviewToUpdate;

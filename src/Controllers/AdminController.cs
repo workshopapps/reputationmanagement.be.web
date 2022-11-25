@@ -46,6 +46,7 @@ public class AdminController : ControllerBase
     }
 
 
+
     [HttpPut("UpdateUserAccount")]
     public async Task<IActionResult> UpdateUser(CustomerAccountForCreationDto userDetails)
     {
@@ -81,6 +82,7 @@ public class AdminController : ControllerBase
         return BadRequest();
 
     }
+
     [SwaggerOperation(Summary = "Create a Review with this endpoint")]
     [HttpPost("create")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
@@ -181,4 +183,7 @@ public class AdminController : ControllerBase
     }
 }
 
+
+
+}
 

@@ -129,7 +129,7 @@ namespace src.Services
             reviewToUpdate.Status = review.Status;
             reviewToUpdate.UpdatedAt = DateTime.Now;
 
-            _context.SaveChanges();
+            Save();
 
             return reviewToUpdate;
         }

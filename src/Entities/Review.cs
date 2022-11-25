@@ -16,8 +16,8 @@ namespace src.Entities
         public string Email { get; set; }
         [Required]
         public DateTime TimeStamp { get; set; }
-        [Required]
-        public DateTime CreatedAt { get; set; }
+       
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; }
         [Required]
         public string ReviewString { get; set; }

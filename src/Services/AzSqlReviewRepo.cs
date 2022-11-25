@@ -233,11 +233,7 @@ namespace src.Services
                 .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt)
                 .Select(r => new UpdatedRequestDTO
                 {
-                    ReviewId = r.ReviewId,
-                    Email = r.Email,
                     ReviewString = r.ReviewString,
-                    Status = r.Status,
-                    TimeStamp = r.TimeStamp,
                 }).ToListAsync();
 
             if (reviews == null)

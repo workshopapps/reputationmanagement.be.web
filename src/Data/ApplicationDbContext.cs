@@ -10,5 +10,8 @@ namespace src.Data
             : base(options) { }
 
         public DbSet<Review> Reviews { get; set; }
+
+        public DbSet<UserComplains> UserComplaint { get; set; }
+
     }
 }

@@ -157,6 +157,22 @@ namespace src.Services
             return resultModel;
         }
 
+
+        public async Task<UserComplains> PostUserComplains(CreateUserComplainsDto complains)
+        {
+            var data = new UserComplains()
+            {
+                ComplaintId = Guid.NewGuid(),
+                ComplaintMessage = complains.ComplaintMessage,
+                TimeStamp = DateTime.Now,
+                UserId = complains.UserId
+            };
+
+            var saveData = await _context.UserComplaint.AddAsync(data);
+            Save();
+
+            return data;
+
         public ReviewForDisplayDto CreateReviews(ReviewForCreationDto review)
         {
             var reviewEntity = _mapper.Map<Review>(review);
@@ -222,3 +238,19 @@ namespace src.Services
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

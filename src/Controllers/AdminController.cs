@@ -44,6 +44,45 @@ public class AdminController : ControllerBase
         return BadRequest();
 
     }
+
+
+
+    [HttpPut("UpdateUserAccount")]
+    public async Task<IActionResult> UpdateUser(CustomerAccountForCreationDto userDetails)
+    {
+        var user = await _userManager.FindByEmailAsync(userDetails.Email);
+        if (user != null) {   
+            IdentityResult result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok("updated");
+            }
+        }
+        return Ok(user);
+    }
+
+    [HttpGet("GetUsers")]
+    public IActionResult GetUsers()
+
+    {
+        
+        var user = _userManager.Users;
+        
+        if (user != null)
+        {
+            var query = user.Select(x => new CustomerAccountForCreationDto()
+            {
+                BusinessEntityName = x.UserName,
+                Email = x.Email,
+                Password = x.PasswordHash,
+                
+            }).ToList();
+            return Ok(query);
+        }
+        return BadRequest();
+
+    }
+
     [SwaggerOperation(Summary = "Create a Review with this endpoint")]
     [HttpPost("create")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
@@ -143,3 +182,8 @@ public class AdminController : ControllerBase
         return Ok("Review is successfully deleted");
     }
 }
+
+
+
+}
+

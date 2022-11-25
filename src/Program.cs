@@ -61,9 +61,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(MyAllowSpecificOrigins,
     policy =>
     {
-			   policy.AllowAnyOrigin()
-                           .AllowAnyHeader()
-                           .AllowAnyMethod();
+	    policy.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod();
     });
 });
 
@@ -71,7 +71,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContextPool<AppIdentityDbContext>(options =>
+builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_SQL_1F63A_CONNECTIONSTRING")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

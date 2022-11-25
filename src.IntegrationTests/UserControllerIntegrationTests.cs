@@ -26,16 +26,12 @@ public class UserControllerIntegrationTests : IClassFixture<TestingWebAppFactory
     {
         var response = await _client.PostAsJsonAsync("api/auth/sign_in", new UserLoginModel
         {
-            Email = "test@example.com",
-            Password = "T35T1NG.m3"
+            Email = "testcustomer@example.com",
+            Password = "Secret123$"
         });
-        // var registrationResponse = await response.Content.ReadAsAsync();
-        // return registrationResponse.Token;
-        // return response.Content.ToString();
-
-        
+       
         string result = await response.Content.ReadAsStringAsync();
-        Console.WriteLine(result);
+        
         return result;
 
     }

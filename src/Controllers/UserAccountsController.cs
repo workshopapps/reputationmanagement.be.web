@@ -69,6 +69,7 @@ namespace src.Controllers
         public async Task<IActionResult> Login([FromBody] UserLoginModel userModel)
         {
             var user = await _userManager.FindByEmailAsync(userModel.Email);
+            if (user is null) { return BadRequest($"User with email {userModel.Email} does not exist"); }
             if (user != null && await _userManager.CheckPasswordAsync(user, userModel.Password))
             {
                 var signingCredentials = GetSigningCredentials();
@@ -77,8 +78,10 @@ namespace src.Controllers
                 var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
                 return Ok(token);
             }
-
-            return BadRequest("Username and password don't match");
+            else
+            {
+                return BadRequest("Username and password don't match");
+            }
         }
 
         private SigningCredentials GetSigningCredentials()

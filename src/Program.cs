@@ -139,6 +139,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-await SeedDb.Seed(app, app.Configuration);
+// await SeedDb.Seed(app, app.Configuration);
 
 app.Run();
+
+public partial class Program { }

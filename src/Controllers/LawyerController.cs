@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
+using src.Helpers;
+using src.Models;
 using src.Models.Dtos;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,12 +21,14 @@ namespace src.Controllers
     {
         private readonly IReviewRepository _reviewRepo;
         private readonly IMapper _mapper;
+        private readonly IEmailSender _emailSender;
 
         public LawyerController(IReviewRepository reviewRepo,
-            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper)
+            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IEmailSender emailSender)
         {
             _reviewRepo = reviewRepo;
             _mapper = mapper;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -43,7 +49,11 @@ namespace src.Controllers
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         public ActionResult UpdateReview(ReviewForUpdateDTO review)
         {
-           _reviewRepo.UpdateReviewLawyer(review);
+           var reviews =_reviewRepo.UpdateReviewLawyer(review);
+            if (reviews == null)
+            {
+                return NotFound();
+            }
             return Ok("Review is successfully updated");
         }
         
@@ -61,7 +71,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get all reviews for Lawyer")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
-        public ActionResult<IEnumerable<ReviewForDisplayDto>> GetAllReviews(int pageNumber = 0, int pageSize = 10)
+        public ActionResult<IEnumerable<ReviewForDisplayDto>> GetAllReviews([FromQuery]int pageNumber = 0, [FromQuery]int pageSize = 10)
         {
             var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
             var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
@@ -84,6 +94,35 @@ namespace src.Controllers
                 return NotFound();
 
             return Ok(singleReview);
+        }
+
+        [SwaggerOperation(Summary = "Returns all inconclusive reviews (statusType = inconclusive)")]
+        [HttpGet("inconclusiveReviews")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        public IActionResult GetAllInconclusiveReviews()
+        {
+            var inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
+            return Ok(inconclusiveReviews);
+        }
+
+
+        [SwaggerOperation(Summary = "Sends email to the user from reviewer")]
+        [HttpPost("email/create")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        public ActionResult SendEmail(EmailDataDto emailData)
+        {
+            const string EMAIL_SUBJECT = "Plea for removal of review";
+
+            try
+            {
+                _emailSender.SendEmailAsync(emailData.EmailToId, EMAIL_SUBJECT, emailData.EmailBody);
+                return Ok();
+            }
+            catch(SmtpCommandException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
     }

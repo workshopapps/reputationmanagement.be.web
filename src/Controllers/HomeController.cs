@@ -84,6 +84,21 @@ namespace src.Controllers
             return Ok(singleReview);
         }
 
+        [HttpPost("postreview")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        public IActionResult Postreview(Review review)
+        {
+            if (review == null)
+            {
+                return BadRequest("Review object is not passed or added");
+            }
+
+            _reviewRepo.CreateSaveReview(review);
+
+            return Ok("Review successfully added");
+
+        }
+
         /// <summary>
         /// Deletes All Reviews Associated With this user
         /// </summary>
@@ -101,17 +116,35 @@ namespace src.Controllers
             return Ok();
         }
 
-        [HttpGet("inconclusive")]
-        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public IActionResult GetAllInconclusiveReviews()
+
+        [SwaggerOperation(Summary = "Create Complaint for each User.")]
+        [HttpPost]
+        [Route("CreateComplaint")]
+        public IActionResult CreateComplaint(CreateUserComplainsDto complains)
         {
-            IEnumerable<Review> inconclusiveIsNull = null;
-            IEnumerable<Review> inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
-            if (inconclusiveReviews == null || inconclusiveReviews.Count() < 1)
+            if (complains == null)
+                return NoContent();
+
+            var query = _reviewRepo.PostUserComplains(complains);
+            if (query == null)
+                return NoContent();
+
+            return Ok(query);
+        }
+
+        [HttpGet("GetUpdatedReviews")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        public IActionResult GetUpdatedReviews(Guid UserId)
+        {
+            var updatedReviews = _reviewRepo.GetUpdatedReviews(UserId);
+
+            if (updatedReviews == null)
             {
-                return Ok(inconclusiveIsNull);
+                return NotFound();
             }
-            return Ok(inconclusiveReviews);
+
+            return Ok(updatedReviews);
+
         }
 
     }

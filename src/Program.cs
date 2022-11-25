@@ -11,6 +11,10 @@ using src.Services;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using src.Models.Dtos;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -57,9 +61,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(MyAllowSpecificOrigins,
     policy =>
     {
-			   policy.AllowAnyOrigin()
-                           .AllowAnyHeader()
-                           .AllowAnyMethod();
+	    policy.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod();
     });
 });
 
@@ -67,7 +71,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContextPool<AppIdentityDbContext>(options =>
+builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_SQL_1F63A_CONNECTIONSTRING")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -113,6 +117,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
+builder.Services.Configure<MailKitEmailSenderOptions>(
+    builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -131,6 +139,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-await SeedDb.Seed(app, app.Configuration);
+// await SeedDb.Seed(app, app.Configuration);
 
 app.Run();
+
+public partial class Program { }

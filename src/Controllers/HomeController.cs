@@ -130,6 +130,7 @@ namespace src.Controllers
                 return NoContent();
 
             return Ok(query);
+        }
 
         [HttpGet("GetUpdatedReviews")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]

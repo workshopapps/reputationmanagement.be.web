@@ -50,7 +50,7 @@ namespace src.Migrations.ApplicationDb
 
                     b.HasKey("ReviewId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 #pragma warning restore 612, 618
         }

@@ -12,10 +12,12 @@ namespace src.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    
 
     public AdminController(UserManager<ApplicationUser> userManager)
     {
         _userManager = userManager;
+     
     }
 
     [HttpDelete("DeleteUser")]
@@ -52,16 +54,26 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("GetUsers")]
-    public IActionResult GetUsers()
+    public async Task<IActionResult> GetUsers()
+
     {
+        
         var user = _userManager.Users;
+        var userRoles = await _userManager.GetRolesAsync((ApplicationUser)user);
         if (user != null)
         {
-            return Ok(user);
+            var query = user.Select(x => new CustomerAccountForCreationDto()
+            {
+                BusinessEntityName = x.UserName,
+                Email = x.Email,
+                Password = x.PasswordHash,
+                Roles = userRoles
+            }).ToList();
+            return Ok(query);
         }
         return BadRequest();
 
     }
 }
 
-//_mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
+

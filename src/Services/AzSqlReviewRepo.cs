@@ -48,20 +48,30 @@ namespace src.Services
             var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
                 return review;
             }
-        
 
-        public IEnumerable<Review> GetReviews(int pageNumber = 0 , int pageSize = 0)
+
+        public IEnumerable<Review> GetReviews(int pageNumber, int pageSize)
         {
-            var lawyerReviews = _context.Reviews.Select(codedSamurai => new Review()
+
+            int defaultPageSize = 10;
+            int defaultPageNumber = 0;
+            int maxPageSize = 100;
+
+            if (pageSize > maxPageSize || pageSize < 0)
             {
-                ReviewId = codedSamurai.ReviewId,
-                Status = codedSamurai.Status,
-                ReviewString = codedSamurai.ReviewString,
+                pageSize = defaultPageSize;
+            }
+            int availableNumberOfPages = _context.Reviews.Count() / pageSize;
+            if (pageNumber > availableNumberOfPages)
+            {
+                pageNumber = defaultPageNumber;
+            }
+            var reviewsToReturn = _context.Reviews.Skip(pageSize * pageNumber).Take(pageSize) as IEnumerable<Review>;
+            
+            return reviewsToReturn;
 
-            }).ToListAsync();
-            return (IEnumerable<Review>)lawyerReviews;
+
         }
-
         public IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews()
         {
             var reviews = _context.Reviews

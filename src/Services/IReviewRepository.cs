@@ -11,6 +11,8 @@ namespace src.Services
 
         IEnumerable<Review> GetReviews(int pageNumber, int pageSize);
 
+        public void CreateSaveReview(Review review);
+
         public void AddReview(Review review);
 
         public void DeleteReview(Guid id);
@@ -23,10 +25,18 @@ namespace src.Services
 
         IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews();
         
-        Review UpdateReviewLawyer(ReviewForUpdateDTO review);
+        Review UpdateReviewLawyer( ReviewForUpdateDTO review);
 
         Task<List<SuccessfulReviewsDto>> GetAllSuccessfulReview();
 
+
         Task<UserComplains> PostUserComplains(CreateUserComplainsDto model);
+
+        ReviewForDisplayDto CreateReviews(ReviewForCreationDto review);
+        IEnumerable<Review> GetAllReviews(int pageNumber = 0, int pageSize = 0);
+        IEnumerable<Review> GetReviewByPropirity(PriorityType priority);
+
+        Task<IEnumerable<UpdatedRequestDTO>> GetUpdatedReviews(Guid UserId);
+
     }
 }

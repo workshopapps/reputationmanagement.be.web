@@ -1,3 +1,5 @@
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using src.Data;
 using src.Entities;
@@ -9,13 +11,15 @@ namespace src.Services
     public class AzSqlReviewRepo : IReviewRepository
     {
         public readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        private static int maxPageSize = 100;
+
         public IQueryable<Review> Reviews => throw new NotImplementedException();
 
-        public AzSqlReviewRepo(ApplicationDbContext context)
+        public AzSqlReviewRepo(ApplicationDbContext context, IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _mapper = mapper;
         }
 
        
@@ -33,41 +37,29 @@ namespace src.Services
             _context.Reviews.Add(review);
           
         }
+     
 
-       
-            public Review GetReviewById(Guid id)
+        public Review GetReviewById(Guid id)
             {
                 if (id == Guid.Empty)
                 {
                     throw new ArgumentNullException(nameof(id));
                 }
-                var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
-                if (review == null)
-                {
-
-                    throw new NullReferenceException("Data not found");
-                }
+            var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
                 return review;
             }
+        
 
-
-        public IEnumerable<Review> GetReviews(int pageNumber, int pageSize)
+        public IEnumerable<Review> GetReviews(int pageNumber = 0 , int pageSize = 0)
         {
-
-            int defaultPageSize = 10;
-            int defaultPageNumber = 0;
-
-            if (pageSize > maxPageSize || pageSize < 0)
+            var lawyerReviews = _context.Reviews.Select(codedSamurai => new Review()
             {
-                pageSize = defaultPageSize;
-            }
-            int availableNumberOfPages = _context.Reviews.Count() / pageSize;
-            if (pageNumber > availableNumberOfPages)
-            {
-                pageNumber = defaultPageNumber;
-            }
-            var reviews = _context.Reviews.Skip((pageSize * pageNumber)).Take(pageSize);
-            return reviews;
+                ReviewId = codedSamurai.ReviewId,
+                Status = codedSamurai.Status,
+                ReviewString = codedSamurai.ReviewString,
+
+            }).ToListAsync();
+            return (IEnumerable<Review>)lawyerReviews;
         }
 
         public IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews()
@@ -125,21 +117,17 @@ namespace src.Services
             }
         }
 
-        public Review UpdateReviewLawyer(ReviewForUpdateDTO review)
+        public Review UpdateReviewLawyer( ReviewForUpdateDTO review)
         {
             if (review == null)
             {
                 throw new NotImplementedException("No review is passed");
             }
-            Review reviewToUpdate = _context.Reviews.FirstOrDefault(r => r.ReviewId == review.ReviewId);
-
-            if (reviewToUpdate == null)
-            {
-                throw new NullReferenceException("Data not found");
-            }
+            var reviewToUpdate = _context.Reviews.Where(c => c.ReviewId == review.ReviewId).SingleOrDefault();
 
             reviewToUpdate.ReviewString = review.ReviewString;
             reviewToUpdate.Status = review.Status;
+            reviewToUpdate.UpdatedAt = DateTime.Now;
 
             _context.SaveChanges();
 
@@ -169,6 +157,7 @@ namespace src.Services
             return resultModel;
         }
 
+
         public async Task<UserComplains> PostUserComplains(CreateUserComplainsDto complains)
         {
             var data = new UserComplains()
@@ -183,6 +172,69 @@ namespace src.Services
             Save();
 
             return data;
+
+        public ReviewForDisplayDto CreateReviews(ReviewForCreationDto review)
+        {
+            var reviewEntity = _mapper.Map<Review>(review);
+            _context.Reviews.Add(reviewEntity);
+            var reviewToReturn = _mapper.Map<ReviewForDisplayDto>(reviewEntity);
+            _context.SaveChanges();
+            return reviewToReturn;
+        }
+
+        public IEnumerable<Review> GetAllReviews(int pageNumber = 0, int pageSize = 0)
+        {
+            if (_context.Reviews == null)
+            {
+                return Enumerable.Empty<Review>();
+            }
+            return _context.Reviews;
+        }
+
+        public IEnumerable<Review> GetReviewByPropirity(PriorityType priority)
+        {
+            if (priority == null)
+            {
+                return Enumerable.Empty<Review>();
+            }
+            
+                return _context.Reviews
+                .Where(x => x.Priority.Equals(priority));
+        }
+
+        public void CreateSaveReview(Review review)
+        {
+            if (review.UserId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(review));
+            }
+
+            if (review == null)
+            {
+                throw new ArgumentNullException(nameof(review));
+            }
+            _context.Reviews.Add(review);
+            _context.SaveChanges();
+        }
+
+        public async Task<IEnumerable<UpdatedRequestDTO>> GetUpdatedReviews(Guid UserId)
+        {
+            var reviews = await _context.Reviews
+                .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt)
+                .Select(r => new UpdatedRequestDTO
+                {
+                    ReviewId = r.ReviewId,
+                    Email = r.Email,
+                    ReviewString = r.ReviewString,
+                    Status = r.Status,
+                    TimeStamp = r.TimeStamp,
+                }).ToListAsync();
+
+            if (reviews == null)
+            {
+                return Enumerable.Empty<UpdatedRequestDTO>();
+            }
+            return reviews;
         }
     }
 }

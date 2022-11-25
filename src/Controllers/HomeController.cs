@@ -116,5 +116,19 @@ namespace src.Controllers
             return Ok();
         }
 
+        [HttpGet("GetUpdatedReviews")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        public IActionResult GetUpdatedReviews(Guid UserId)
+        {
+            var updatedReviews = _reviewRepo.GetUpdatedReviews(UserId);
+
+            if (updatedReviews == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedReviews);
+        }
+
     }
 }

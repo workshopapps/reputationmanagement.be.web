@@ -31,5 +31,7 @@ namespace src.Services
         ReviewForDisplayDto CreateReviews(ReviewForCreationDto review);
         IEnumerable<Review> GetAllReviews(int pageNumber = 0, int pageSize = 0);
         IEnumerable<Review> GetReviewByPropirity(PriorityType priority);
+
+        Task<IEnumerable<UpdatedRequestDTO>> GetUpdatedReviews(Guid UserId);
     }
 }

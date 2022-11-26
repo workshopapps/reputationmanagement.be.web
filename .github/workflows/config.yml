@@ -46,7 +46,7 @@ jobs:
       with:
         name: workshopapps/reputationmanagement.be.web/backend
         registry: docker.pkg.github.com
-        username: ${{ secrets.GITHUB_USERNAME }}
+        username: ${{ secrets.REPOSITORY_NAME }}
         password: ${{ secrets.GITHUB_TOKEN }}
         dockerfile: Dockerfile
         tags: latest
@@ -54,17 +54,17 @@ jobs:
     - name: Deploy package to digitalocean
       uses: appleboy/ssh-action@master
       env:
-          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
+          GITHUB_USERNAME: ${{ secrets.REPOSITORY_NAME}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
-        envs: GITHUB_USERNAME, GITHUB_TOKEN
+        envs: REPOSITORY_NAME, GITHUB_TOKEN
         script: |
           docker stop $(docker ps -a -q)
-          docker login docker.pkg.github.com -u $GITHUB_USERNAME -p $GITHUB_TOKEN
+          docker login docker.pkg.github.com -u $REPOSITORY_NAME -p $GITHUB_TOKEN
           docker pull docker.pkg.github.com/workshopapps/reputationmanagement.be.web/backend:latest
           docker run -dit -p 8080:80 docker.pkg.github.com/workshopapps/reputationmanagement.be.web/backend:latest
  

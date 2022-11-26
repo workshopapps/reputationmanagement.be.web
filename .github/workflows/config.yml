@@ -27,7 +27,7 @@ jobs:
         dotnet-quality: 'preview'
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore /src/
     
     - name: Build
       run: dotnet build -c Release --no-restore

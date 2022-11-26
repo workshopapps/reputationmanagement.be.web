@@ -2,11 +2,9 @@ name: CI Build and deploy ASP.Net Core app
 
 on:
   push:
-    branches:
-      - development
+    branches: ["development"]
   pull_request:
-    branches:
-      - development
+    branches: ["development"]
 
 jobs:
   publish:

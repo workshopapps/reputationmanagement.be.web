@@ -48,13 +48,6 @@ jobs:
     - name: Push Docker Image to Docker Hub
       run: docker push $DOCKERHUB_USERNAME/$REPOSITORY_NAME:${{ steps.date.outputs.date }}
       
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    
-    steps:
-    - env:
-        CI: true
     - name: Deploy package to your instance
       uses: appleboy/ssh-action@master
       env:

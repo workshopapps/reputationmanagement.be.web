@@ -30,10 +30,10 @@ jobs:
       run: dotnet restore src/
     
     - name: Build
-      run: dotnet build -c Release --no-restore
+      run: dotnet build -c Release --no-restore src/
     
     - name: Test
-      run: dotnet test -c Release --no-restore --no-build --verbosity normal --filter "Category!=LongRunning"
+      run: dotnet test -c Release --no-restore --no-build --verbosity normal --filter "Category!=LongRunning" src/
       env:
         CI: true
     - name: Log in to Docker Hub

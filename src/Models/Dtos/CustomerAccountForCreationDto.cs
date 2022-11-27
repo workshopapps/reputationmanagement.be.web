@@ -3,7 +3,7 @@
 namespace src.Models.Dtos
 {
     public class CustomerAccountForCreationDto
-    {
+    {   
         [Required]
         public string BusinessEntityName { get; set; }
 

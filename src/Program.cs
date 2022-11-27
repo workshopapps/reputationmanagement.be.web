@@ -123,12 +123,15 @@ builder.Services.Configure<MailKitEmailSenderOptions>(
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseStatusCodePages();
 }
+
+app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI();
 

@@ -7,7 +7,7 @@ namespace EarlyMan.PL.Profiles
         public UserAccountProfile()
         {
             CreateMap<src.Models.Dtos.CustomerAccountForCreationDto, src.Entities.ApplicationUser>()
-                .ForMember(x => x.UserName, opt => opt.MapFrom(source => source.BusinessEntityName.Replace(" ", "")))
+                .ForMember(x => x.UserName, opt => opt.MapFrom(source => source.BusinessEntityName.Replace(" ", "_")))
                 .ForMember(x=>x.PostAddress, o => o.MapFrom(str => string.Empty));
             CreateMap<src.Models.Dtos.LawyerAccountForCreationDto, src.Entities.ApplicationUser>()
                 .ForMember(x => x.UserName, opt => opt.MapFrom(source => source.FirstName + source.LastName))

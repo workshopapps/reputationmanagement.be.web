@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using src.Entities;
 using src.Models;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,12 +31,13 @@ namespace src.Controllers
         [HttpPost("create_account")]
         public async Task<ActionResult> Register([FromBody] src.Models.Dtos.CustomerAccountForCreationDto userModel)
         {
+            userModel.BusinessEntityName = userModel.BusinessEntityName.ToLowerInvariant();
             var user = _mapper.Map<ApplicationUser>(userModel);
             var result = await _userManager.CreateAsync(user, userModel.Password);
             if (!result.Succeeded)
             {
                 var badResponse = "";
-                if (result.Errors.Any(x => x.Code == "PasswordTooShort"))
+                if (result.Errors.Any(Error => Error.Code == "PasswordTooShort"))
                 {
                     badResponse = "The password is too short";
                 }
@@ -47,7 +49,8 @@ namespace src.Controllers
                 {
                     badResponse = result.Errors.FirstOrDefault().Description;
                 }
-                return BadRequest(badResponse);
+                var jsonResponse = JsonConvert.SerializeObject(badResponse);
+                return BadRequest(jsonResponse);
             }
             else
             {

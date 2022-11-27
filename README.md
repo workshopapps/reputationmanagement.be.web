@@ -36,18 +36,18 @@
   <p align="center">
     "Reputation Management. Imagine you have a restaurant. Someone comes and leaves a horrible review and 1 star. You need that review gone. That's what we are here for. Our lawyers will send a letter to the reviewer asking them to take down their review. If successful, you pay us for the service."
     <br />
-    <a href="https://drive.google.com/file/d/1a6jXVKLDQ3smRvZqMDSd4edPNNTRHrWj/view?usp=sharing"><strong>Explore the docs »</strong></a>
+    <a href="https://drive.google.com/file/d/1a6jXVKLDQ3smRvZqMDSd4edPNNTRHrWj/view?usp=sharing"><strong>Explore the docs Â»</strong></a>
     <br />
     <br />
     <a href="https://fixit.hng.tech/">View Demo</a>
-    ·
+    Â·
     <!-- <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
-    ·
+    Â·
     <a href="https://github.com/github_username/repo_name/issues">Request Feature</a> -->
   </p>
 </div>
 
-
+[![.github/workflows/config.yml](https://github.com/workshopapps/reputationmanagement.be.web/actions/workflows/config.yml/badge.svg?branch=development)](https://github.com/workshopapps/reputationmanagement.be.web/actions/workflows/config.yml)
 
 <!-- TABLE OF CONTENTS -->
 <details>

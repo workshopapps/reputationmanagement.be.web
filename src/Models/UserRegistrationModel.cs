@@ -2,7 +2,7 @@
 
 namespace src.Models
 {
-    public class CustomerAccountForCreationDto
+    public class UserRegistrationModel
     { 
         [Required]
         public string UserName { get; set; }

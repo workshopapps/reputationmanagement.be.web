@@ -5,14 +5,17 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using src.Entities;
 using src.Models;
+using src.Models.Dtos;
+using src.Models.ExampleModels;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace src.Controllers
 {
-    [SwaggerTag("For authorization for Customer")]
+    [SwaggerTag("Used this endpoint to authorize Customer users")]
     [Route("api/auth")]
     [ApiController]
     public class UserAccountsController : ControllerBase
@@ -28,10 +31,18 @@ namespace src.Controllers
             _jwtSettings = configuration.GetSection("JwtSettings");
         }
 
+        /// <returns>User's Auth token if successful.</returns>
+        /// <response code="200">Returns OK with the raw auth token as the only response.</response>
+        /// <response code="400">If the account creation was unsuccessful due to bad input</response>
+        [SwaggerOperation(Summary = "Registers a new User.")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(400, typeof(BadCustomerAccountForCreationExample))]
+        [SwaggerResponseExample(200, typeof(GoodCustomerAccountForCreationExample))]
         [HttpPost("create_account")]
-        public async Task<ActionResult> Register([FromBody] src.Models.Dtos.CustomerAccountForCreationDto userModel)
+        public async Task<ActionResult> Register([FromBody] CustomerAccountForCreationDto userModel)
         {
-            userModel.BusinessEntityName = userModel.BusinessEntityName.ToLowerInvariant();
             var user = _mapper.Map<ApplicationUser>(userModel);
             var result = await _userManager.CreateAsync(user, userModel.Password);
             if (!result.Succeeded)
@@ -47,10 +58,10 @@ namespace src.Controllers
                 }
                 else
                 {
-                    badResponse = result.Errors.FirstOrDefault().Description;
+                    badResponse = "Bad Input";
                 }
-                var jsonResponse = JsonConvert.SerializeObject(badResponse);
-                return BadRequest(jsonResponse);
+               
+                return BadRequest(badResponse);
             }
             else
             {
@@ -68,6 +79,15 @@ namespace src.Controllers
             return Ok();
         }
 
+
+        /// <returns>Use bearer auth token</returns>
+        /// <response code="200">Returns OK with the raw auth token as the only content.</response>
+        /// <response code="400">If the authentication was unsuccessful.</response>
+        [SwaggerOperation(Summary = "Signs in the user")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(400, typeof(BadSignInDetailsForCustomer))]
+        [SwaggerResponseExample(200, typeof(GoodSignInDetailsForCustomer))]
         [HttpPost("sign_in")]
         public async Task<IActionResult> Login([FromBody] UserLoginModel userModel)
         {

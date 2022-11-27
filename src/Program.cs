@@ -15,6 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using src.Models.Dtos;
+using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -82,6 +84,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
 opts =>
 {
     opts.User.RequireUniqueEmail = true;
+    opts.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMOPQRSTUVWXYZ1234567890!()_.-$@+";
 })
 .AddEntityFrameworkStores<AppIdentityDbContext>()
 .AddDefaultTokenProviders();
@@ -115,8 +118,10 @@ builder.Services.AddSwaggerGen(c =>
     {
         {securityScheme, new string[] { }}
     });
+    c.ExampleFilters();
 });
 
+builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
 builder.Services.Configure<MailKitEmailSenderOptions>(
     builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));

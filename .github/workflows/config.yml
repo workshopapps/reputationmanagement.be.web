@@ -46,7 +46,8 @@ jobs:
       run: echo "::set-output name=date::$(date +'%Y-%m-%d--%M-%S')"
     - name: Build Docker Image
       run: |
-        docker build . --file /src/Dockerfile --tag $DOCKERHUB_USERNAME/$REPOSITORY_NAME:${{ steps.date.outputs.date }}
+        cd reputationmanagement.be.web/
+        docker build . -t $DOCKERHUB_USERNAME/$REPOSITORY_NAME:${{ steps.date.outputs.date }}
     - name: Push Docker Image to Docker Hub
       run: docker push $DOCKERHUB_USERNAME/$REPOSITORY_NAME:${{ steps.date.outputs.date }}
     - name: Deploy package to your instance

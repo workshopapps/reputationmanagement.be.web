@@ -49,7 +49,11 @@ namespace src.Controllers
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         public ActionResult UpdateReview(ReviewForUpdateDTO review)
         {
-           _reviewRepo.UpdateReviewLawyer(review);
+           var reviews =_reviewRepo.UpdateReviewLawyer(review);
+            if (reviews == null)
+            {
+                return NotFound();
+            }
             return Ok("Review is successfully updated");
         }
         
@@ -102,14 +106,16 @@ namespace src.Controllers
         }
 
 
-        [SwaggerOperation(Summary = "Send email to the reviewer")]
+        [SwaggerOperation(Summary = "Sends email to the user from reviewer")]
         [HttpPost("email/create")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public ActionResult SendEmail(EmailData emailData)
+        public ActionResult SendEmail(EmailDataDto emailData)
         {
+            const string EMAIL_SUBJECT = "Plea for removal of review";
+
             try
             {
-                _emailSender.SendEmailWrapper(emailData);
+                _emailSender.SendEmailAsync(emailData.EmailToId, EMAIL_SUBJECT, emailData.EmailBody);
                 return Ok();
             }
             catch(SmtpCommandException ex)

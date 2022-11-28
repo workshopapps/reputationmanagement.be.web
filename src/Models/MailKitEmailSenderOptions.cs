@@ -1,6 +1,7 @@
 ﻿
 
 using MailKit.Security;
+using src.CustomValidations;
 namespace src.Models
 {
     public class MailKitEmailSenderOptions
@@ -15,6 +16,7 @@ namespace src.Models
 
         public SecureSocketOptions Host_SecureSocketOptions = SecureSocketOptions.Auto;
 
+        [EmailValidator]
         public string Sender_Email { get; set; }
 
         public string Sender_Name { get; set; }

@@ -84,6 +84,21 @@ namespace src.Controllers
             return Ok(singleReview);
         }
 
+        [HttpPost("postreview")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        public IActionResult Postreview(Review review)
+        {
+            if (review == null)
+            {
+                return BadRequest("Review object is not passed or added");
+            }
+
+            _reviewRepo.CreateSaveReview(review);
+
+            return Ok("Review successfully added");
+
+        }
+
         /// <summary>
         /// Deletes All Reviews Associated With this user
         /// </summary>
@@ -101,6 +116,7 @@ namespace src.Controllers
             return Ok();
         }
 
+
         [SwaggerOperation(Summary = "Create Complaint for each User.")]
         [HttpPost]
         [Route("CreateComplaint")]
@@ -114,6 +130,20 @@ namespace src.Controllers
                 return NoContent();
 
             return Ok(query);
+
+        [HttpGet("GetUpdatedReviews")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        public IActionResult GetUpdatedReviews(Guid UserId)
+        {
+            var updatedReviews = _reviewRepo.GetUpdatedReviews(UserId);
+
+            if (updatedReviews == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedReviews);
+
         }
 
     }

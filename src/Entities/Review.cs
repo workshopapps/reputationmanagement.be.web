@@ -15,7 +15,10 @@ namespace src.Entities
         [Required]
         public string Email { get; set; }
         [Required]
-        public DateTime TimeStamp { get; set; } 
+        public DateTime TimeStamp { get; set; }
+        [Required]
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         [Required]
         public string ReviewString { get; set; }
         [Required]

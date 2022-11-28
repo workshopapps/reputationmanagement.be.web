@@ -9,8 +9,8 @@ on:
       - development
       
 env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   REPOSITORY_NAME: ${{ secrets.REPOSITORY_NAME}}
 
 jobs:
@@ -39,16 +39,15 @@ jobs:
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
-        username: $DOCKER_USERNAME
-        password: $DOCKER_TOKEN
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Get Current Date
       id: date
       run: echo "::set-output name=date::$(date +'%Y-%m-%d--%M-%S')"
     - name: Build Docker Image
-      run: docker build . --file Dockerfile --tag $DOCKER_USERNAME/$REPOSITORY_NAME:${{ steps.date.outputs.date }}
+      run: docker build . --file Dockerfile --tag $DOCKERHUB_USERNAME/$REPOSITORY_NAME:${{ steps.date.outputs.date }}
     - name: Push Docker Image to Docker Hub
-      run: docker push $DOCKER_USERNAME/$REPOSITORY_NAME:${{ steps.date.outputs.date }}
-      
+      run: docker push $DOCKERHUB_USERNAME/$REPOSITORY_NAME:${{ steps.date.outputs.date }}
     - name: Deploy package to your instance
       uses: appleboy/ssh-action@master
       env:
@@ -59,7 +58,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
-        envs: REPOSITORY_NAME, GITHUB_TOKEN
+        envs: GITHUB_NAME, GITHUB_TOKEN
         script: |
           cd reputationmanagement.be.web/
           docker stop $(docker ps -qf expose=3000)

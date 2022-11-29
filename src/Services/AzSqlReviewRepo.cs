@@ -212,18 +212,24 @@ namespace src.Services
                 .Where(x => x.Priority.Equals(priority));
         }
 
-        public void CreateSaveReview(Review review)
+        public void CreateSaveReview(Guid userId, ReviewForCreationDto review)
         {
-            if (review.UserId == Guid.Empty)
+            if (userId == Guid.Empty)
             {
-                throw new ArgumentNullException(nameof(review));
+                throw new ArgumentNullException(nameof(userId));
             }
 
             if (review == null)
             {
                 throw new ArgumentNullException(nameof(review));
             }
-            _context.Reviews.Add(review);
+            _context.Reviews.Add(new Review
+            {
+                Email = review.Email,
+                ReviewString = review.ReviewString,
+                Status = review.Status,
+                Priority = review.Priority
+            });
             _context.SaveChanges();
         }
 

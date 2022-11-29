@@ -5,9 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
+using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
+using static src.Models.ExampleModels.CreateReviewForCustomersExample;
 
 namespace src.Controllers
 {
@@ -84,16 +87,29 @@ namespace src.Controllers
             return Ok(singleReview);
         }
 
+        [SwaggerOperation(Summary = "Create or Post a Review")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(400, typeof(BadCreateReviewExample))]
+        [SwaggerResponseExample(200, typeof(GoodCreateReviewExample))]
         [HttpPost("postreview")]
-        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        public IActionResult Postreview(Review review)
+        //[Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        public IActionResult Postreview(ReviewForCreationDto review)
         {
+            // get user Id From request
+            var userId = new Guid(HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            if (userId == Guid.Empty)
+            {
+                return BadRequest("No userid is passed");
+            }
+
             if (review == null)
             {
                 return BadRequest("Review object is not passed or added");
             }
 
-            _reviewRepo.CreateSaveReview(review);
+            _reviewRepo.CreateSaveReview(userId, review);
 
             return Ok("Review successfully added");
 

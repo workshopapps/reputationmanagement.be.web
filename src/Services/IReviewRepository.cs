@@ -11,7 +11,7 @@ namespace src.Services
 
         IEnumerable<Review> GetReviews(int pageNumber, int pageSize);
 
-        public void CreateSaveReview(Review review);
+        public void CreateSaveReview(Guid userId, ReviewForCreationDto review);
 
         public void AddReview(Review review);
 

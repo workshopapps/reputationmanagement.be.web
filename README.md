@@ -156,6 +156,15 @@ To get a local copy up and running follow these simple example steps.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- Database Migration Guide for Backend devs-->
+### Database Migration Guide for Backend Devs
+
+1. Download and install [PostgreSQL](www.postgresql.org/download). 
+2. Please ensure PgAdmin is checked during installation.
+3. Change connection strings in appsetting.Development.json (Replace <YourNpgName> with your username and <YourNpgPassword> with your password)
+4. Update database
+
+
 
 <!-- CONTACT -->
 ## Contact

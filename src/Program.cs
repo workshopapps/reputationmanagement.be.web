@@ -73,12 +73,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var AuthConnString = builder.Configuration.GetConnectionString("DefaultAuthConnection");
+var connstring = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<AppIdentityDbContext>(options => {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultAuthConnection"));
+    options.UseMySql(AuthConnString, ServerVersion.AutoDetect(AuthConnString));
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseMySql(connstring, ServerVersion.AutoDetect(connstring));
 });
 
 // Use role base auth.

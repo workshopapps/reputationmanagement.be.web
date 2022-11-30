@@ -59,16 +59,33 @@ namespace src.Controllers
         /// <param name="CreateReview"></param>
         /// <returns></returns>
         [SwaggerOperation(Summary = "Create a Review with this endpoint")]
-        [HttpGet("create")]
-        public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
+        [HttpPost("create")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        public IActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
-            // use this to get user Id From request and 
-            //  var userId = new Guid(HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
-
-            return Ok();
+            var review = _reviewRepo.CreateReviews(reviewForCreationDto);
+            return Ok(review);
+           
         }
 
-        [HttpGet("/api/reviews/{reviewId}")]
+        [SwaggerOperation(Summary = "Update a review by an Admin")]
+        [HttpPut]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [Route("{reviewId}/update")]
+        public ActionResult EditReview([FromBody] ReviewForUpdateDTO review)
+        {
+
+            var reviews = _reviewRepo.UpdateReviewLawyer(review);
+            if (review == null)
+            {
+                return NotFound();
+            }
+            return Ok("Review is successfully updated");
+
+        }
+
+
+            [HttpGet("/api/reviews/{reviewId}")]
         [Authorize(Roles = "Customer", AuthenticationSchemes ="Bearer")]
         public IActionResult GetSingleReview(Guid reviewId)
         {
@@ -102,18 +119,21 @@ namespace src.Controllers
         /// <summary>
         /// Deletes All Reviews Associated With this user
         /// </summary>
-        /// <returns>Ok</returns>
-        [SwaggerOperation(Summary = "Deletes All Reviews Associated With this user")]
-        [HttpDelete("reviews/delete-all-reviews")]
-        public IActionResult DeleteReviews()
+        /// <param name="reviewId"></param>
+        /// <returns>Review is successfully deleted</returns>
+        [SwaggerOperation(Summary = "delete a review by an User")]
+        [HttpDelete]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [Route("review/{reviewId}/delete")]
+        public IActionResult DeleteReviews(Guid reviewId)
         {
-            //todo
-            var userId = new Guid(HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
-
-            _reviewRepo.DeleteReviews(userId);
-            _reviewRepo.Save();
-
-            return Ok();
+            _reviewRepo.DeleteReview(reviewId);
+           var result = _reviewRepo.Save();
+            if (!result)
+            {
+                return NotFound("Data not found");
+            }
+            return Ok("Review is successfully deleted");
         }
 
 
@@ -146,6 +166,8 @@ namespace src.Controllers
             return Ok(updatedReviews);
 
         }
+
+      
 
     }
 }

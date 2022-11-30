@@ -95,6 +95,7 @@ namespace src.Services
         public void DeleteReview(Guid reviewId)
         {
             Review review = GetReviewById(reviewId);
+            
             _context.Reviews.Remove(review);
         }
 

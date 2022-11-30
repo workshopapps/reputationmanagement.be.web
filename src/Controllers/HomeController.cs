@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
+using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
 
 namespace src.Controllers
@@ -59,6 +61,9 @@ namespace src.Controllers
         /// <param name="CreateReview"></param>
         /// <returns></returns>
         [SwaggerOperation(Summary = "Create a Review with this endpoint")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("create")]
         public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
@@ -132,6 +137,14 @@ namespace src.Controllers
             return Ok(query);
         }
 
+
+
+
+
+        [SwaggerOperation(Summary = "Notify user when a review's status changes ")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("GetUpdatedReviews")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         public IActionResult GetUpdatedReviews(Guid UserId)

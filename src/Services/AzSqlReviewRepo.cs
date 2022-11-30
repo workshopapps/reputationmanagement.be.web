@@ -5,6 +5,7 @@ using src.Data;
 using src.Entities;
 using src.Models.Dtos;
 using System.Collections;
+using System.Linq;
 
 namespace src.Services
 {
@@ -237,7 +238,7 @@ namespace src.Services
                     Email = r.Email,
                     ReviewString = r.ReviewString,
                     Status = r.Status,
-                    TimeStamp = r.TimeStamp,
+                    UpdatedAt = r.UpdatedAt,
                 }).ToListAsync();
 
             if (reviews == null)

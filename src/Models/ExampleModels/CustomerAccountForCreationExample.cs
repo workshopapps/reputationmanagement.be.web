@@ -36,7 +36,6 @@ namespace src.Models.ExampleModels
                    Email = "Qwerty@example",
                    Password = "Secret123"
                });
-
         }
     }
 }

@@ -156,6 +156,15 @@ To get a local copy up and running follow these simple example steps.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- Database Migration Guide for Backend devs-->
+### Database Migration Guide for Backend Devs
+
+1. Download and install [MySql](https://dev.mysql.com/downloads/). 
+2. Please select the developer option when installing.
+3. Change connection strings in appsetting.Development.json (Replace <user> with your username (the default is root) and <password> with your password)
+4. Update database
+
+
 
 <!-- CONTACT -->
 ## Contact

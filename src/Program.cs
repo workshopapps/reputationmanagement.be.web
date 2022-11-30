@@ -73,11 +73,16 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppIdentityDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_SQL_1F63A_CONNECTIONSTRING")));
+var AuthConnString = builder.Configuration.GetConnectionString("DefaultAuthConnection");
+var connstring = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING")));
+builder.Services.AddDbContext<AppIdentityDbContext>(options => {
+    options.UseMySql(AuthConnString, ServerVersion.AutoDetect(AuthConnString));
+});
+
+builder.Services.AddDbContext<ApplicationDbContext>(options => {
+    options.UseMySql(connstring, ServerVersion.AutoDetect(connstring));
+});
 
 // Use role base auth.
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
@@ -147,7 +152,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// await SeedDb.Seed(app, app.Configuration);
+await SeedDb.Seed(app, app.Configuration);
 
 app.Run();
 

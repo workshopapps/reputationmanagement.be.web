@@ -24,8 +24,8 @@ namespace src.Services
         // Add more CRUD
 
         IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews();
-        
-        Review UpdateReviewLawyer( ReviewForUpdateDTO review);
+
+        Task<Review> UpdateReviewLawyer(ReviewForUpdateDTO review);
 
         Task<List<SuccessfulReviewsDto>> GetAllSuccessfulReview();
 

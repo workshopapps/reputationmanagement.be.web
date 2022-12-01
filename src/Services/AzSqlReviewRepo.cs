@@ -1,4 +1,6 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using src.Data;
@@ -12,14 +14,18 @@ namespace src.Services
     {
         public readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        public readonly IEmailSender _emailSender;
+        public readonly UserManager<ApplicationUser> _userManager;
 
 
         public IQueryable<Review> Reviews => throw new NotImplementedException();
 
-        public AzSqlReviewRepo(ApplicationDbContext context, IMapper mapper)
+        public AzSqlReviewRepo(ApplicationDbContext context, IMapper mapper, IEmailSender emailSender, UserManager<ApplicationUser> userManager)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapper = mapper;
+            _emailSender = emailSender;
+            _userManager = userManager;
         }
 
        
@@ -127,17 +133,22 @@ namespace src.Services
             }
         }
 
-        public Review UpdateReviewLawyer( ReviewForUpdateDTO review)
+        public async Task<Review> UpdateReviewLawyer(ReviewForUpdateDTO review)
         {
             if (review == null)
             {
                 throw new NotImplementedException("No review is passed");
             }
-            var reviewToUpdate = _context.Reviews.Where(c => c.ReviewId == review.ReviewId).SingleOrDefault();
+            var reviewToUpdate = _context.Reviews.Where(c => c.ReviewId == review.ReviewId).FirstOrDefault();
 
             reviewToUpdate.ReviewString = review.ReviewString;
             reviewToUpdate.Status = review.Status;
             reviewToUpdate.UpdatedAt = DateTime.Now;
+
+            //var userEmail = _contextI.Users.FirstOrDefault(x => x.Id == reviewToUpdate.UserId.ToString()).Email;
+            var user = await _userManager.FindByIdAsync(reviewToUpdate.UserId.ToString());
+
+            await _emailSender.SendEmailAsync(user.Email, "Congrats it works", "Message received");
 
             Save();
 

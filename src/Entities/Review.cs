@@ -19,6 +19,7 @@ namespace src.Entities
        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; }
+        public DateTime ViewLastTime { get; set; }
         [Required]
         public string ReviewString { get; set; }
         [Required]

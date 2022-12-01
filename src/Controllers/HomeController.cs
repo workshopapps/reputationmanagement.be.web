@@ -89,6 +89,10 @@ namespace src.Controllers
             return Ok(singleReview);
         }
 
+        [SwaggerOperation(Summary = "Create a Review with this endpoint")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("postreview")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         public IActionResult Postreview(Review review)

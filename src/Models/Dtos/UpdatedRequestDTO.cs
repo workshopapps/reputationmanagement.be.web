@@ -11,6 +11,7 @@ namespace src.Models.Dtos
         public DateTime TimeStamp { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        //public DateTime ViewLastTime { get; set; }
         public string ReviewString { get; set; }
         public StatusType Status { get; set; }
     }

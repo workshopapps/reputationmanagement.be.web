@@ -93,10 +93,15 @@ namespace src.Services
             return reviews;
         }
 
-        public void DeleteReview(Guid reviewId)
+        public bool DeleteReview(Guid reviewId)
         {
             Review review = GetReviewById(reviewId);
+            if (review == null)
+            {
+                return false;
+            }
             _context.Reviews.Remove(review);
+            return true;
         }
 
         /// <summary>

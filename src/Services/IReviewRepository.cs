@@ -15,7 +15,7 @@ namespace src.Services
 
         public void AddReview(Review review);
 
-        public void DeleteReview(Guid id);
+        public bool DeleteReview(Guid id);
 
         public void DeleteReviews(Guid userId);
 

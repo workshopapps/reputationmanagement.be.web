@@ -53,20 +53,8 @@ namespace src.Controllers
             return Ok();
         }
 
-        /// <summary>
-        /// Create a Review with this endpoint
-        /// </summary>
-        /// <param name="CreateReview"></param>
-        /// <returns></returns>
-        [SwaggerOperation(Summary = "Create a Review with this endpoint")]
-        [HttpGet("create")]
-        public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
-        {
-            // use this to get user Id From request and 
-            //  var userId = new Guid(HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
-
-            return Ok();
-        }
+     
+      
 
         [HttpGet("/api/reviews/{reviewId}")]
         [Authorize(Roles = "Customer", AuthenticationSchemes ="Bearer")]
@@ -83,6 +71,84 @@ namespace src.Controllers
 
             return Ok(singleReview);
         }
+
+        /// <summary>
+        /// Create a Review with this endpoint
+        /// </summary>
+        /// <param name="CreateReview"></param>
+        /// <returns></returns>
+        [SwaggerOperation(Summary = "Create a Review with this endpoint")]
+        [HttpPost("review")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
+        {
+            var review = _reviewRepo.CreateReviews(reviewForCreationDto);
+            return Ok(review);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="review"></param>
+        /// <returns>Review is successfully updated</returns>
+
+        [SwaggerOperation(Summary = "Update a review by an User")]
+        [HttpPut]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [Route("{reviewId}/edit")]
+        public ActionResult EditReview([FromBody] ReviewForUpdateDTO review)
+        {
+
+            var reviews = _reviewRepo.UpdateReviewLawyer(review);
+            if (review == null)
+            {
+                return NotFound();
+            }
+            return Ok("Review is successfully updated");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reviewId"></param>
+        /// <returns>Review is successfully deleted</returns>
+        [SwaggerOperation(Summary = "delete a review by a user")]
+        [HttpDelete]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [Route("{reviewId}")]
+        public ActionResult DeleteReview(Guid reviewId)
+        {
+
+            var result = _reviewRepo.DeleteReview(reviewId);
+            if (!result)
+            {
+                return NotFound();
+            }
+            _reviewRepo.Save();
+            return Ok("Review is successfully deleted");
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>Reviews successfully deleted</returns>
+        [SwaggerOperation(Summary = "delete multiple reviews by a User")]
+        [HttpDelete]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [Route("{userId}")]
+        public ActionResult DeleteReviews(Guid userId)
+        {
+
+          _reviewRepo.DeleteReviews(userId); 
+            _reviewRepo.Save();
+            return Ok("Reviews successfully deleted");
+        }
+
+
+        
+
 
         [HttpPost("postreview")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]

@@ -151,9 +151,10 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("GetUpdatedReviews")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        public IActionResult GetUpdatedReviews(Guid UserId)
-        {
-            var updatedReviews = _reviewRepo.GetUpdatedReviews(UserId);
+        public IActionResult GetUpdatedReviews()
+        {            
+            var userId = Guid.Parse(((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.NameIdentifier).Value);
+            var updatedReviews = _reviewRepo.GetUpdatedReviews(userId);
 
             if (updatedReviews == null)
             {

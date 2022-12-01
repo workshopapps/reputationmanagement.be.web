@@ -227,36 +227,48 @@ namespace src.Services
             _context.Reviews.Add(review);
             _context.SaveChanges();
         }
-
+        /// <summary>
+        /// Get the all updated reveiws user, and update the ViewLastTime of the review
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<UpdatedRequestDTO>> GetUpdatedReviews(Guid UserId)
         {
             var reviews = await _context.Reviews
-                .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt && _x.UpdatedAt >= _x.ViewLastTime)
-                .Select(r => new UpdatedRequestDTO
-                {
-                    ReviewId = r.ReviewId,
-                    Email = r.Email,
-                    ReviewString = r.ReviewString,
-                    Status = r.Status,
-                    TimeStamp = r.TimeStamp,
-                    CreatedAt = r.CreatedAt,
-                    UpdatedAt = r.UpdatedAt,
-                }).ToListAsync();
-                // Update the ViewLastTime to the UpdatedAt when this endpoint is called
-                var updateReview = await _context.Reviews.ToListAsync();
-                foreach (var r in updateReview)
-                {
-                    if (r.UserId == UserId)
-                    {
-                        r.ViewLastTime = r.UpdatedAt;
-                    }
-                }
-                await _context.SaveChangesAsync();
-            if (reviews == null)
+                .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt && _x.UpdatedAt > _x.ViewLastTime).ToListAsync();
+            var r = _mapper.Map<IEnumerable<UpdatedRequestDTO>>(reviews);
+            await _context.SaveChangesAsync();
+            if (r is null)
             {
                 return Enumerable.Empty<UpdatedRequestDTO>();
             }
-            return reviews;
+            return r;
+
+
+            //var r = new List<UpdatedRequestDTO>();
+            //var reviews = await _context.Reviews
+            //    .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt && _x.UpdatedAt > _x.ViewLastTime).ToListAsync();
+            //foreach (var item in reviews)
+            //{
+            //    var ur = new UpdatedRequestDTO()
+            //    {
+            //        ReviewId = item.ReviewId,
+            //        Email = item.Email,
+            //        ReviewString = item.ReviewString,
+            //        Status = item.Status,
+            //        TimeStamp = item.TimeStamp,
+            //        CreatedAt = item.CreatedAt,
+            //        UpdatedAt = item.UpdatedAt,
+            //    };
+            //    r.Add(ur);
+            //    item.ViewLastTime = item.UpdatedAt;
+            //}
+            //await _context.SaveChangesAsync();
+            //if (r is null)
+            //{
+            //    return Enumerable.Empty<UpdatedRequestDTO>();
+            //}
+            //return r;
         }
     }
 }

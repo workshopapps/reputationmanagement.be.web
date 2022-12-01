@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
+using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
 
 namespace src.Controllers
@@ -19,12 +21,16 @@ namespace src.Controllers
     {
         private readonly IReviewRepository _reviewRepo;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager; 
 
         public HomeController(IReviewRepository reviewRepo, 
             UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper)
         {
             _reviewRepo = reviewRepo;
             _mapper = mapper;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -213,5 +219,39 @@ namespace src.Controllers
 
         }
 
+        /// <summary>
+        /// Gets the language preference of the currently signed in user
+        /// </summary>
+        /// <returns>The Language preference of the signed in user</returns>
+        [HttpGet("customer/language")]
+        [SwaggerOperation(Summary = "Gets the language preference of the currently signed in user")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLanguage()
+        {
+            var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value; 
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            return Ok(user.Language);
+        }
+
+        [HttpPost("customer/language")]
+        [SwaggerOperation(Summary = "Sets the language preference of the currently signed in user, select one of {\"english\", \"german\", \"russian\", \"chinese\"}")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult> SetLanguage([FromQuery] string language)
+        {
+            List<string> listOfSupportedLanguages = new() { "english", "german", "russian", "chinese" };
+            
+            if (listOfSupportedLanguages.Contains(language.ToLowerInvariant()))
+            {
+                var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                user.Language = language.ToLowerInvariant();
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (updateResult.Succeeded)
+                {
+                    return CreatedAtAction("GetLanguage", language);
+                }
+            }
+            return BadRequest("Invalid language string, please select one of {\"english\", \"german\", \"russian\", \"chinese\"}");
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace src.Models.ExampleModels
                 yield return SwaggerExample.Create("Good input that will return Ok + your auth token",
                     new UserLoginModel()
                     {
-                        Email = "youraccountcreationemail@example.com",
+                        Email = "testcustomer@example.com",
                         Password = "Secret123$"
                     });
             }

@@ -6,6 +6,6 @@ namespace src.Entities
     {
 
         public string PostAddress { get; set; }
-        
+        public string Language { get; set; } = "english";
     }
 }

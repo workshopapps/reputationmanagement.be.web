@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
+using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
 
 namespace src.Controllers
@@ -59,7 +61,7 @@ namespace src.Controllers
         /// <param name="CreateReview"></param>
         /// <returns></returns>
         [SwaggerOperation(Summary = "Create a Review with this endpoint")]
-        [HttpPost("create")]
+        [HttpPost("review")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         public IActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
@@ -68,10 +70,15 @@ namespace src.Controllers
            
         }
 
-        [SwaggerOperation(Summary = "Update a review by an Admin")]
+        [SwaggerOperation(Summary = "Update a review by an user")]
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(400, typeof(BadCustomerAccountForCreationExample))]
+        [SwaggerResponseExample(200, typeof(GoodCustomerAccountForCreationExample))]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("{reviewId}/update")]
+        [Route("{reviewId}")]
         public ActionResult EditReview([FromBody] ReviewForUpdateDTO review)
         {
 
@@ -124,15 +131,16 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "delete a review by an User")]
         [HttpDelete]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("review/{reviewId}/delete")]
+        [Route("review/{reviewId}")]
         public IActionResult DeleteReviews(Guid reviewId)
         {
-            _reviewRepo.DeleteReview(reviewId);
-           var result = _reviewRepo.Save();
+           var result = _reviewRepo.DeleteReview(reviewId);
+          
             if (!result)
             {
                 return NotFound("Data not found");
             }
+            _reviewRepo.Save();
             return Ok("Review is successfully deleted");
         }
 

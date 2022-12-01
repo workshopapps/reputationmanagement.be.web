@@ -43,8 +43,8 @@ namespace src.Services
             {
                 if (id == Guid.Empty)
                 {
-                    throw new ArgumentNullException(nameof(id));
-                }
+                    return null;
+            }
             var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
                 return review;
             }
@@ -91,12 +91,22 @@ namespace src.Services
             }
             return reviews;
         }
+        /// <summary>
+        /// Deletes All Reviews Associated With this user
+        /// </summary>
+        /// <param name="reviewId"></param>
+        /// <returns></returns>
 
-        public void DeleteReview(Guid reviewId)
+        public bool DeleteReview(Guid reviewId)
         {
             Review review = GetReviewById(reviewId);
-            
+            if (review == null)
+            {
+                return false;
+            }
             _context.Reviews.Remove(review);
+            return true;
+            
         }
 
         /// <summary>

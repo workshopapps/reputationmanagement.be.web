@@ -172,6 +172,18 @@ namespace src.Services
             return resultModel;
         }
 
+        public IEnumerable<Review> GetReviewByStatusType(StatusType status)
+        {
+            return _context.Reviews
+            .Where(s => s.Status.Equals(status));
+        }
+
+        public IEnumerable<Review> GetPendingReview()
+        {
+            return _context.Reviews
+            .Where(p => p.Status == StatusType.PendingReview);
+        }
+
 
         public async Task<UserComplains> PostUserComplains(CreateUserComplainsDto complains)
         {

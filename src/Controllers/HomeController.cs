@@ -94,7 +94,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Update a review by an User")]
         [HttpPut]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("{reviewId}/edit")]
+        [Route("review/{reviewId}")]
         public ActionResult EditReview([FromBody] ReviewForUpdateDTO review)
         {
 
@@ -114,7 +114,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "delete a review by a user")]
         [HttpDelete]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("{reviewId}")]
+        [Route("review/{reviewId}")]
         public ActionResult DeleteReview(Guid reviewId)
         {
 
@@ -136,7 +136,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "delete multiple reviews for the signed in customer")]
         [HttpDelete]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("reviews/{userId}")]
+        [Route("reviews/")]
         public async Task<ActionResult> DeleteReviews()
         {
             var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;

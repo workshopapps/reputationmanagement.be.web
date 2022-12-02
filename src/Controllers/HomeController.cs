@@ -71,8 +71,11 @@ namespace src.Controllers
         /// <param name="CreateReview"></param>
         /// <returns></returns>
         [SwaggerOperation(Summary = "Create a Review with this endpoint")]
-        [HttpPost("review")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost("review")]
         public async Task<ActionResult> CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
             var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
@@ -92,12 +95,13 @@ namespace src.Controllers
         /// <returns>Review is successfully updated</returns>
 
         [SwaggerOperation(Summary = "Update a review by an User")]
-        [HttpPut]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("review/{reviewId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPut("review/{reviewId}")]
         public ActionResult EditReview([FromBody] ReviewForUpdateDTO review)
         {
-
             var reviews = _reviewRepo.UpdateReviewLawyer(review);
             if (review == null)
             {
@@ -111,10 +115,12 @@ namespace src.Controllers
         /// </summary>
         /// <param name="reviewId"></param>
         /// <returns>Review is successfully deleted</returns>
-        [SwaggerOperation(Summary = "delete a review by a user")]
-        [HttpDelete]
+        [SwaggerOperation(Summary = "delete a review by a customer")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("review/{reviewId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpDelete("review/{reviewId}")]
         public ActionResult DeleteReview(Guid reviewId)
         {
 
@@ -132,11 +138,13 @@ namespace src.Controllers
         /// 
         /// </summary>
         /// <param name="userId"></param>
-        /// <returns>Reviews successfully deleted</returns>
-        [SwaggerOperation(Summary = "delete multiple reviews for the signed in customer")]
-        [HttpDelete]
+        /// <returns>Reviews successfully deleted</returns>     
+        [SwaggerOperation(Summary = "delete multiple reviews by a Customer")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("reviews/")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpDelete("reviews")]
         public async Task<ActionResult> DeleteReviews()
         {
             var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
@@ -162,7 +170,7 @@ namespace src.Controllers
             return Ok(query);
         }
 
-        [HttpGet("GetUpdatedReviews")]
+        [HttpGet("reviews/updates")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         public IActionResult GetUpdatedReviews(Guid UserId)
         {

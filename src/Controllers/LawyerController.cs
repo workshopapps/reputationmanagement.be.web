@@ -17,6 +17,7 @@ using System.Text.Json;
 
 namespace src.Controllers
 {
+    [SwaggerTag("For Lawyer Authorization")]
     [ApiController]
     [Route("api/lawyer")]
     [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
@@ -70,7 +71,12 @@ namespace src.Controllers
            return Ok(query);
         }
 
-
+        /// <summary>
+        /// Provides all the reviews for the lawyer, with pagination to avoid query delay
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         [SwaggerOperation(Summary = "Get all reviews for Lawyer")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
@@ -108,6 +114,47 @@ namespace src.Controllers
             var inconclusiveReviews = _reviewRepo.GetInconclusiveReviews();
             return Ok(inconclusiveReviews);
         }
+
+        /// <summary>
+        /// Gets all the pending reviews
+        /// </summary>
+        /// <returns>Pending reviews</returns>
+
+        [SwaggerOperation(Summary = "Get All Pending Reviews")]
+        [HttpGet("PendingReview")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+
+        public IActionResult UnclaimedReviews()
+        {
+            var pendingReview = _reviewRepo.GetPendingReview();
+            if (pendingReview == null)
+            {
+                return NotFound("No pending reviews");
+            }
+            return Ok(pendingReview);
+        }
+
+        /// <summary>
+        /// Get Reviews by Status Type
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns>Reviews of the same statusType Provided</returns>
+        [SwaggerOperation(Summary = "Reviews By StatusType, PendingReview = 0, Successful = 1, Inconclusive = 2, Failed = 3")]
+        [HttpGet("GetReviewByStatus")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        public IActionResult GetReviewByStatus(StatusType status)
+        {
+            var reviewByStatus = _reviewRepo.GetReviewByStatusType(status);
+
+            if (reviewByStatus == null)
+            {
+                return NotFound("No reviews with this status");
+            }
+
+            return Ok(reviewByStatus);
+
+        }
+
 
 
         [SwaggerOperation(Summary = "Sends email to the user from reviewer")]

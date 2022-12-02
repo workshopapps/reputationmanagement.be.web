@@ -8,7 +8,7 @@ namespace src.Models.Dtos
         [Required]
         public Guid ReviewId { get; set; }
         [Required]
-        public string ReviewString { get; set; }
+        public string ReviewString { get; set; } 
         [Required]
         public StatusType Status { get; set; }
         [Required]

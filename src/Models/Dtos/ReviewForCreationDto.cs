@@ -5,7 +5,8 @@ namespace src.Models.Dtos
 {
     public class ReviewForCreationDto
     {
-        [Required]
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress]
         public string Email { get; set; }
         [Required]
         public string ReviewString { get; set; }

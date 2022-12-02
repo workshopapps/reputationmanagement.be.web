@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using src.Entities;
@@ -23,12 +25,18 @@ namespace src.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfigurationSection _jwtSettings;
+        private readonly IPasswordValidator<ApplicationUser> _passwordValidator;
+        private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
 
-        public UserAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public UserAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
+             IPasswordValidator<ApplicationUser> passwordValidator,
+                IPasswordHasher<ApplicationUser> passwordHasher)
         {
             _mapper = mapper;
             _userManager = userManager;
             _jwtSettings = configuration.GetSection("JwtSettings");
+            _passwordValidator = passwordValidator;
+            _passwordHasher = passwordHasher;
         }
 
         /// <returns>User's Auth token if successful.</returns>
@@ -105,6 +113,48 @@ namespace src.Controllers
             {
                 return BadRequest("Username and password don't match");
             }
+        }
+
+        /// <returns>Use bearer auth token</returns>
+        /// <response code="200">Returns OK with the raw auth token as the only content.</response>
+        /// <response code="400">If the authentication was unsuccessful.</response>
+        [SwaggerOperation(Summary = "Changes password for user that is logged in")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [SwaggerResponseExample(400, typeof(BadSignInDetailsForCustomer))]
+        [SwaggerResponseExample(200, typeof(GoodSignInDetailsForCustomer))]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [HttpPost("change_password")]
+        public async Task<IActionResult> ChangePassword([FromBody] PasswordChangeModelForSignedInUser passwordResetModel)
+        {
+
+            //string? userEmail = HttpContext.User.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.Email).Value;
+            var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            var passwordValidatorResult = await _passwordValidator.ValidateAsync(_userManager, user, passwordResetModel.OldPassword);
+
+            if (passwordValidatorResult.Succeeded)
+            {
+                user.PasswordHash = _passwordHasher.HashPassword(user, passwordResetModel.NewPassword);
+                IdentityResult updatePasswordResult = await _userManager.UpdateAsync(user);
+                
+                if (updatePasswordResult.Succeeded) { return Ok("Password changed successfully"); }
+                else
+                {
+                    return BadRequest("the new password is faulty");
+                }
+            }
+            else
+            {
+                foreach (IdentityError error in passwordValidatorResult.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+
+            return BadRequest();
+
+
         }
 
         private SigningCredentials GetSigningCredentials()

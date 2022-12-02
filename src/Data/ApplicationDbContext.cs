@@ -13,5 +13,7 @@ namespace src.Data
 
         public DbSet<UserComplains> UserComplaint { get; set; }
 
+        public DbSet<ChallengeReview> challengeReviews { get; set; }
+
     }
 }

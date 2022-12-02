@@ -40,5 +40,7 @@ namespace src.Services
 
         Task<IEnumerable<UpdatedRequestDTO>> GetUpdatedReviews(Guid UserId);
 
+        Task<ChallengeReview> PostChallengeReview (ChallengeUserReviewDto challenge);
+
     }
 }

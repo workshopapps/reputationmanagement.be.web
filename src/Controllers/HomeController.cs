@@ -185,6 +185,22 @@ namespace src.Controllers
 
         }
 
+
+        [HttpPost]
+        [Route("PostChallengeReviews")]
+        public IActionResult CreateChallengeReviews(ChallengeUserReviewDto challenge)
+        {
+            if (challenge == null)
+                return NoContent();
+
+            var query = _reviewRepo.PostChallengeReview(challenge);
+            if (query == null)
+                return NoContent();
+
+            return Ok(query);
+        }
+
+
         /// <summary>
         /// Gets the language preference of the currently signed in user
         /// </summary>

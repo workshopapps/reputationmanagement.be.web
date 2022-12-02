@@ -264,6 +264,21 @@ namespace src.Services
             }
             return reviews;
         }
+
+        public async Task<ChallengeReview> PostChallengeReview (ChallengeUserReviewDto challenge)
+        {
+            var model = new ChallengeReview()
+            {
+                ReviewId = challenge.ReviewId,
+                UserId = challenge.UserId,
+                ComplaintMessage = challenge.ComplaintMessage
+            };
+
+            var savemodel = await _context.challengeReviews.AddAsync(model);
+            Save();
+
+            return model;
+        }
     }
 }
 

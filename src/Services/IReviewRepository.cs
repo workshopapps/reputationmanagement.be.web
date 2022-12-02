@@ -32,7 +32,7 @@ namespace src.Services
 
         Task<UserComplains> PostUserComplains(CreateUserComplainsDto model);
 
-        ReviewForDisplayDto CreateReviews(ReviewForCreationDto review);
+        ReviewForDisplayDto CreateReview(Review review);
         IEnumerable<Review> GetAllReviews(int pageNumber = 0, int pageSize = 0);
         IEnumerable<Review> GetReviewByPropirity(PriorityType priority);
 

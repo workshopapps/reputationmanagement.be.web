@@ -188,12 +188,12 @@ namespace src.Services
 
             return data;
         }
-        public ReviewForDisplayDto CreateReviews(ReviewForCreationDto review)
+        public ReviewForDisplayDto CreateReview(Review review)
         {
-            var reviewEntity = _mapper.Map<Review>(review);
-            _context.Reviews.Add(reviewEntity);
-            var reviewToReturn = _mapper.Map<ReviewForDisplayDto>(reviewEntity);
-            _context.SaveChanges();
+            
+            _context.Reviews.Add(review);
+            var reviewToReturn = _mapper.Map<ReviewForDisplayDto>(review);
+            Save();
             return reviewToReturn;
         }
 

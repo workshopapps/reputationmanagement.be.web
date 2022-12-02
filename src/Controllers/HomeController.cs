@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
@@ -45,26 +46,11 @@ namespace src.Controllers
            
             string greetings = "Hello customer!";
             return Ok(greetings);
-        }
-
-        /// <summary>
-        /// Returns the reviews posted by the currently signed in user
-        /// </summary>
-        /// <returns>a list of reviews</returns>
-        [SwaggerOperation(Summary = "Returns the reviews posted by the currently signed in user")]
-        [HttpGet("postedreviews")]
-        public ActionResult<IEnumerable<ReviewForDisplayDto>> PostedReviews()
-        {
-            //todo
-            return Ok();
-        }
-
-     
+        } 
       
-
         [HttpGet("/api/reviews/{reviewId}")]
         [Authorize(Roles = "Customer", AuthenticationSchemes ="Bearer")]
-        public IActionResult GetSingleReview(Guid reviewId)
+        public ActionResult<ReviewForDisplayDto> GetSingleReview(Guid reviewId)
         {
             if (reviewId == Guid.Empty)
             {
@@ -74,8 +60,9 @@ namespace src.Controllers
 
             if (singleReview == null)
                 return NotFound();
-
-            return Ok(singleReview);
+            var reviewForDisplay = _mapper.Map<ReviewForDisplayDto>(singleReview);
+            var json = JsonConvert.SerializeObject(reviewForDisplay);
+            return Ok(json);
         }
 
         /// <summary>
@@ -86,10 +73,16 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Create a Review with this endpoint")]
         [HttpPost("review")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
+        public async Task<ActionResult> CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
-            var review = _reviewRepo.CreateReviews(reviewForCreationDto);
-            return Ok(review);
+            var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
+            var user = await _userManager.FindByEmailAsync(userMail);
+            var userId = new Guid(user.Id);
+            
+            var reviewForCreation = _mapper.Map<Review>(reviewForCreationDto);
+            reviewForCreation.UserId = userId; 
+            var reviewForDisplay = _reviewRepo.CreateReview(reviewForCreation);
+            return CreatedAtAction(nameof(GetSingleReview), new {reviewId = reviewForDisplay.ReviewId}, reviewForDisplay);
         }
 
         /// <summary>

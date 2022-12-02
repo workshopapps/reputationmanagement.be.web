@@ -133,7 +133,7 @@ namespace src.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>Reviews successfully deleted</returns>
-        [SwaggerOperation(Summary = "delete multiple reviews by a User")]
+        [SwaggerOperation(Summary = "delete multiple reviews for the signed in customer")]
         [HttpDelete]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [Route("{userId}")]
@@ -144,43 +144,6 @@ namespace src.Controllers
             _reviewRepo.Save();
             return Ok("Reviews successfully deleted");
         }
-
-
-        
-
-
-        [HttpPost("postreview")]
-        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        public IActionResult Postreview(Review review)
-        {
-            if (review == null)
-            {
-                return BadRequest("Review object is not passed or added");
-            }
-
-            _reviewRepo.CreateSaveReview(review);
-
-            return Ok("Review successfully added");
-
-        }
-
-        /// <summary>
-        /// Deletes All Reviews Associated With this user
-        /// </summary>
-        /// <returns>Ok</returns>
-        [SwaggerOperation(Summary = "Deletes All Reviews Associated With this user")]
-        [HttpDelete("reviews/delete-all-reviews")]
-        public IActionResult DeleteReviews()
-        {
-            //todo
-            var userId = new Guid(HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
-
-            _reviewRepo.DeleteReviews(userId);
-            _reviewRepo.Save();
-
-            return Ok();
-        }
-
 
         [SwaggerOperation(Summary = "Create Complaint for each User.")]
         [HttpPost]

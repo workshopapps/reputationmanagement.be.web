@@ -120,9 +120,6 @@ namespace src.Controllers
         /// <response code="400">If the authentication was unsuccessful.</response>
         [SwaggerOperation(Summary = "Changes password for user that is logged in")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [SwaggerResponseExample(400, typeof(BadSignInDetailsForCustomer))]
-        [SwaggerResponseExample(200, typeof(GoodSignInDetailsForCustomer))]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [HttpPost("change_password")]
         public async Task<IActionResult> ChangePassword([FromBody] PasswordChangeModelForSignedInUser passwordResetModel)

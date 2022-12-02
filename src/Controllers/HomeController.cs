@@ -84,8 +84,11 @@ namespace src.Controllers
         /// <param name="CreateReview"></param>
         /// <returns></returns>
         [SwaggerOperation(Summary = "Create a Review with this endpoint")]
-        [HttpPost("review")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost("review")]
         public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
             var review = _reviewRepo.CreateReviews(reviewForCreationDto);
@@ -99,9 +102,12 @@ namespace src.Controllers
         /// <returns>Review is successfully updated</returns>
 
         [SwaggerOperation(Summary = "Update a review by an User")]
-        [HttpPut]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("{reviewId}/edit")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPut("{reviewId}/edit")]
+        
         public ActionResult EditReview([FromBody] ReviewForUpdateDTO review)
         {
 
@@ -119,9 +125,11 @@ namespace src.Controllers
         /// <param name="reviewId"></param>
         /// <returns>Review is successfully deleted</returns>
         [SwaggerOperation(Summary = "delete a review by a user")]
-        [HttpDelete]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("{reviewId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpDelete("{reviewId}")]
         public ActionResult DeleteReview(Guid reviewId)
         {
 
@@ -141,8 +149,11 @@ namespace src.Controllers
         /// <param name="userId"></param>
         /// <returns>Reviews successfully deleted</returns>
         [SwaggerOperation(Summary = "delete multiple reviews by a User")]
-        [HttpDelete]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpDelete]
         [Route("{userId}")]
         public ActionResult DeleteReviews(Guid userId)
         {

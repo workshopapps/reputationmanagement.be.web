@@ -9,8 +9,10 @@ using src.Entities;
 using src.Helpers;
 using src.Models;
 using src.Models.Dtos;
+using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json;
 
 namespace src.Controllers
@@ -111,14 +113,15 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Sends email to the user from reviewer")]
         [HttpPost("email/create")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public ActionResult SendEmail(EmailDataDto emailData)
+        [SwaggerResponseExample(400, typeof(BadSendingEmailTExample))]
+        [SwaggerResponseExample(200, typeof(GoodSendingEmailTExample))]
+        public ActionResult SendEmail([FromBody]EmailDataDto emailData)
         {
             const string EMAIL_SUBJECT = "Plea for removal of review";
-
             try
             {
                 _emailSender.SendEmailAsync(emailData.EmailToId, EMAIL_SUBJECT, emailData.EmailBody);
-                return Ok();
+                return Ok("Success");
             }
             catch(SmtpCommandException ex)
             {

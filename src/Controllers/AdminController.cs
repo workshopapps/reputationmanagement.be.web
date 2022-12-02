@@ -83,15 +83,15 @@ public class AdminController : ControllerBase
 
     }
 
-    [SwaggerOperation(Summary = "Create a Review with this endpoint")]
-    [HttpPost("create")]
-    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
-    {
-        // use this to get user Id From request and 
-        var review = _reviewRepo.CreateReviews(reviewForCreationDto);
-        return Ok(review);
-    }
+    //[SwaggerOperation(Summary = "Create a Review with this endpoint")]
+    //[HttpPost("create")]
+    //[Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    //public ActionResult CreateReview([FromBody] Review reviewForCreation)
+    //{
+    //    // use this to get user Id From request and 
+    //    var review = _reviewRepo.CreateReview(reviewForCreation);
+    //    return Ok(review);
+    //}
 
     [SwaggerOperation(Summary = "Get all reviews for Admin")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]

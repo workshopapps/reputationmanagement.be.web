@@ -28,11 +28,13 @@ namespace src.Services
         Review UpdateReviewLawyer( ReviewForUpdateDTO review);
 
         Task<List<SuccessfulReviewsDto>> GetAllSuccessfulReview();
+        IEnumerable<Review> GetReviewByStatusType(StatusType status);
+        IEnumerable<Review> GetPendingReview();
 
 
         Task<UserComplains> PostUserComplains(CreateUserComplainsDto model);
 
-        ReviewForDisplayDto CreateReviews(ReviewForCreationDto review);
+        ReviewForDisplayDto CreateReview(Review review);
         IEnumerable<Review> GetAllReviews(int pageNumber = 0, int pageSize = 0);
         IEnumerable<Review> GetReviewByPropirity(PriorityType priority);
 

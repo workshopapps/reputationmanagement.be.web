@@ -2,11 +2,14 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
+using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
 
 namespace src.Controllers
@@ -19,12 +22,16 @@ namespace src.Controllers
     {
         private readonly IReviewRepository _reviewRepo;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager; 
 
         public HomeController(IReviewRepository reviewRepo, 
             UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper)
         {
             _reviewRepo = reviewRepo;
             _mapper = mapper;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -39,26 +46,11 @@ namespace src.Controllers
            
             string greetings = "Hello customer!";
             return Ok(greetings);
-        }
-
-        /// <summary>
-        /// Returns the reviews posted by the currently signed in user
-        /// </summary>
-        /// <returns>a list of reviews</returns>
-        [SwaggerOperation(Summary = "Returns the reviews posted by the currently signed in user")]
-        [HttpGet("postedreviews")]
-        public ActionResult<IEnumerable<ReviewForDisplayDto>> PostedReviews()
-        {
-            //todo
-            return Ok();
-        }
-
-     
+        } 
       
-
-        [HttpGet("/api/reviews/{reviewId}")]
+        [HttpGet("review/{reviewId}")]
         [Authorize(Roles = "Customer", AuthenticationSchemes ="Bearer")]
-        public IActionResult GetSingleReview(Guid reviewId)
+        public ActionResult<ReviewForDisplayDto> GetSingleReview(Guid reviewId)
         {
             if (reviewId == Guid.Empty)
             {
@@ -68,8 +60,9 @@ namespace src.Controllers
 
             if (singleReview == null)
                 return NotFound();
-
-            return Ok(singleReview);
+            var reviewForDisplay = _mapper.Map<ReviewForDisplayDto>(singleReview);
+            var json = JsonConvert.SerializeObject(reviewForDisplay);
+            return Ok(json);
         }
 
         /// <summary>
@@ -78,12 +71,21 @@ namespace src.Controllers
         /// <param name="CreateReview"></param>
         /// <returns></returns>
         [SwaggerOperation(Summary = "Create a Review with this endpoint")]
-        [HttpPost("review")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        public ActionResult CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost("review")]
+        public async Task<ActionResult> CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
-            var review = _reviewRepo.CreateReviews(reviewForCreationDto);
-            return Ok(review);
+            var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
+            var user = await _userManager.FindByEmailAsync(userMail);
+            var userId = new Guid(user.Id);
+            
+            var reviewForCreation = _mapper.Map<Review>(reviewForCreationDto);
+            reviewForCreation.UserId = userId; 
+            var reviewForDisplay = _reviewRepo.CreateReview(reviewForCreation);
+            return CreatedAtAction(nameof(GetSingleReview), new {reviewId = reviewForDisplay.ReviewId}, reviewForDisplay);
         }
 
         /// <summary>
@@ -93,12 +95,13 @@ namespace src.Controllers
         /// <returns>Review is successfully updated</returns>
 
         [SwaggerOperation(Summary = "Update a review by an User")]
-        [HttpPut]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("{reviewId}/edit")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPut("review/{reviewId}")]
         public ActionResult EditReview([FromBody] ReviewForUpdateDTO review)
         {
-
             var reviews = _reviewRepo.UpdateReviewLawyer(review);
             if (review == null)
             {
@@ -112,10 +115,12 @@ namespace src.Controllers
         /// </summary>
         /// <param name="reviewId"></param>
         /// <returns>Review is successfully deleted</returns>
-        [SwaggerOperation(Summary = "delete a review by a user")]
-        [HttpDelete]
+        [SwaggerOperation(Summary = "delete a review by a customer")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("{reviewId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpDelete("review/{reviewId}")]
         public ActionResult DeleteReview(Guid reviewId)
         {
 
@@ -133,55 +138,22 @@ namespace src.Controllers
         /// 
         /// </summary>
         /// <param name="userId"></param>
-        /// <returns>Reviews successfully deleted</returns>
-        [SwaggerOperation(Summary = "delete multiple reviews by a User")]
-        [HttpDelete]
+        /// <returns>Reviews successfully deleted</returns>     
+        [SwaggerOperation(Summary = "delete multiple reviews by a Customer")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("{userId}")]
-        public ActionResult DeleteReviews(Guid userId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpDelete("reviews")]
+        public async Task<ActionResult> DeleteReviews()
         {
-
-          _reviewRepo.DeleteReviews(userId); 
+            var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
+            var user = await _userManager.FindByEmailAsync(userMail);
+            var userId = new Guid(user.Id);
+            _reviewRepo.DeleteReviews(userId); 
             _reviewRepo.Save();
             return Ok("Reviews successfully deleted");
         }
-
-
-        
-
-
-        [HttpPost("postreview")]
-        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        public IActionResult Postreview(Review review)
-        {
-            if (review == null)
-            {
-                return BadRequest("Review object is not passed or added");
-            }
-
-            _reviewRepo.CreateSaveReview(review);
-
-            return Ok("Review successfully added");
-
-        }
-
-        /// <summary>
-        /// Deletes All Reviews Associated With this user
-        /// </summary>
-        /// <returns>Ok</returns>
-        [SwaggerOperation(Summary = "Deletes All Reviews Associated With this user")]
-        [HttpDelete("reviews/delete-all-reviews")]
-        public IActionResult DeleteReviews()
-        {
-            //todo
-            var userId = new Guid(HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
-
-            _reviewRepo.DeleteReviews(userId);
-            _reviewRepo.Save();
-
-            return Ok();
-        }
-
 
         [SwaggerOperation(Summary = "Create Complaint for each User.")]
         [HttpPost]
@@ -198,7 +170,7 @@ namespace src.Controllers
             return Ok(query);
         }
 
-        [HttpGet("GetUpdatedReviews")]
+        [HttpGet("reviews/updates")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         public IActionResult GetUpdatedReviews(Guid UserId)
         {
@@ -212,6 +184,7 @@ namespace src.Controllers
             return Ok(updatedReviews);
 
         }
+
 
         [HttpPost]
         [Route("PostChallengeReviews")]
@@ -227,5 +200,40 @@ namespace src.Controllers
             return Ok(query);
         }
 
+
+        /// <summary>
+        /// Gets the language preference of the currently signed in user
+        /// </summary>
+        /// <returns>The Language preference of the signed in user</returns>
+        [HttpGet("customer/language")]
+        [SwaggerOperation(Summary = "Gets the language preference of the currently signed in user")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLanguage()
+        {
+            var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value; 
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            return Ok(user.Language);
+        }
+
+        [HttpPost("customer/language")]
+        [SwaggerOperation(Summary = "Sets the language preference of the currently signed in user, select one of {\"english\", \"german\", \"russian\", \"chinese\"}")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult> SetLanguage([FromQuery] string language)
+        {
+            List<string> listOfSupportedLanguages = new() { "english", "german", "russian", "chinese" };
+            
+            if (listOfSupportedLanguages.Contains(language.ToLowerInvariant()))
+            {
+                var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                var user = await _userManager.FindByEmailAsync(userEmail);
+                user.Language = language.ToLowerInvariant();
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (updateResult.Succeeded)
+                {
+                    return CreatedAtAction("GetLanguage", language);
+                }
+            }
+            return BadRequest("Invalid language string, please select one of {\"english\", \"german\", \"russian\", \"chinese\"}");
+        }
     }
 }

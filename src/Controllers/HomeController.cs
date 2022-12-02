@@ -48,7 +48,7 @@ namespace src.Controllers
             return Ok(greetings);
         } 
       
-        [HttpGet("/api/reviews/{reviewId}")]
+        [HttpGet("/api/review/{reviewId}")]
         [Authorize(Roles = "Customer", AuthenticationSchemes ="Bearer")]
         public ActionResult<ReviewForDisplayDto> GetSingleReview(Guid reviewId)
         {
@@ -136,11 +136,13 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "delete multiple reviews for the signed in customer")]
         [HttpDelete]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        [Route("{userId}")]
-        public ActionResult DeleteReviews(Guid userId)
+        [Route("reviews/{userId}")]
+        public async Task<ActionResult> DeleteReviews()
         {
-
-          _reviewRepo.DeleteReviews(userId); 
+            var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
+            var user = await _userManager.FindByEmailAsync(userMail);
+            var userId = new Guid(user.Id);
+            _reviewRepo.DeleteReviews(userId); 
             _reviewRepo.Save();
             return Ok("Reviews successfully deleted");
         }

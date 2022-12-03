@@ -1,12 +1,10 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+using CsvHelper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using src.Data;
 using src.Entities;
 using src.Models.Dtos;
-using System.Collections;
-using System.Net;
-using System.Security.Claims;
 
 namespace src.Services
 {
@@ -15,19 +13,16 @@ namespace src.Services
         public readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private IHttpContextAccessor _httpContextAccessor;
-
-
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public IQueryable<Review> Reviews => throw new NotImplementedException();
 
-        public AzSqlReviewRepo(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public AzSqlReviewRepo(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
-
+            _userManager = userManager;
         }
-
 
         public void AddReview(Review review)
         {
@@ -41,9 +36,7 @@ namespace src.Services
                 throw new ArgumentNullException(nameof(review));
             }
             _context.Reviews.Add(review);
-
         }
-
 
         public Review GetReviewById(Guid id)
         {
@@ -55,10 +48,8 @@ namespace src.Services
             return review;
         }
 
-
         public IEnumerable<Review> GetReviews(int pageNumber, int pageSize)
         {
-
             int defaultPageSize = 10;
             int defaultPageNumber = 0;
             int maxPageSize = 100;
@@ -75,9 +66,8 @@ namespace src.Services
             var reviewsToReturn = _context.Reviews.Skip(pageSize * pageNumber).Take(pageSize) as IEnumerable<Review>;
 
             return reviewsToReturn;
-
-
         }
+
         public IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews()
         {
             var reviews = _context.Reviews
@@ -190,7 +180,6 @@ namespace src.Services
             .Where(p => p.Status == StatusType.PendingReview);
         }
 
-
         public async Task<UserComplains> PostUserComplains(CreateUserComplainsDto complains)
         {
             var data = new UserComplains()
@@ -209,7 +198,6 @@ namespace src.Services
 
         public ReviewForDisplayDto CreateReview(Review review)
         {
-
             _context.Reviews.Add(review);
             var reviewToReturn = _mapper.Map<ReviewForDisplayDto>(review);
             Save();
@@ -273,7 +261,6 @@ namespace src.Services
             if (review == null)
             {
                 return null;
-
             }
 
             if (review.LawyerEmail != null)
@@ -284,7 +271,6 @@ namespace src.Services
             review.LawyerEmail = email;
             _context.SaveChanges();
             return review.LawyerEmail;
-
         }
 
         public IEnumerable<Review> GetClaimedReviews(string email)
@@ -307,21 +293,59 @@ namespace src.Services
 
             return model;
         }
+
+        public async Task<dynamic> ReviewsBulkUpload(IFormFile file)
+        {
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            using var memoryStream = new MemoryStream(new byte[file.Length]);
+            file.CopyTo(memoryStream);
+            memoryStream.Position = 0;
+
+            using (var reader = new StreamReader(memoryStream))
+            using (var csvReader = new CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+            {
+                var csvRecords = csvReader.GetRecords<ReviewCsvDto>().ToList();
+
+                foreach (var item in csvRecords)
+                {
+                    var user = _userManager.FindByEmailAsync(item.CustomerEmail).GetAwaiter().GetResult();
+                    var userId = Guid.Parse(user.Id);
+
+                    _context.Reviews.Add(new Review
+                    {
+                        Email = item.Email,
+                        ReviewString = item.ReviewString,
+                        Priority = Enum.Parse<PriorityType>(item.Priority),
+                        Status = Enum.Parse<StatusType>(item.Status),
+                        TimeStamp = DateTime.Now,
+                        UserId = userId
+                    });
+                }
+                _context.SaveChanges();
+                return "Success";
+            }
+        }
+
+        public IEnumerable<Review> GetReviewsByBusinessName(string businessName)
+        {
+            var users = _userManager.GetUsersInRoleAsync("Customer").Result.ToList();
+            var emptyReviews = new List<Review>();
+
+            var requiredUser = users.Find(user => user.UserName.ToLower() == businessName.ToLower());
+            if (requiredUser is not null)
+            {
+                var requiredUserId = requiredUser.Id;
+                var reviews = _context.Reviews.Where(review => review.UserId.ToString() == requiredUserId);
+                return reviews;
+            }
+            else
+            {
+                return emptyReviews as IEnumerable<Review>; ;
+            }
+        }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

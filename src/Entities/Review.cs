@@ -18,8 +18,8 @@ namespace src.Entities
         public DateTime TimeStamp { get; set; }
        
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime UpdatedAt { get; set; }
-        public DateTime ViewLastTime { get; set; }
+        public DateTime UpdatedAt { get; set; } = default;
+        public DateTime ViewLastTime { get; set; } = default;
 
         [Required]
         public string ReviewString { get; set; }

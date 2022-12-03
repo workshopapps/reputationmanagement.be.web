@@ -14,7 +14,7 @@ namespace src.Models
 
         public string Host_Password { get; set; }
 
-        public SecureSocketOptions Host_SecureSocketOptions = SecureSocketOptions.Auto;
+        public SecureSocketOptions Host_SecureSocketOptions = SecureSocketOptions.StartTls;
 
         [EmailValidator]
         public string Sender_Email { get; set; }

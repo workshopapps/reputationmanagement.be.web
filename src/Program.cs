@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using src.Models.Dtos;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Hosting;
+using Hellang.Middleware.ProblemDetails;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -84,6 +85,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
     options.UseMySql(connstring, ServerVersion.AutoDetect(connstring));
 });
 
+//Configuring Problem Details
+builder.Services.AddProblemDetails();
+
 // Use role base auth.
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
 opts =>
@@ -145,7 +149,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     app.UseStatusCodePages();
 }
-
+app.UseProblemDetails();
 app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI();

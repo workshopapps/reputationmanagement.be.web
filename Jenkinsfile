@@ -2,6 +2,9 @@ pipeline {
 
 	agent any
 	stages {
+        stage('Checkout git repo') {
+        git branch: 'develpment', url: params.git_repo
+    }
 		
         stage('Build') {
         bat """

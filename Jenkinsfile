@@ -6,8 +6,7 @@ pipeline {
         stage("build backend"){
 
 			steps {
-				sh "cd backend"
-				sh "cd backend && dotnet tool install --global dotnet-ef --version 6.*"
+				sh "dotnet tool install --global dotnet-ef --version 6.*"
                 sh "dotnet ef database update --context ApplicationDbContext"
                 sh "dotnet ef database update --context AppIdentityDbContext"
 			} 

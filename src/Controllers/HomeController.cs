@@ -23,15 +23,17 @@ namespace src.Controllers
         private readonly IReviewRepository _reviewRepo;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager; 
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IQuoteRepository _quoteRepo;
 
         public HomeController(IReviewRepository reviewRepo, 
-            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper)
+            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IQuoteRepository quoteRepo)
         {
             _reviewRepo = reviewRepo;
             _mapper = mapper;
             _userManager = userManager;
             _signInManager = signInManager;
+            _quoteRepo = quoteRepo;
         }
 
         /// <summary>
@@ -268,6 +270,17 @@ namespace src.Controllers
             var data = _reviewRepo.ReviewsBulkUpload(file);
 
             return Ok("Reviews bulk upload added successfully");
+        }
+
+        [HttpPost("quote")]
+        [AllowAnonymous]
+        [SwaggerOperation(Summary = "Create a quote for an unauthorised user")]
+
+        public IActionResult CreateAQuote(QuoteForCreationDto quoteDto)
+        {
+            var quoteForCreation = _mapper.Map<Quote>(quoteDto);
+            _quoteRepo.CreateQuote(quoteDto);       
+            return Created($"api/Admin/quote/{quoteForCreation.Id}",quoteForCreation);
         }
 
     }

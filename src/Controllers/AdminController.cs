@@ -18,13 +18,15 @@ public class AdminController : ControllerBase
 
     private readonly IReviewRepository _reviewRepo;
     private readonly IMapper _mapper;
+    private readonly IQuoteRepository _quoteRepo;
 
 
-    public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper)
+    public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper, IQuoteRepository quoteRepo)
     {
         _userManager = userManager;
         _reviewRepo = reviewRepository;
         _mapper = mapper;
+        _quoteRepo = quoteRepo;
     }
 
     [HttpDelete("DeleteUser")]
@@ -181,6 +183,22 @@ public class AdminController : ControllerBase
         _reviewRepo.DeleteReview(reviewId);
         _reviewRepo.Save();
         return Ok("Review is successfully deleted");
+    }
+
+    [SwaggerOperation(Summary = "Gets Quotes for the admin")]
+    [HttpGet("quote/{quoteId}")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public ActionResult GetQuote(Guid quoteId)
+    {
+        Quote quote = _quoteRepo.GetQuoteById(quoteId);
+        var quoteToDisplay = _mapper.Map<QuoteForCreationDto>(quote);
+        return Ok(quoteToDisplay);
+    }
+    [HttpGet("quotes")]
+    public ActionResult Getall()
+    {
+        return Ok(_quoteRepo.GetAll().ToList());
+
     }
 }
 

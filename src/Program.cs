@@ -111,6 +111,7 @@ opts =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddTransient<IReviewRepository, AzSqlReviewRepo>();
+builder.Services.AddTransient<IQuoteRepository, QuoteRepo>();
 
 
 

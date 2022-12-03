@@ -1,4 +1,4 @@
-String githubUrl = "https://github.com/workshopapps/reputationmanagement.be.web.git"
+String githubUrl = "https://github.com/workshopapps/reputationmanagement.be.web"
 
 node () {
     stage('Checkout') {

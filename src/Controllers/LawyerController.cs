@@ -13,6 +13,8 @@ using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System.Net;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace src.Controllers
@@ -200,6 +202,35 @@ namespace src.Controllers
                 return BadRequest(ex.Message);
             }
             
+        }
+
+        [SwaggerOperation(Summary = "Lawyer claims a review.")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("ClaimReview")]
+        public IActionResult ClaimReview(Guid reviewId)
+        {
+            if (reviewId == null)
+            {
+                return BadRequest();
+            }
+            var LawyerEmail = this.User.FindFirstValue(ClaimTypes.Name);
+            var result = _reviewRepo.ClaimReview(reviewId, LawyerEmail);
+            if(result == null)
+            {
+                return BadRequest();
+            }
+            return Ok();  
+        }
+
+        [SwaggerOperation(Summary = "Getv all reviews claimed by lawyer")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("GetClaimedReviews")]
+        public IActionResult GetClaimedReviews()
+        {
+            var LawyerEmail = this.User.FindFirstValue(ClaimTypes.Name);
+            var result = _reviewRepo.GetClaimedReviews(LawyerEmail);
+            return Ok(result);
         }
 
     }

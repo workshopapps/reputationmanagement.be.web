@@ -5,6 +5,8 @@ using src.Data;
 using src.Entities;
 using src.Models.Dtos;
 using System.Collections;
+using System.Net;
+using System.Security.Claims;
 
 namespace src.Services
 {
@@ -12,14 +14,18 @@ namespace src.Services
     {
         public readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private IHttpContextAccessor _httpContextAccessor;
+
 
 
         public IQueryable<Review> Reviews => throw new NotImplementedException();
 
-        public AzSqlReviewRepo(ApplicationDbContext context, IMapper mapper)
+        public AzSqlReviewRepo(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
+
         }
 
        
@@ -263,6 +269,35 @@ namespace src.Services
                 return Enumerable.Empty<UpdatedRequestDTO>();
             }
             return reviews;
+        }
+
+        public string ClaimReview(Guid reviewId, string email)
+        {
+            //Get the ID of the signed in lawyer
+            // var userId = SignInManager.AuthenticationManager.AuthenticationResponseGrant.Identity.GetUserId();
+
+            var review = _context.Reviews.FirstOrDefault(c => c.ReviewId == reviewId);
+            if(review == null)
+            {
+                return null;
+                
+            }
+
+            if(review.LawyerEmail != null)
+            {
+               return null;
+            }
+            
+            review.LawyerEmail = email;
+            _context.SaveChanges();
+            return review.LawyerEmail;
+              
+        }
+
+        public IEnumerable<Review> GetClaimedReviews(string email)
+        {
+            var result = _context.Reviews.Where(x => x.LawyerEmail == email).ToList();
+            return result;
         }
 
         public async Task<ChallengeReview> PostChallengeReview (ChallengeUserReviewDto challenge)

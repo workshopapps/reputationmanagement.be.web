@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using src.Entities;
 using src.Models.Dtos;
 
@@ -38,7 +39,11 @@ namespace src.Services
         IEnumerable<Review> GetAllReviews(int pageNumber = 0, int pageSize = 0);
         IEnumerable<Review> GetReviewByPropirity(PriorityType priority);
 
-        Task<IEnumerable<UpdatedRequestDTO>> GetUpdatedReviews(Guid UserId);
+        public Task<IEnumerable<UpdatedRequestDTO>> GetUpdatedReviews(Guid UserId);
+
+        string ClaimReview(Guid reviewId, string email );
+        
+        IEnumerable<Review> GetClaimedReviews(string email);
 
         Task<ChallengeReview> PostChallengeReview (ChallengeUserReviewDto challenge);
 

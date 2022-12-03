@@ -15,7 +15,10 @@ namespace src.Data
 
         public DbSet<ChallengeReview> challengeReviews { get; set; }
 
-         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Quote> Quotes { get; set; }
+
+
 
     }
 }

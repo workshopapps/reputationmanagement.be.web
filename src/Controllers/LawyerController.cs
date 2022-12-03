@@ -234,5 +234,17 @@ namespace src.Controllers
             return Ok(result);
         }
 
+        [SwaggerOperation(Summary = "Get all reviews by company name")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("reviews/search")]
+        public IActionResult GetReviewByBusinessName([FromQuery] string businessEntityName)
+        {
+            var reviews = _reviewRepo.GetReviewsByBusinessName(businessEntityName).ToList();
+            var reviewsToReturn = _mapper.Map<List<ReviewForDisplayDto>>(reviews);
+            return Ok(reviewsToReturn);
+        }
+
+
+
     }
 }

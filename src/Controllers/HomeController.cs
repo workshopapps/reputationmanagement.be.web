@@ -169,12 +169,16 @@ namespace src.Controllers
 
             return Ok(query);
         }
-
+        [SwaggerOperation(Summary = "Notify user when a review's status changes ")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("reviews/updates")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        public IActionResult GetUpdatedReviews(Guid UserId)
+        public IActionResult GetUpdatedReviews()
         {
-            var updatedReviews = _reviewRepo.GetUpdatedReviews(UserId);
+            var userId = Guid.Parse(((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.NameIdentifier).Value);
+            var updatedReviews = _reviewRepo.GetUpdatedReviews(userId);
 
             if (updatedReviews == null)
             {

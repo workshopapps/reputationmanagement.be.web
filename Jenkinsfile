@@ -5,6 +5,7 @@ pipeline {
 		
         stage('Build') {
         bat """
+        dotnet tool install --global dotnet-ef --version 6.*
         dotnet build -c Release /p:Version=${BUILD_NUMBER}
         dotnet publish -c Release --no-build
         """

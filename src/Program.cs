@@ -18,6 +18,8 @@ using src.Models.Dtos;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Hosting;
 using Hellang.Middleware.ProblemDetails;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -87,6 +89,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
 
 //Configuring Problem Details
 builder.Services.AddProblemDetails();
+
+// Configuring FluentValidation
+builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters().AddValidatorsFromAssemblyContaining<ResetPasswordDto>();
 
 // Use role base auth.
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(

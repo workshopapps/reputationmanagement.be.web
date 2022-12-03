@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +15,7 @@ using Swashbuckle.AspNetCore.Filters;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
 using static PayStack.Net.TransferRecipient;
 
 namespace src.Controllers
@@ -28,16 +30,19 @@ namespace src.Controllers
         private readonly IConfigurationSection _jwtSettings;
         private readonly IPasswordValidator<ApplicationUser> _passwordValidator;
         private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
+        private readonly IEmailSender _emailSender;
 
         public UserAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
              IPasswordValidator<ApplicationUser> passwordValidator,
-                IPasswordHasher<ApplicationUser> passwordHasher)
+                IPasswordHasher<ApplicationUser> passwordHasher,
+            IEmailSender emailSender)
         {
             _mapper = mapper;
             _userManager = userManager;
             _jwtSettings = configuration.GetSection("JwtSettings");
             _passwordValidator = passwordValidator;
             _passwordHasher = passwordHasher;
+            _emailSender = emailSender;
         }
 
         /// <returns>User's Auth token if successful.</returns>
@@ -69,7 +74,7 @@ namespace src.Controllers
                 {
                     badResponse = "Bad Input";
                 }
-               
+
                 return BadRequest(badResponse);
             }
             else
@@ -135,7 +140,7 @@ namespace src.Controllers
             {
                 user.PasswordHash = _passwordHasher.HashPassword(user, passwordResetModel.NewPassword);
                 IdentityResult updatePasswordResult = await _userManager.UpdateAsync(user);
-                
+
                 if (updatePasswordResult.Succeeded) { return Ok("Password changed successfully"); }
                 else
                 {
@@ -187,6 +192,48 @@ namespace src.Controllers
             return claims;
         }
 
+
+        [SwaggerOperation(Summary = "send a password reset token to user that is not logged in")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost("forgotpassword")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.EmailAddress);
+            if (user is null)
+            {
+                return BadRequest("No user with this email exists");
+            }
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            await _emailSender.SendEmailAsync(model.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this {token}");
+
+            return Ok("Please check your email for the password reset link");
+        }
+        [SwaggerOperation(Summary = "reset users password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user is null)
+            {
+                return BadRequest("No user with this email exists");
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+
+            if (result.Succeeded)
+            {
+                return Ok("Password reset ");
+            }
+
+            return BadRequest("Something went Wrong");
+        }
+
         /// <returns>Use details of the user</returns>
         /// <response code="200">With the details of the signed in user</response>
         /// <response code="400">If the authentication was unsuccessful.</response>
@@ -231,7 +278,6 @@ namespace src.Controllers
         
 
         }
-
 
     }
 }

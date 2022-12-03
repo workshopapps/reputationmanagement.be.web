@@ -47,5 +47,8 @@ namespace src.Services
 
         Task<ChallengeReview> PostChallengeReview (ChallengeUserReviewDto challenge);
 
+        public Task<dynamic> ReviewsBulkUpload(IFormFile file);
+
+
     }
 }

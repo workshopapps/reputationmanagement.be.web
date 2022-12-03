@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using src.Data;
 
@@ -10,9 +11,10 @@ using src.Data;
 namespace src.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221202084417_UpdateReview")]
+    partial class UpdateReview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,24 +81,6 @@ namespace src.Migrations
                     b.ToTable("ApplicationUser");
                 });
 
-            modelBuilder.Entity("src.Entities.ChallengeReview", b =>
-                {
-                    b.Property<Guid>("ReviewId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("ComplaintMessage")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("ReviewId");
-
-                    b.ToTable("challengeReviews");
-                });
-
             modelBuilder.Entity("src.Entities.Review", b =>
                 {
                     b.Property<Guid>("ReviewId")
@@ -110,8 +94,8 @@ namespace src.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("LawyerEmail")
-                        .HasColumnType("longtext");
+                    b.Property<Guid>("LawyerId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("Priority")
                         .HasColumnType("int");
@@ -135,37 +119,6 @@ namespace src.Migrations
                     b.HasKey("ReviewId");
 
                     b.ToTable("Reviews");
-                });
-
-            modelBuilder.Entity("src.Entities.Transaction", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("TrxRef")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("src.Entities.UserComplains", b =>

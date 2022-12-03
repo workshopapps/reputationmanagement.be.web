@@ -25,6 +25,8 @@ namespace src.Entities
         public StatusType Status { get; set; }
         
         public PriorityType Priority { get; set; } = PriorityType.NotUrgent;
+        
+        public string? LawyerEmail { get; set; }
     }
 
     public enum StatusType

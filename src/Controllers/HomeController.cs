@@ -46,8 +46,27 @@ namespace src.Controllers
            
             string greetings = "Hello customer!";
             return Ok(greetings);
-        } 
-      
+        }
+
+        /// <summary>
+        /// Provides all the reviews for the lawyer, with pagination to avoid query delay
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns>A list of all Reviews</returns>
+        [SwaggerOperation(Summary = "Get all reviews for user")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [HttpGet("reviews")]
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        public ActionResult<List<ReviewForDisplayDto>> GetAllReviews([FromQuery] int pageNumber = 0, [FromQuery] int pageSize = 10)
+        {
+            var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
+            var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews) as List<ReviewForDisplayDto>;
+            //var json = JsonSerializer.Serialize(reviewsToReturn);
+            return Ok(reviewsToReturn);
+
+        }
+
         [HttpGet("review/{reviewId}")]
         [Authorize(Roles = "Customer", AuthenticationSchemes ="Bearer")]
         public ActionResult<ReviewForDisplayDto> GetSingleReview(Guid reviewId)

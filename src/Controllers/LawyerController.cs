@@ -94,6 +94,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get all reviews for Lawyer")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
         public ActionResult<List<ReviewForDisplayDto>> GetAllReviews([FromQuery]int pageNumber = 0, [FromQuery]int pageSize = 10)
         {
             var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();

@@ -28,9 +28,9 @@ namespace src.Services
 
         }
 
-       
+
         public void AddReview(Review review)
-        {            
+        {
             if (review.UserId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(review));
@@ -41,19 +41,19 @@ namespace src.Services
                 throw new ArgumentNullException(nameof(review));
             }
             _context.Reviews.Add(review);
-          
+
         }
-     
+
 
         public Review GetReviewById(Guid id)
+        {
+            if (id == Guid.Empty)
             {
-                if (id == Guid.Empty)
-                {
-                    throw new ArgumentNullException(nameof(id));
-                }
-            var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
-                return review;
+                throw new ArgumentNullException(nameof(id));
             }
+            var review = _context.Reviews.Where(c => c.ReviewId == id).SingleOrDefault();
+            return review;
+        }
 
 
         public IEnumerable<Review> GetReviews(int pageNumber, int pageSize)
@@ -73,7 +73,7 @@ namespace src.Services
                 pageNumber = defaultPageNumber;
             }
             var reviewsToReturn = _context.Reviews.Skip(pageSize * pageNumber).Take(pageSize) as IEnumerable<Review>;
-            
+
             return reviewsToReturn;
 
 
@@ -84,10 +84,10 @@ namespace src.Services
                 .Where(review => review.Status == StatusType.Inconclusive)
                 .Select(r => new ReviewForDisplayDto
                 {
-                    ReviewId= r.ReviewId,
-                    Email= r.Email,
-                    ReviewString= r.ReviewString,
-                    Status  = r.Status,
+                    ReviewId = r.ReviewId,
+                    Email = r.Email,
+                    ReviewString = r.ReviewString,
+                    Status = r.Status,
                     TimeStamp = r.TimeStamp
                 }).ToList();
 
@@ -138,7 +138,7 @@ namespace src.Services
             }
         }
 
-        public Review UpdateReviewLawyer( ReviewForUpdateDTO review)
+        public Review UpdateReviewLawyer(ReviewForUpdateDTO review)
         {
             if (review == null)
             {
@@ -154,7 +154,7 @@ namespace src.Services
 
             return reviewToUpdate;
         }
-        
+
         public async Task<List<SuccessfulReviewsDto>> GetAllSuccessfulReview()
         {
             var resultModel = new List<SuccessfulReviewsDto>();
@@ -209,7 +209,7 @@ namespace src.Services
 
         public ReviewForDisplayDto CreateReview(Review review)
         {
-            
+
             _context.Reviews.Add(review);
             var reviewToReturn = _mapper.Map<ReviewForDisplayDto>(review);
             Save();
@@ -231,9 +231,9 @@ namespace src.Services
             {
                 return Enumerable.Empty<Review>();
             }
-            
-                return _context.Reviews
-                .Where(x => x.Priority.Equals(priority));
+
+            return _context.Reviews
+            .Where(x => x.Priority.Equals(priority));
         }
 
         public void CreateSaveReview(Review review)
@@ -254,21 +254,14 @@ namespace src.Services
         public async Task<IEnumerable<UpdatedRequestDTO>> GetUpdatedReviews(Guid UserId)
         {
             var reviews = await _context.Reviews
-                .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt)
-                .Select(r => new UpdatedRequestDTO
-                {
-                    ReviewId = r.ReviewId,
-                    Email = r.Email,
-                    ReviewString = r.ReviewString,
-                    Status = r.Status,
-                    TimeStamp = r.TimeStamp,
-                }).ToListAsync();
-
-            if (reviews == null)
+                .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt && _x.UpdatedAt > _x.ViewLastTime).ToListAsync();
+            var r = _mapper.Map<IEnumerable<UpdatedRequestDTO>>(reviews);
+            await _context.SaveChangesAsync();
+            if (r is null)
             {
                 return Enumerable.Empty<UpdatedRequestDTO>();
             }
-            return reviews;
+            return r;
         }
 
         public string ClaimReview(Guid reviewId, string email)
@@ -277,21 +270,21 @@ namespace src.Services
             // var userId = SignInManager.AuthenticationManager.AuthenticationResponseGrant.Identity.GetUserId();
 
             var review = _context.Reviews.FirstOrDefault(c => c.ReviewId == reviewId);
-            if(review == null)
+            if (review == null)
             {
                 return null;
-                
+
             }
 
-            if(review.LawyerEmail != null)
+            if (review.LawyerEmail != null)
             {
-               return null;
+                return null;
             }
-            
+
             review.LawyerEmail = email;
             _context.SaveChanges();
             return review.LawyerEmail;
-              
+
         }
 
         public IEnumerable<Review> GetClaimedReviews(string email)
@@ -300,7 +293,7 @@ namespace src.Services
             return result;
         }
 
-        public async Task<ChallengeReview> PostChallengeReview (ChallengeUserReviewDto challenge)
+        public async Task<ChallengeReview> PostChallengeReview(ChallengeUserReviewDto challenge)
         {
             var model = new ChallengeReview()
             {

@@ -58,7 +58,6 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Update a review by Lawyer")]
         [HttpPatch]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        [SwaggerResponseExample(200, typeof(GoodUpdateReviewExample))]
         public ActionResult UpdateReview([FromBody]ReviewForUpdateDTO review)
         {
            var reviews =_reviewRepo.UpdateReviewLawyer(review);

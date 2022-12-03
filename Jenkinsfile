@@ -7,8 +7,6 @@ pipeline {
 
 			steps {
 				sh "dotnet tool install --global dotnet-ef --version 6.*"
-                sh "dotnet ef database update --context ApplicationDbContext"
-                sh "dotnet ef database update --context AppIdentityDbContext"
 			} 
         }
 		stage("deploy") {

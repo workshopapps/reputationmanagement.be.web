@@ -5,11 +5,11 @@ pipeline {
         
         stage('Build') {
             steps {
-                bat """
-                dotnet tool install --global dotnet-ef --version 6.*
-                dotnet build -c Release /p:Version=${BUILD_NUMBER}
-                 dotnet publish -c Release --no-build
-                """
+                
+                sh "dotnet tool install --global dotnet-ef --version 6.*"
+                sh "dotnet build -c Release /p:Version=${BUILD_NUMBER}"
+                sh "dotnet publish -c Release --no-build"
+                
             }
         
     }

@@ -235,5 +235,17 @@ namespace src.Controllers
             }
             return BadRequest("Invalid language string, please select one of {\"english\", \"german\", \"russian\", \"chinese\"}");
         }
+
+        [SwaggerOperation(Summary = "Create multiple reviews")]
+        [HttpPost]
+        [Route("UploadReviewsCSV")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult UploadReviewsCSV(IFormFile file)
+        {
+            var data = _reviewRepo.ReviewsBulkUpload(file);
+
+            return Ok("Reviews bulk upload added successfully");
+        }
+
     }
 }

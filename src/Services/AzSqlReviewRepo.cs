@@ -1,10 +1,13 @@
 using AutoMapper;
+using CsvHelper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using src.Data;
 using src.Entities;
 using src.Models.Dtos;
 using System.Collections;
+using System.Formats.Asn1;
 
 namespace src.Services
 {
@@ -12,17 +15,20 @@ namespace src.Services
     {
         public readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
+
 
 
         public IQueryable<Review> Reviews => throw new NotImplementedException();
 
-        public AzSqlReviewRepo(ApplicationDbContext context, IMapper mapper)
+        public AzSqlReviewRepo(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapper = mapper;
+            _userManager = userManager;
         }
 
-       
+
         public void AddReview(Review review)
         {            
             if (review.UserId == Guid.Empty)
@@ -278,6 +284,43 @@ namespace src.Services
             Save();
 
             return model;
+        }
+
+        public async Task<dynamic> ReviewsBulkUpload(IFormFile file)
+        {
+
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            using var memoryStream = new MemoryStream(new byte[file.Length]);
+            file.CopyTo(memoryStream);
+            memoryStream.Position = 0;
+
+            using (var reader = new StreamReader(memoryStream))
+            using (var csvReader = new CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture))
+            {
+                var csvRecords = csvReader.GetRecords<ReviewCsvDto>().ToList();
+
+                foreach (var item in csvRecords)
+                {
+                    var user = _userManager.FindByEmailAsync(item.CustomerEmail).GetAwaiter().GetResult();
+                    var userId = Guid.Parse(user.Id);
+
+                    _context.Reviews.Add(new Review
+                    {
+                        Email = item.Email,
+                        ReviewString = item.ReviewString,
+                        Priority = Enum.Parse<PriorityType>(item.Priority),
+                        Status = Enum.Parse<StatusType>(item.Status),
+                        TimeStamp = DateTime.Now,
+                        UserId = userId
+                    });
+                }
+                _context.SaveChanges();
+                return "Success";
+            }
         }
     }
 }

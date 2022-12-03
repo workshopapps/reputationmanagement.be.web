@@ -190,6 +190,11 @@ namespace src.Controllers
             }
             return claims;
         }
+
+        [SwaggerOperation(Summary = "send a password reset token to user that is not logged in")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("forgotpassword")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto model)
         {
@@ -204,7 +209,10 @@ namespace src.Controllers
 
             return Ok("Please check your email for the password reset link");
         }
-
+        [SwaggerOperation(Summary = "reset users password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
         {

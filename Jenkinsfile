@@ -1,6 +1,6 @@
 String githubUrl = "https://github.com/workshopapps/reputationmanagement.be.web"
 
-node () {
+pipeline {
     stage('Checkout') {
         checkout([
             $class: 'GitSCM', 

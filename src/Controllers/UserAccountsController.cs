@@ -14,6 +14,7 @@ using Swashbuckle.AspNetCore.Filters;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static PayStack.Net.TransferRecipient;
 
 namespace src.Controllers
 {
@@ -185,5 +186,52 @@ namespace src.Controllers
             }
             return claims;
         }
+
+        /// <returns>Use details of the user</returns>
+        /// <response code="200">With the details of the signed in user</response>
+        /// <response code="400">If the authentication was unsuccessful.</response>
+        [SwaggerOperation(Summary = "Get User details")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [HttpGet("details")]
+        public async Task<IActionResult> GetSignedInUserDetails()
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Name);
+            var SignedInUser = _userManager.FindByEmailAsync(userEmail).Result;
+
+            var detailsToReturn = _mapper.Map<UserDetailsDto>(SignedInUser);
+            return Ok(detailsToReturn);
+
+        }
+
+        /// <returns>Use details of the user</returns>
+        /// <response code="200">With the details of the signed in user</response>
+        /// <response code="400">If the authentication was unsuccessful.</response>
+        [SwaggerOperation(Summary = "Get User details")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [HttpPut("details")]
+        public async Task<IActionResult> UpdateSignedInUserDetails(UserDetailsDto newUserDetails)
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Name);
+            var signedInUser = _userManager.FindByEmailAsync(userEmail).Result;
+
+            signedInUser.Email= newUserDetails.Email;
+            signedInUser.PhoneNumber= newUserDetails.PhoneNumber;
+            signedInUser.UserName = newUserDetails.BusinessEntityName.Replace(" ", "_");
+            
+            var updateAllResult  = await _userManager.UpdateAsync(signedInUser);
+
+            var updateSecurityStampResult = await _userManager.UpdateSecurityStampAsync(signedInUser);
+            await _userManager.UpdateNormalizedUserNameAsync(signedInUser);
+           
+            return Ok();
+
+            
+        
+
+        }
+
+
     }
 }

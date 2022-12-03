@@ -12,6 +12,9 @@ namespace EarlyMan.PL.Profiles
             CreateMap<src.Models.Dtos.LawyerAccountForCreationDto, src.Entities.ApplicationUser>()
                 .ForMember(x => x.UserName, opt => opt.MapFrom(source => source.FirstName + source.LastName))
                 .ForMember(x => x.PostAddress, o => o.MapFrom(str => string.Empty));
+
+            CreateMap<src.Entities.ApplicationUser, src.Models.Dtos.UserDetailsDto>()
+            .ForMember(x => x.BusinessEntityName, opt => opt.MapFrom(source => source.UserName.Replace("_", " ")));
         }
     }
 }

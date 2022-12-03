@@ -17,6 +17,7 @@ using System.Text.Json;
 
 namespace src.Controllers
 {
+    /// <permission cref="lawyer">description</permission>
     [SwaggerTag("For Lawyer Authorization")]
     [ApiController]
     [Route("api/lawyer")]
@@ -48,10 +49,17 @@ namespace src.Controllers
             return Ok(greetings);
         }
 
+
+        /// <summary>
+        /// Provides all the reviews for the lawyer, with pagination to avoid query delay
+        /// </summary>
+        /// <param name="review"></param>
+        /// <returns>A review</returns>
         [SwaggerOperation(Summary = "Update a review by Lawyer")]
         [HttpPatch]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public ActionResult UpdateReview(ReviewForUpdateDTO review)
+        [SwaggerResponseExample(200, typeof(GoodUpdateReviewExample))]
+        public ActionResult UpdateReview([FromBody]ReviewForUpdateDTO review)
         {
            var reviews =_reviewRepo.UpdateReviewLawyer(review);
             if (reviews == null)
@@ -60,7 +68,12 @@ namespace src.Controllers
             }
             return Ok("Review is successfully updated");
         }
-        
+
+        /// <summary>
+        /// Returns all the successful reviews
+        /// </summary>
+        /// <returns>Returns all reviews with a statusType of pending</returns>
+        [SwaggerOperation(Summary = "Get all successful reviews for Lawyer (statusType = successful)")]
         [HttpGet]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [Route("SuccessfulReview")]
@@ -76,7 +89,7 @@ namespace src.Controllers
         /// </summary>
         /// <param name="pageNumber"></param>
         /// <param name="pageSize"></param>
-        /// <returns></returns>
+        /// <returns>A list of all Reviews</returns>
         [SwaggerOperation(Summary = "Get all reviews for Lawyer")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
@@ -89,10 +102,16 @@ namespace src.Controllers
 
         }
 
-
+        /// <summary>
+        /// Gets a review by id
+        /// </summary>
+        /// <param name="reviewId"></param>
+        /// <returns>A single review</returns>
+        [SwaggerOperation(Summary = "Gets a single review by id")]
         [HttpGet("reviews/{reviewId}")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public IActionResult GetSingleReview(Guid reviewId)
+        [SwaggerResponseExample(200, typeof(GoodSingleReviewExample))]
+        public IActionResult GetSingleReview([FromBody]Guid reviewId)
         {
             if (reviewId == Guid.Empty)
             {
@@ -106,7 +125,11 @@ namespace src.Controllers
             return Ok(singleReview);
         }
 
-        [SwaggerOperation(Summary = "Returns all inconclusive reviews (statusType = inconclusive)")]
+        /// <summary>
+        /// Returns all the inconclusive reviews
+        /// </summary>
+        /// <returns>All reviews with a statusType of inconclusive</returns>
+        [SwaggerOperation(Summary = "Gets all inconclusive reviews for lawyer (statusType = inconclusive)")]
         [HttpGet("inconclusiveReviews")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         public IActionResult GetAllInconclusiveReviews()
@@ -116,14 +139,12 @@ namespace src.Controllers
         }
 
         /// <summary>
-        /// Gets all the pending reviews
+        /// Returns all the pending reviews
         /// </summary>
         /// <returns>Pending reviews</returns>
-
-        [SwaggerOperation(Summary = "Get All Pending Reviews")]
+        [SwaggerOperation(Summary = "Gets all Pending reviews for lawyer (statusType = Pending)")]
         [HttpGet("PendingReview")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-
         public IActionResult UnclaimedReviews()
         {
             var pendingReview = _reviewRepo.GetPendingReview();
@@ -138,11 +159,12 @@ namespace src.Controllers
         /// Get Reviews by Status Type
         /// </summary>
         /// <param name="status"></param>
-        /// <returns>Reviews of the same statusType Provided</returns>
+        /// <returns>Reviews of the same statusType provided</returns>
         [SwaggerOperation(Summary = "Reviews By StatusType, PendingReview = 0, Successful = 1, Inconclusive = 2, Failed = 3")]
         [HttpGet("GetReviewByStatus")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public IActionResult GetReviewByStatus(StatusType status)
+        [SwaggerResponseExample(200, typeof(GoodReviewByStatusForCustomer))]
+        public IActionResult GetReviewByStatus([FromQuery]StatusType status)
         {
             var reviewByStatus = _reviewRepo.GetReviewByStatusType(status);
 
@@ -156,7 +178,11 @@ namespace src.Controllers
         }
 
 
-
+        /// <summary>
+        /// Allows for sending of email to users of selected bad reviews
+        /// </summary>
+        /// <param name="emailData">destructured as {EmailId-> for user email, EmailBody -> for email content}</param>
+        /// <returns>Reviews of the same statusType Provided</returns>
         [SwaggerOperation(Summary = "Sends email to the user from reviewer")]
         [HttpPost("email/create")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]

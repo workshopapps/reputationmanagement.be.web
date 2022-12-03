@@ -138,8 +138,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
 builder.Services.Configure<MailKitEmailSenderOptions>(
-    builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));
-
+builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));
+builder.Services.AddResponseCaching();
 var app = builder.Build();
 
 
@@ -158,6 +158,8 @@ app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseResponseCaching();
 
 app.MapControllers();
 

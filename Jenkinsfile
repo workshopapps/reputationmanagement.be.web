@@ -2,7 +2,7 @@ pipeline {
 	
 	environment {
         CI = 'false'
-    }
+    	}
 
 	agent any
 	stages {
@@ -16,7 +16,7 @@ pipeline {
 			}
 		}
 	
-        stage('Build') {
+        	stage('Build') {
 			steps {
 
 				sh "dotnet tool install --global dotnet-ef --version 6.*"
@@ -24,24 +24,22 @@ pipeline {
 				sh "dotnet publish -c Release --no-build"
 
 				}
-	}
+		}
 
-	stage("test backend"){
+		stage("test backend"){
 
 			steps {
 				sh "cd reputationmanagement.be.web"
 				sh "cd reputationmanagement.be.web/src && dotnet test src/ -c Release --no-restore --no-build --verbosity normal --filter "Category!=LongRunning""
 			}
-        }
+        	}
 		
-	stage("Deploy") {
+		stage("Deploy") {
 		
 			steps {
 				sh "sudo cp -rf ${WORKSPACE}/src/* /home/ehmeeops/reputationmanagement.be.web/backend"
 				// sh "sudo pm2 start"
 			}		
-	}
-
-
+		}
 	}
 }

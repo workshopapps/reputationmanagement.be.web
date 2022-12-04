@@ -45,7 +45,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Greets the lawyer")]
         [HttpGet("greet")]
         [AllowAnonymous]
-        public ActionResult updaterequest()
+        public ActionResult greet()
         {
             string greetings = "Hello lawyer!";
             return Ok(greetings);
@@ -63,6 +63,7 @@ namespace src.Controllers
         public ActionResult UpdateReview([FromBody]ReviewForUpdateDTO review)
         {
            var reviews =_reviewRepo.UpdateReviewLawyer(review);
+           
             if (reviews == null)
             {
                 return NotFound();

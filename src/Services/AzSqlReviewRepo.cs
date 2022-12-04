@@ -243,7 +243,14 @@ namespace src.Services
         {
             var reviews = await _context.Reviews
                 .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt && _x.UpdatedAt > _x.ViewLastTime).ToListAsync();
+
+            foreach (var review in reviews)
+            {
+                review.TimeStamp = review.UpdatedAt = review.ViewLastTime = DateTime.Now;
+                _context.Reviews.Update(review);
+            }
             var r = _mapper.Map<IEnumerable<UpdatedRequestDTO>>(reviews);
+
             await _context.SaveChangesAsync();
             if (r is null)
             {

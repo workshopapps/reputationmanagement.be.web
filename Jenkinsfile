@@ -20,8 +20,8 @@ pipeline {
 			steps {
 
 				//sh "dotnet tool install --global dotnet-ef --version 6.*"
-				sh "dotnet build -c Release /p:Version=${BUILD_NUMBER}"
-				sh "dotnet publish -c Release --no-build"
+				sh "cd reputationmanagement.be.web"
+				sh "cd reputationmanagement.be.web/src && dotnet build && dotnet publish"
 
 				}
 		}
@@ -30,7 +30,7 @@ pipeline {
 
 			steps {
 				sh "cd reputationmanagement.be.web"
-				sh "cd reputationmanagement.be.web/src && dotnet test src/ -c Release --no-restore --no-build"
+				sh "cd reputationmanagement.be.web/src && dotnet test"
 			}
         	}
 		

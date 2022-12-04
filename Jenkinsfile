@@ -19,7 +19,7 @@ pipeline {
         	stage('Build') {
 			steps {
 
-				sh "dotnet tool install --global dotnet-ef --version 6.*"
+				//sh "dotnet tool install --global dotnet-ef --version 6.*"
 				sh "dotnet build -c Release /p:Version=${BUILD_NUMBER}"
 				sh "dotnet publish -c Release --no-build"
 

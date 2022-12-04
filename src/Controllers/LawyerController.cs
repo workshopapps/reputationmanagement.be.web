@@ -29,6 +29,8 @@ namespace src.Controllers
         private readonly IReviewRepository _reviewRepo;
         private readonly IMapper _mapper;
         private readonly IEmailSender _emailSender;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public LawyerController(IReviewRepository reviewRepo,
             UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IEmailSender emailSender)
@@ -36,6 +38,7 @@ namespace src.Controllers
             _reviewRepo = reviewRepo;
             _mapper = mapper;
             _emailSender = emailSender;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -55,20 +58,38 @@ namespace src.Controllers
         /// <summary>
         /// Provides all the reviews for the lawyer, with pagination to avoid query delay
         /// </summary>
-        /// <param name="review"></param>
+        /// <param name="reviewForUpdate"></param>
         /// <returns>A review</returns>
         [SwaggerOperation(Summary = "Update a review by Lawyer")]
         [HttpPatch]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public ActionResult UpdateReview([FromBody]ReviewForUpdateDTO review)
+        public async Task<ActionResult> UpdateReview([FromBody]ReviewForUpdateDTO reviewForUpdate)
         {
-           var reviews =_reviewRepo.UpdateReviewLawyer(review);
-           
-            if (reviews == null)
+           var updatedReview =_reviewRepo.UpdateReviewLawyer(reviewForUpdate);
+            const string EMAIL_SUBJECT = "Review status update";
+
+            var review = _reviewRepo.GetReviewById(updatedReview.ReviewId);
+            var userId = review.UserId;
+            var userToNotify = await _userManager.FindByIdAsync(userId.ToString());
+            if (updatedReview == null)
             {
                 return NotFound();
             }
-            return Ok("Review is successfully updated");
+
+            try
+            {
+                
+               await _emailSender.SendEmailAsync(userToNotify.Email, "Update on your review",
+                    $"The status of your review with id of {review.ReviewId} and review string of {review.ReviewString} has been updated to a status of " +
+                    $"{review.Status}");
+                return Ok("Review is successfully updated");
+            }
+            catch (SmtpCommandException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
+            
         }
 
         /// <summary>

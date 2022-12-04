@@ -198,39 +198,38 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("forgotpassword")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto model)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto data)
         {
-            var user = await _userManager.FindByEmailAsync(model.EmailAddress);
+            var user = await _userManager.FindByEmailAsync(data.EmailAddress);
             if (user is null)
             {
                 return BadRequest("No user with this email exists");
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            await _emailSender.SendEmailAsync(model.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this {token}");
+            await _emailSender.SendEmailAsync(data.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this {token}");
 
             return Ok("Please check your email for the password reset link");
         }
-        [SwaggerOperation(Summary = "reset users password")]
+        [SwaggerOperation(Summary = "reset users password.")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
+        [HttpPost("reset-password.")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto data)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByEmailAsync(data.Email);
             if (user is null)
             {
                 return BadRequest("No user with this email exists");
             }
 
-            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, data.Token, data.NewPassword);
 
             if (result.Succeeded)
             {
                 return Ok("Password reset ");
             }
-
             return BadRequest("Something went Wrong");
         }
 

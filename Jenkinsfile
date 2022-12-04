@@ -30,7 +30,7 @@ pipeline {
 
 			steps {
 				sh "cd reputationmanagement.be.web"
-				sh "cd reputationmanagement.be.web/src && dotnet test src/ -c Release --no-restore --no-build --verbosity normal --filter "Category!=LongRunning""
+				sh "cd reputationmanagement.be.web/src && dotnet test src/ -c Release --no-restore --no-build"
 			}
         	}
 		

@@ -216,15 +216,15 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("reset-password.")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordDto data)
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto datamodel)
         {
-            var user = await _userManager.FindByEmailAsync(data.Email);
+            var user = await _userManager.FindByEmailAsync(datamodel.Email);
             if (user is null)
             {
                 return BadRequest("No user with this email exists");
             }
 
-            var result = await _userManager.ResetPasswordAsync(user, data.Token, data.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, datamodel.Token, datamodel.NewPassword);
 
             if (result.Succeeded)
             {

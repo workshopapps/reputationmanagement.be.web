@@ -1,8 +1,21 @@
 pipeline {
+	
+	environment {
+        CI = 'false'
+    }
 
 	agent any
 	stages {
         
+	stage("Get repo"){
+
+			steps {
+				sh "rm -rf ${WORKSPACE}/reputationmanagement.be.web"
+				sh "git clone https://github.com/workshopapps/reputationmanagement.be.web.git"
+				sh "sudo cp -r ${WORKSPACE}/reputationmanagement.be.web /home/ehmeeops/reputationmanagement.be.web"
+			}
+		}
+	
         stage('Build') {
             steps {
                 
@@ -10,15 +23,22 @@ pipeline {
                 sh "dotnet build -c Release /p:Version=${BUILD_NUMBER}"
                 sh "dotnet publish -c Release --no-build"
                 
-            }
+            		}
         
-    }
+    		}
+		
+	stage("test backend"){
+
+			steps {
+				sh "cd reputationmanagement.be.web"
+				sh "cd reputationmanagement.be.web/src && dotnet test src/ -c Release --no-restore --no-build --verbosity normal --filter "Category!=LongRunning""
+			}
+        }
 		stage("Deploy") {
 		
 			steps {
-				sh "sudo cp -rf ${WORKSPACE}/backend/* /home/enyioman/repute_api/backend"
-				sh "sudo su - enyioman && whoami"
-				sh "sudo dotnet run"
+				sh "sudo cp -rf ${WORKSPACE}/backend/* /home/ehmeeops/reputationmanagement.be.web/backend"
+				sh "sudo pm2 start"
 			}
 			
 	}
@@ -29,4 +49,3 @@ pipeline {
 
 
 }
-

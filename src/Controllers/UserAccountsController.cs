@@ -198,16 +198,16 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("forgotpassword")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto data)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dataModel)
         {
-            var user = await _userManager.FindByEmailAsync(data.EmailAddress);
+            var user = await _userManager.FindByEmailAsync(dataModel.EmailAddress);
             if (user is null)
             {
                 return BadRequest("No user with this email exists");
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            await _emailSender.SendEmailAsync(data.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this {token}");
+            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this {token}");
 
             return Ok("Please check your email for the password reset link");
         }

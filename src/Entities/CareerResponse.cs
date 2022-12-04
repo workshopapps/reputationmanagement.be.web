@@ -14,7 +14,7 @@ namespace src.Entities
         [Required]  
         public string PhoneNumber { get; set; }
         [Required]
-        public LawyerType Position { get; set; }
+        public string Position { get; set; }
         [Required]
         public string Reason { get; set; }
         [Required]
@@ -22,33 +22,5 @@ namespace src.Entities
         [Required]
         public string CoverLetterFileName { get; set; }
         public DateTime SubmittedAt { get; set; } = DateTime.Now;
-    }
-
-    public enum LawyerType
-    {
-        [Description("Bankruptcy Lawyer")]
-        BankruptcyLawyer,
-        [Description("Business Lawyer (Corporate Lawyer)")]
-        BusinessLawyer,
-        [Description("Constitutional Lawyer")]
-        ConstitutionalLawyer,
-        [Description("Criminal Defense Lawyer")]
-        CriminalDefenceLawyer,
-        [Description("Employement and Labour Lawyer")]
-        EmployementLaborLawyer,
-        [Description("Employement and Labour Lawyer")]
-        EntertainmentLawyer,
-        [Description("Entertainment Lawyer")]
-        EstatePlanningLawyer,
-        [Description("Estate Planning Lawyer")]
-        FamilyLawyer,
-        [Description("Family Lawyer")]
-        ImmigrationLawyer,
-        [Description("Intellectual Property (IP) Lawyer")]
-        IntellectualPropertyLawyer,
-        [Description("Peronal Injury lawyer")]
-        PersonalInjuryLawyer,
-        [Description("Tax Lawyer")]
-        TaxLawyer
     }
 }

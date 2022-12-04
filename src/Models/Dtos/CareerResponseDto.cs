@@ -13,7 +13,7 @@ namespace src.Models.Dtos
         [Required]
         public string PhoneNumber { get; set; }
         [Required]
-        public LawyerType Position { get; set; }
+        public string Position { get; set; }
         [Required]
         public string Reason { get; set; }
         [Required]

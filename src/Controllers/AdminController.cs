@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
 using src.Models.Dtos;
+using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace src.Controllers;
 
@@ -46,14 +48,28 @@ public class AdminController : ControllerBase
         return BadRequest();
 
     }
+    /// <summary>
+    /// Updates user information
+    /// </summary>
+    /// <param name="userDetails"></param>
+    /// <returns>Returns the updated information</returns>
 
 
-
+    [SwaggerOperation(Summary = "Updates user details")]
     [HttpPut("UpdateUserAccount")]
+    [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+    [SwaggerResponseExample(400, typeof(BadUserUpdateExampleDetailsForCustomer))]
+    [SwaggerResponseExample(200, typeof(GoodUserUpdateExampleDetailsForCustomer))]
+
+
     public async Task<IActionResult> UpdateUser(CustomerAccountForCreationDto userDetails)
     {
         var user = await _userManager.FindByEmailAsync(userDetails.Email);
-        if (user != null) {   
+        if (user != null) {
+
+            user.Email = userDetails.Email;
+            user.UserName = userDetails.BusinessEntityName;
+            user.PasswordHash = userDetails.Password;
             IdentityResult result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {

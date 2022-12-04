@@ -20,5 +20,7 @@ namespace src.Data
 
 
 
+        public DbSet<CareerResponse> CareerResponses { get; set; }
+
     }
 }

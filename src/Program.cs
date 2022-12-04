@@ -72,7 +72,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-
+builder.Services.AddTransient<IBufferedFileUploadService, BufferedFileUploadLocalService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

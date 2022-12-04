@@ -196,10 +196,13 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("reviews/updates")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
-        public IActionResult GetUpdatedReviews()
+        public async Task<ActionResult> GetUpdatedReviews()
         {
-            var userId = Guid.Parse(((ClaimsIdentity)User.Identity).FindFirst(ClaimTypes.NameIdentifier).Value);
-            var updatedReviews = _reviewRepo.GetUpdatedReviews(userId);
+            var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
+            var user = await _userManager.FindByEmailAsync(userMail);
+            var userId = new Guid(user.Id);
+           
+            var updatedReviews = _reviewRepo.GetUpdatedReviews(userId).Result;
 
             if (updatedReviews == null)
             {

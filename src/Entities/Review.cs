@@ -29,6 +29,14 @@ namespace src.Entities
         public PriorityType Priority { get; set; } = PriorityType.NotUrgent;
         
         public string? LawyerEmail { get; set; }
+
+        ///new reqs
+        [Required]
+        public string BusinessType { get; set; }
+        [Required]
+        public string WebsiteName { get; set; }
+        [Required]
+        public int Rating { get; set; }
     }
 
     public enum StatusType

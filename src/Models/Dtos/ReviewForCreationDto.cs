@@ -14,5 +14,13 @@ namespace src.Models.Dtos
         public StatusType Status { get; set; }
         [Required]
         public PriorityType Priority { get; set; }
+        
+        //New reqs
+        [Required]
+        public string BusinessType { get; set; }
+        [Required]
+        public string WebsiteName { get; set; }
+        [Required]
+        public int Rating { get; set; }
     }
 }

@@ -206,8 +206,12 @@ namespace src.Controllers
                 return BadRequest("No user with this email exists");
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            string link = $"http://localhost:7234/UserAccounts/reset-password?userEmail=" +
+                   HttpUtility.UrlEncode(user.Email) +
+                   "&code=" + HttpUtility.UrlEncode(token) +
+                   "&Scheme=" + HttpUtility.UrlEncode(HttpContext.Request.Scheme);
 
-            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this {token}");
+            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this <a href=\"{link}\">link</a>");
 
             return Ok("Please check your email for the password reset link");
         }
@@ -262,19 +266,19 @@ namespace src.Controllers
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var signedInUser = _userManager.FindByEmailAsync(userEmail).Result;
 
-            signedInUser.Email= newUserDetails.Email;
-            signedInUser.PhoneNumber= newUserDetails.PhoneNumber;
+            signedInUser.Email = newUserDetails.Email;
+            signedInUser.PhoneNumber = newUserDetails.PhoneNumber;
             signedInUser.UserName = newUserDetails.BusinessEntityName.Replace(" ", "_");
-            
-            var updateAllResult  = await _userManager.UpdateAsync(signedInUser);
+
+            var updateAllResult = await _userManager.UpdateAsync(signedInUser);
 
             var updateSecurityStampResult = await _userManager.UpdateSecurityStampAsync(signedInUser);
             await _userManager.UpdateNormalizedUserNameAsync(signedInUser);
-           
+
             return Ok();
 
-            
-        
+
+
 
         }
 

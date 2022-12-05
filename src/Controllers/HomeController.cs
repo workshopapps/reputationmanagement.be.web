@@ -61,18 +61,18 @@ namespace src.Controllers
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
         [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Client)]
-        public ActionResult<List<ReviewForDisplayDto>> GetAllReviews([FromQuery] int pageNumber = 0, [FromQuery] int pageSize = 10)
+        public ActionResult GetAllReviews([FromQuery] int pageNumber = 0, [FromQuery] int pageSize = 10)
         {
-            var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
+            var userEmail = User.FindFirstValue(ClaimTypes.Name);
+            var appUser = _userManager.FindByEmailAsync(userEmail).Result;
+            var reviews = _reviewRepo.GetReviews(pageNumber, pageSize,appUser.Id).ToList();
             var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews) as List<ReviewForDisplayDto>;
-            var json = JsonConvert.SerializeObject(reviewsToReturn);
-            return Ok(json);
-
+            return Ok(reviewsToReturn);
         }
 
         [HttpGet("review/{reviewId}")]
         [Authorize(Roles = "Customer", AuthenticationSchemes ="Bearer")]
-        public ActionResult<ReviewForDisplayDto> GetSingleReview(Guid reviewId)
+        public ActionResult GetSingleReview(Guid reviewId)
         {
             if (reviewId == Guid.Empty)
             {
@@ -83,8 +83,7 @@ namespace src.Controllers
             if (singleReview == null)
                 return NotFound();
             var reviewForDisplay = _mapper.Map<ReviewForDisplayDto>(singleReview);
-            var json = JsonConvert.SerializeObject(reviewForDisplay);
-            return Ok(json);
+            return Ok(reviewForDisplay);
         }
 
         /// <summary>

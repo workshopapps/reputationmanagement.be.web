@@ -48,24 +48,38 @@ namespace src.Services
             return review;
         }
 
-        public IEnumerable<Review> GetReviews(int pageNumber, int pageSize)
+        public IEnumerable<Review> GetReviews(int pageNumber, int pageSize, string? userGuid=null)
         {
             int defaultPageSize = 10;
             int defaultPageNumber = 0;
             int maxPageSize = 100;
 
+           
             if (pageSize > maxPageSize || pageSize < 0)
             {
                 pageSize = defaultPageSize;
             }
-            int availableNumberOfPages = _context.Reviews.Count() / pageSize;
-            if (pageNumber > availableNumberOfPages)
+            if (userGuid is null)
             {
-                pageNumber = defaultPageNumber;
+                int availableNumberOfPages = _context.Reviews.Count() / pageSize;
+                if (pageNumber > availableNumberOfPages)
+                {
+                    pageNumber = defaultPageNumber;
+                }
+                return _context.Reviews.Skip(pageSize * pageNumber).Take(pageSize) as IEnumerable<Review>;
             }
-            var reviewsToReturn = _context.Reviews.Skip(pageSize * pageNumber).Take(pageSize) as IEnumerable<Review>;
+            else
+            {
+                int availableNumberOfPages = _context.Reviews.Where(review => review.UserId == new Guid(userGuid)).Count() / pageSize;
+                if (pageNumber > availableNumberOfPages)
+                {
+                    pageNumber = defaultPageNumber;
+                }
+                return _context.Reviews.Where(review => review.UserId == new Guid(userGuid)).Skip(pageSize * pageNumber).Take(pageSize);
+            }
+            
 
-            return reviewsToReturn;
+           
         }
 
         public IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews()

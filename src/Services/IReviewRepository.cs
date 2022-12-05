@@ -10,7 +10,7 @@ namespace src.Services
 
         Review GetReviewById(Guid id);
 
-        IEnumerable<Review> GetReviews(int pageNumber, int pageSize);
+        IEnumerable<Review> GetReviews(int pageNumber, int pageSize, string? userGuid=null);
 
         public void CreateSaveReview(Review review);
 
@@ -26,9 +26,9 @@ namespace src.Services
 
         IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews();
         
-        Review UpdateReviewLawyer( ReviewForUpdateDTO review);
-
-        Task<List<SuccessfulReviewsDto>> GetAllSuccessfulReview();
+        Review UpdateReviewLawyer( LawyerReviewForUpdateDTO review, Guid reviewId);
+        Review UpdateReview(ReviewForUpdateDTO review, Guid reviewId);
+        Task<IEnumerable<ReviewForDisplayDto>> GetAllSuccessfulReviews();
         IEnumerable<Review> GetReviewByStatusType(StatusType status);
         IEnumerable<Review> GetPendingReview();
 

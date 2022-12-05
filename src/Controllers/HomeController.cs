@@ -10,6 +10,7 @@ using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace src.Controllers
@@ -59,19 +60,20 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get all reviews for user")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
-        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
-        public ActionResult<List<ReviewForDisplayDto>> GetAllReviews([FromQuery] int pageNumber = 0, [FromQuery] int pageSize = 10)
+        //[ResponseCache(NoStore = true, Duration = 0)]
+        [ResponseCache(Duration = 30, Location = ResponseCacheLocation.Client)]
+        public ActionResult GetAllReviews([FromQuery] int pageNumber = 0, [FromQuery] int pageSize = 10)
         {
-            var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
+            var userEmail = User.FindFirstValue(ClaimTypes.Name);
+            var appUser = _userManager.FindByEmailAsync(userEmail).Result;
+            var reviews = _reviewRepo.GetReviews(pageNumber, pageSize,appUser.Id).ToList();
             var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews) as List<ReviewForDisplayDto>;
-            //var json = JsonSerializer.Serialize(reviewsToReturn);
             return Ok(reviewsToReturn);
-
         }
 
         [HttpGet("review/{reviewId}")]
         [Authorize(Roles = "Customer", AuthenticationSchemes ="Bearer")]
-        public ActionResult<ReviewForDisplayDto> GetSingleReview(Guid reviewId)
+        public ActionResult GetSingleReview(Guid reviewId)
         {
             if (reviewId == Guid.Empty)
             {
@@ -82,8 +84,7 @@ namespace src.Controllers
             if (singleReview == null)
                 return NotFound();
             var reviewForDisplay = _mapper.Map<ReviewForDisplayDto>(singleReview);
-            var json = JsonConvert.SerializeObject(reviewForDisplay);
-            return Ok(json);
+            return Ok(reviewForDisplay);
         }
 
         /// <summary>
@@ -99,6 +100,7 @@ namespace src.Controllers
         [HttpPost("review")]
         public async Task<ActionResult> CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
+            
             var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
             var user = await _userManager.FindByEmailAsync(userMail);
             var userId = new Guid(user.Id);
@@ -121,14 +123,10 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("review/{reviewId}")]
-        public ActionResult EditReview([FromBody] ReviewForUpdateDTO review)
+        public ActionResult EditReview([FromQuery] Guid reviewId, [FromBody] ReviewForUpdateDTO review)
         {
-            var reviews = _reviewRepo.UpdateReviewLawyer(review);
-            if (review == null)
-            {
-                return NotFound();
-            }
-            return Ok("Review is successfully updated");
+            var reviews = _reviewRepo.UpdateReview(review, reviewId);
+            return Ok("Review was successfully updated");
         }
 
         /// <summary>

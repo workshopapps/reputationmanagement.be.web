@@ -118,7 +118,7 @@ builder.Services.AddTransient<IQuoteRepository, QuoteRepo>();
 // Allower Swagger to deal with JWT Auth fluently
 builder.Services.AddSwaggerGen(c =>
 {
-    c.EnableAnnotations();
+    c.EnableAnnotations();    
     var securityScheme = new OpenApiSecurityScheme
     {
         Name = "JWT Authentication",

@@ -63,7 +63,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Update a review by Lawyer")]
         [HttpPut("review/{reviewId}")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult> UpdateReview([FromQuery] Guid reviewId, [FromBody]LawyerReviewForUpdateDTO reviewForUpdate)
+        public async Task<ActionResult> UpdateReview(Guid reviewId, [FromBody]LawyerReviewForUpdateDTO reviewForUpdate)
         {
            var updatedReview =_reviewRepo.UpdateReviewLawyer(reviewForUpdate, reviewId);
             const string EMAIL_SUBJECT = "Review status update";
@@ -133,7 +133,7 @@ namespace src.Controllers
         [HttpGet("reviews/{reviewId}")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [SwaggerResponseExample(200, typeof(GoodSingleReviewExample))]
-        public ActionResult GetSingleReview([FromBody]Guid reviewId)
+        public ActionResult GetSingleReview(Guid reviewId)
         {
             if (reviewId == Guid.Empty)
             {

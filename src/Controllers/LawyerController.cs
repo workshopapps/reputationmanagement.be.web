@@ -61,11 +61,11 @@ namespace src.Controllers
         /// <param name="reviewForUpdate"></param>
         /// <returns>A review</returns>
         [SwaggerOperation(Summary = "Update a review by Lawyer")]
-        [HttpPatch]
+        [HttpPut("review/{reviewId}")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult> UpdateReview([FromBody]LawyerReviewForUpdateDTO reviewForUpdate)
+        public async Task<ActionResult> UpdateReview([FromQuery] Guid reviewId, [FromBody]LawyerReviewForUpdateDTO reviewForUpdate)
         {
-           var updatedReview =_reviewRepo.UpdateReviewLawyer(reviewForUpdate);
+           var updatedReview =_reviewRepo.UpdateReviewLawyer(reviewForUpdate, reviewId);
             const string EMAIL_SUBJECT = "Review status update";
 
             var review = _reviewRepo.GetReviewById(updatedReview.ReviewId);
@@ -81,7 +81,7 @@ namespace src.Controllers
                 
                await _emailSender.SendEmailAsync(userToNotify.Email, "Update on your review",
                     $"The status of your review with id of {review.ReviewId} and review string of {review.ReviewString} has been updated to a status of " +
-                    $"{review.Status}");
+                    $"{review.Status}" + $"check find the review at https://repute.hng.tech/review/{review.ReviewId}");
                 return Ok("Review is successfully updated");
             }
             catch (SmtpCommandException ex)
@@ -115,13 +115,12 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get all reviews for Lawyer")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
-        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
-        public ActionResult<List<ReviewForDisplayDto>> GetAllReviews([FromQuery]int pageNumber = 0, [FromQuery]int pageSize = 10)
+        [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
+        public ActionResult GetAllReviews([FromQuery]int pageNumber = 0, [FromQuery]int pageSize = 10)
         {
             var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
             var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews) as List<ReviewForDisplayDto>;
-            var json = JsonSerializer.Serialize(reviewsToReturn);
-            return Ok(json);
+            return Ok(reviewsToReturn);
 
         }
 
@@ -134,7 +133,7 @@ namespace src.Controllers
         [HttpGet("reviews/{reviewId}")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [SwaggerResponseExample(200, typeof(GoodSingleReviewExample))]
-        public IActionResult GetSingleReview([FromBody]Guid reviewId)
+        public ActionResult GetSingleReview([FromBody]Guid reviewId)
         {
             if (reviewId == Guid.Empty)
             {
@@ -230,7 +229,7 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("ClaimReview")]
-        public IActionResult ClaimReview(Guid reviewId)
+        public ActionResult ClaimReview(Guid reviewId)
         {
             if (reviewId == null)
             {
@@ -248,7 +247,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Getv all reviews claimed by lawyer")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("GetClaimedReviews")]
-        public IActionResult GetClaimedReviews()
+        public ActionResult GetClaimedReviews()
         {
             var LawyerEmail = this.User.FindFirstValue(ClaimTypes.Name);
             var result = _reviewRepo.GetClaimedReviews(LawyerEmail);
@@ -258,7 +257,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get all reviews by company name")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("reviews/search")]
-        public IActionResult GetReviewByBusinessName([FromQuery] string businessEntityName)
+        public ActionResult GetReviewByBusinessName([FromQuery] string businessEntityName)
         {
             var reviews = _reviewRepo.GetReviewsByBusinessName(businessEntityName).ToList();
             var reviewsToReturn = _mapper.Map<List<ReviewForDisplayDto>>(reviews);

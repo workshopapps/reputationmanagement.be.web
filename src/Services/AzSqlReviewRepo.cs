@@ -76,10 +76,7 @@ namespace src.Services
                     pageNumber = defaultPageNumber;
                 }
                 return _context.Reviews.Where(review => review.UserId == new Guid(userGuid)).Skip(pageSize * pageNumber).Take(pageSize);
-            }
-            
-
-           
+            }  
         }
 
         public IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews()
@@ -136,13 +133,13 @@ namespace src.Services
             }
         }
 
-        public Review UpdateReviewLawyer(LawyerReviewForUpdateDTO review)
+        public Review UpdateReviewLawyer(LawyerReviewForUpdateDTO review, Guid reviewId)
         {
             if (review == null)
             {
                 throw new NotImplementedException("No review is passed");
             }
-            var reviewToUpdate = _context.Reviews.Where(c => c.ReviewId == review.ReviewId).SingleOrDefault();
+            var reviewToUpdate = _context.Reviews.Where(c => c.ReviewId == reviewId).SingleOrDefault();
 
            
             reviewToUpdate.Status = review.Status;
@@ -351,9 +348,20 @@ namespace src.Services
             }
             else
             {
-                return emptyReviews as IEnumerable<Review>; ;
+                return emptyReviews;
             }
         }
 
+        public Review UpdateReview(ReviewForUpdateDTO review, Guid reviewId)
+        {
+           var reviewToBeUpdated = _context.Reviews.Find(reviewId);
+           var updatedReview = _mapper.Map<Review>(reviewToBeUpdated);
+            reviewToBeUpdated.UpdatedAt = DateTime.Now;
+            reviewToBeUpdated.TimeStamp = DateTime.Now;
+            Save();
+            return reviewToBeUpdated;
+
+           
+        }
     }
 }

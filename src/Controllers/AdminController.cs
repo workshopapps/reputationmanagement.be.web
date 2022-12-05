@@ -22,7 +22,6 @@ public class AdminController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IQuoteRepository _quoteRepo;
 
-
     public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper, IQuoteRepository quoteRepo)
     {
         _userManager = userManager;
@@ -36,37 +35,34 @@ public class AdminController : ControllerBase
     {
         var user = await _userManager.FindByIdAsync(Id);
 
-        if(user != null)
+        if (user != null)
         {
             var result = await _userManager.DeleteAsync(user);
-            if(result.Succeeded)
+            if (result.Succeeded)
             {
                 return Ok("User Deleted");
             }
         }
 
         return BadRequest();
-
     }
+
     /// <summary>
     /// Updates user information
     /// </summary>
     /// <param name="userDetails"></param>
     /// <returns>Returns the updated information</returns>
 
-
     [SwaggerOperation(Summary = "Updates user details")]
     [HttpPut("UpdateUserAccount")]
     [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
     [SwaggerResponseExample(400, typeof(BadUserUpdateExampleDetailsForCustomer))]
     [SwaggerResponseExample(200, typeof(GoodUserUpdateExampleDetailsForCustomer))]
-
-
     public async Task<IActionResult> UpdateUser(CustomerAccountForCreationDto userDetails)
     {
         var user = await _userManager.FindByEmailAsync(userDetails.Email);
-        if (user != null) {
-
+        if (user != null)
+        {
             user.Email = userDetails.Email;
             user.UserName = userDetails.BusinessEntityName;
             user.PasswordHash = userDetails.Password;
@@ -83,9 +79,8 @@ public class AdminController : ControllerBase
     public IActionResult GetUsers()
 
     {
-        
         var user = _userManager.Users;
-        
+
         if (user != null)
         {
             var query = user.Select(x => new CustomerAccountForCreationDto()
@@ -93,12 +88,10 @@ public class AdminController : ControllerBase
                 BusinessEntityName = x.UserName,
                 Email = x.Email,
                 Password = x.PasswordHash,
-                
             }).ToList();
             return Ok(query);
         }
         return BadRequest();
-
     }
 
     //[SwaggerOperation(Summary = "Create a Review with this endpoint")]
@@ -106,7 +99,7 @@ public class AdminController : ControllerBase
     //[Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     //public ActionResult CreateReview([FromBody] Review reviewForCreation)
     //{
-    //    // use this to get user Id From request and 
+    //    // use this to get user Id From request and
     //    var review = _reviewRepo.CreateReview(reviewForCreation);
     //    return Ok(review);
     //}
@@ -118,16 +111,14 @@ public class AdminController : ControllerBase
     public ActionResult GetAllReviews(int pageNumber = 0, int pageSize = 10)
     {
         var reviews = _reviewRepo.GetAllReviews(pageNumber, pageSize).ToList();
-       var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
+        var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
         return Ok(reviewsToReturn);
-
     }
-
 
     [SwaggerOperation(Summary = "Get a particular reviews for Admin")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [HttpGet("reviews/{reviewId}")]
-     public IActionResult GetSingleReview(Guid reviewId)
+    public IActionResult GetSingleReview(Guid reviewId)
     {
         if (reviewId == Guid.Empty)
         {
@@ -153,11 +144,10 @@ public class AdminController : ControllerBase
     [HttpGet]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [Route("SuccessfulReview")]
-    public async Task<IActionResult> SuccessReview()
+    public async Task<ActionResult> SuccessReview()
     {
-        var resultModel = new List<SuccessfulReviewsDto>();
-        var query = await _reviewRepo.GetAllSuccessfulReview();
-        return Ok(query);
+        var reviews = await _reviewRepo.GetAllSuccessfulReviews();
+        return Ok(reviews);
     }
 
     [HttpGet]
@@ -165,7 +155,7 @@ public class AdminController : ControllerBase
     [Route("Reveiws/Priority")]
     public IActionResult GetreviewByPriority(PriorityType priority)
     {
-       // var resultModel = new List<SuccessfulReviewsDto>();
+        // var resultModel = new List<SuccessfulReviewsDto>();
         var query = _reviewRepo.GetReviewByPropirity(priority);
         if (query == null)
         {
@@ -177,25 +167,23 @@ public class AdminController : ControllerBase
     [SwaggerOperation(Summary = "Update a review by an Admin")]
     [HttpPut]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    [Route("{reviewId}/update")]
-    public ActionResult UpdateReview([FromBody]  ReviewForUpdateDTO review)
+    [Route("reviews/{reviewId}")]
+    public ActionResult UpdateReview([FromQuery] Guid reviewId, [FromBody] ReviewForUpdateDTO review)
     {
-       
-    var reviews =  _reviewRepo.UpdateReviewLawyer( review);
+        var reviews = _reviewRepo.UpdateReview(review, reviewId);
         if (review == null)
         {
-            return NotFound();
+            return BadRequest();
         }
-        return Ok("Review is successfully updated");
+        return Ok("Review was successfully updated");
     }
 
     [SwaggerOperation(Summary = "delete a review by an Admin")]
     [HttpDelete]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [Route("{reviewId}/delete")]
-    public ActionResult DeleteReview (Guid reviewId)
+    public ActionResult DeleteReview(Guid reviewId)
     {
-
         _reviewRepo.DeleteReview(reviewId);
         _reviewRepo.Save();
         return Ok("Review is successfully deleted");
@@ -210,11 +198,10 @@ public class AdminController : ControllerBase
         var quoteToDisplay = _mapper.Map<QuoteForCreationDto>(quote);
         return Ok(quoteToDisplay);
     }
+
     [HttpGet("quotes")]
     public ActionResult Getall()
     {
         return Ok(_quoteRepo.GetAll().ToList());
-
     }
 }
-

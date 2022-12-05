@@ -296,7 +296,6 @@ namespace src.Controllers
         [HttpPost("ContactUs")]
         [SwaggerOperation(Summary = "Allow user to mail the admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [AllowAnonymous]
         public async Task<ActionResult> ContactUs(ContactUsEmailDto contactMsg)
         {
             try

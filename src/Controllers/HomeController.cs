@@ -28,7 +28,6 @@ namespace src.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IContactUsMail _contactUsMail;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IQuoteRepository _quoteRepo;
 
         public HomeController(IReviewRepository reviewRepo, 
@@ -303,7 +302,7 @@ namespace src.Controllers
             try
             {
                 _contactUsMail.SendEmailAsync(contactMsg.FromEmail, contactMsg.EmailSubject, contactMsg.EmailBody);
-                return Ok("Success");
+                return Ok("Success, message sent");
             }
             catch (SmtpCommandException ex)
             {

@@ -10,7 +10,7 @@ namespace src.Services
 
         Review GetReviewById(Guid id);
 
-        IEnumerable<Review> GetReviews(int pageNumber, int pageSize);
+        IEnumerable<Review> GetReviews(int pageNumber, int pageSize, string? userGuid=null);
 
         public void CreateSaveReview(Review review);
 

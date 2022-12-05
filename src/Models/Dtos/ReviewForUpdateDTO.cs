@@ -14,4 +14,12 @@ namespace src.Models.Dtos
         [Required]
         public PriorityType Priority { get; set; }
     }
+
+    public class LawyerReviewForUpdateDTO
+    {
+        [Required]
+        public Guid ReviewId { get; set; }
+        [Required]
+        public StatusType Status { get; set; }
+    }
 }

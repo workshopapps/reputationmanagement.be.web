@@ -63,7 +63,7 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Update a review by Lawyer")]
         [HttpPatch]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult> UpdateReview([FromBody]ReviewForUpdateDTO reviewForUpdate)
+        public async Task<ActionResult> UpdateReview([FromBody]LawyerReviewForUpdateDTO reviewForUpdate)
         {
            var updatedReview =_reviewRepo.UpdateReviewLawyer(reviewForUpdate);
             const string EMAIL_SUBJECT = "Review status update";
@@ -102,9 +102,8 @@ namespace src.Controllers
         [Route("SuccessfulReview")]
         public async Task<ActionResult> SuccessReview()
         {
-           var resultModel = new List<SuccessfulReviewsDto>();
-           var query = await _reviewRepo.GetAllSuccessfulReview();
-           return Ok(query);
+           var successfulReviews = await _reviewRepo.GetAllSuccessfulReviews() as List<ReviewForDisplayDto>;
+           return Ok(successfulReviews);
         }
 
         /// <summary>

@@ -92,7 +92,7 @@ namespace src.Services
                     Email = r.Email,
                     ReviewString = r.ReviewString,
                     Status = r.Status,
-                    TimeStamp = r.TimeStamp
+                    TimeOfReview = r.TimeStamp
                 }).ToList();
 
             if (reviews == null)

@@ -60,7 +60,8 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get all reviews for user")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
-        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Client)]
+        //[ResponseCache(NoStore = true, Duration = 0)]
+        [ResponseCache(Duration = 30, Location = ResponseCacheLocation.Client)]
         public ActionResult GetAllReviews([FromQuery] int pageNumber = 0, [FromQuery] int pageSize = 10)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
@@ -99,6 +100,7 @@ namespace src.Controllers
         [HttpPost("review")]
         public async Task<ActionResult> CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
+            
             var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
             var user = await _userManager.FindByEmailAsync(userMail);
             var userId = new Guid(user.Id);

@@ -277,7 +277,7 @@ namespace src.Controllers
             return Ok("Reviews bulk upload added successfully");
         }
 
-        [HttpPost("quote")]
+        [HttpPost("createquote")]
         [AllowAnonymous]
         [SwaggerOperation(Summary = "Create a quote for an unauthorised user")]
 

@@ -143,6 +143,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
+builder.Services.AddTransient<IContactUsMail, ContactUsMailKit>();
 builder.Services.Configure<MailKitEmailSenderOptions>(
 builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));
 builder.Services.AddResponseCaching();

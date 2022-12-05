@@ -1,6 +1,8 @@
 using AutoMapper;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using src.Entities;
@@ -25,16 +27,18 @@ namespace src.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IContactUsMail _contactUsMail;
         private readonly IQuoteRepository _quoteRepo;
 
         public HomeController(IReviewRepository reviewRepo, 
-            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IQuoteRepository quoteRepo)
+            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IQuoteRepository quoteRepo, IContactUsMail contactUsMail)
         {
             _reviewRepo = reviewRepo;
             _mapper = mapper;
             _userManager = userManager;
             _signInManager = signInManager;
             _quoteRepo = quoteRepo;
+            _contactUsMail = contactUsMail;
         }
 
         /// <summary>
@@ -271,6 +275,34 @@ namespace src.Controllers
             var data = _reviewRepo.ReviewsBulkUpload(file);
 
             return Ok("Reviews bulk upload added successfully");
+        }
+
+        [HttpPost("createquote")]
+        [AllowAnonymous]
+        [SwaggerOperation(Summary = "Create a quote for an unauthorised user")]
+
+        public IActionResult CreateAQuote(QuoteForCreationDto quoteDto)
+        {
+            var quoteForCreation = _mapper.Map<Quote>(quoteDto);
+            _quoteRepo.CreateQuote(quoteDto);       
+            return Created($"api/Admin/quote/{quoteForCreation.Id}",quoteForCreation);
+        }
+
+
+        [HttpPost("ContactUs")]
+        [SwaggerOperation(Summary = "Allow user to mail the admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> ContactUs(ContactUsEmailDto contactMsg)
+        {
+            try
+            {
+                _contactUsMail.SendEmailAsync(contactMsg.FromEmail, contactMsg.EmailSubject, contactMsg.EmailBody);
+                return Ok("Success, message sent");
+            }
+            catch (SmtpCommandException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

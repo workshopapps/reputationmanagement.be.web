@@ -272,17 +272,5 @@ namespace src.Controllers
 
             return Ok("Reviews bulk upload added successfully");
         }
-
-        [HttpPost("quote")]
-        [AllowAnonymous]
-        [SwaggerOperation(Summary = "Create a quote for an unauthorised user")]
-
-        public IActionResult CreateAQuote(QuoteForCreationDto quoteDto)
-        {
-            var quoteForCreation = _mapper.Map<Quote>(quoteDto);
-            _quoteRepo.CreateQuote(quoteDto);       
-            return Created($"api/Admin/quote/{quoteForCreation.Id}",quoteForCreation);
-        }
-
     }
 }

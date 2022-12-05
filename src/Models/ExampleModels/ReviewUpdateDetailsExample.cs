@@ -11,7 +11,6 @@ namespace src.Models.ExampleModels
 
                 new ReviewForUpdateDTO()
                 {
-                   ReviewId = Guid.NewGuid(),
                    ReviewString = "Bad product",
                    Status =0,
                    Priority =0
@@ -26,7 +25,6 @@ namespace src.Models.ExampleModels
             yield return SwaggerExample.Create("Bad input that will return 400 BadRequest, \"The ReviewString field is required\"",
                new ReviewForUpdateDTO()
                {
-                   ReviewId = Guid.NewGuid(),
                    ReviewString = "",
                    Status = 0,
                    Priority = 0

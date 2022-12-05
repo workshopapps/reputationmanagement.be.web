@@ -10,6 +10,7 @@ using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace src.Controllers
@@ -59,13 +60,13 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get all reviews for user")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
-        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Client)]
         public ActionResult<List<ReviewForDisplayDto>> GetAllReviews([FromQuery] int pageNumber = 0, [FromQuery] int pageSize = 10)
         {
             var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
             var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews) as List<ReviewForDisplayDto>;
-            //var json = JsonSerializer.Serialize(reviewsToReturn);
-            return Ok(reviewsToReturn);
+            var json = JsonConvert.SerializeObject(reviewsToReturn);
+            return Ok(json);
 
         }
 

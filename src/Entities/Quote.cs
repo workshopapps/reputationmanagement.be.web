@@ -4,6 +4,7 @@ namespace src.Entities
 {
     public class Quote
     {
+        [Key]
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [EmailAddress]
@@ -12,10 +13,13 @@ namespace src.Entities
 
         [Phone]
         [Required(ErrorMessage = "Please We need a valid email address so that we may contact you")]
-        public string PhoneNumber { get; set; }
+        public string Phone { get; set; }
 
         [Required]
         public string BusinessName { get; set; }
+        [Required]
+        public string FullName { get; set; }
+
         [Required]
         public string ReviewLocation { get; set; }
 

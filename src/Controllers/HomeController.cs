@@ -127,14 +127,10 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPut("review/{reviewId}")]
-        public ActionResult EditReview([FromBody] ReviewForUpdateDTO review)
+        public ActionResult EditReview([FromQuery] Guid reviewId, [FromBody] ReviewForUpdateDTO review)
         {
-            var reviews = _reviewRepo.UpdateReviewLawyer(review);
-            if (review == null)
-            {
-                return NotFound();
-            }
-            return Ok("Review is successfully updated");
+            var reviews = _reviewRepo.UpdateReview(review, reviewId);
+            return Ok("Review was successfully updated");
         }
 
         /// <summary>

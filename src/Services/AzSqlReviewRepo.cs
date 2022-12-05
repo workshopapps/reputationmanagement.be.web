@@ -76,24 +76,15 @@ namespace src.Services
                     pageNumber = defaultPageNumber;
                 }
                 return _context.Reviews.Where(review => review.UserId == new Guid(userGuid)).Skip(pageSize * pageNumber).Take(pageSize);
-            }
-            
-
-           
+            }  
         }
 
         public IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews()
         {
-            var reviews = _context.Reviews
-                .Where(review => review.Status == StatusType.Inconclusive)
-                .Select(r => new ReviewForDisplayDto
-                {
-                    ReviewId = r.ReviewId,
-                    Email = r.Email,
-                    ReviewString = r.ReviewString,
-                    Status = r.Status,
-                    TimeOfReview = r.TimeStamp
-                }).ToList();
+            var reviewsFromdb = _context.Reviews
+                .Where(review => review.Status == StatusType.Inconclusive).ToList();
+
+            var reviews = _mapper.Map<List<ReviewForDisplayDto>>(reviewsFromdb);
 
             if (reviews == null)
             {
@@ -142,16 +133,17 @@ namespace src.Services
             }
         }
 
-        public Review UpdateReviewLawyer(ReviewForUpdateDTO review)
+        public Review UpdateReviewLawyer(LawyerReviewForUpdateDTO review, Guid reviewId)
         {
             if (review == null)
             {
                 throw new NotImplementedException("No review is passed");
             }
-            var reviewToUpdate = _context.Reviews.Where(c => c.ReviewId == review.ReviewId).SingleOrDefault();
+            var reviewToUpdate = _context.Reviews.Where(c => c.ReviewId == reviewId).SingleOrDefault();
 
-            reviewToUpdate.ReviewString = review.ReviewString;
+           
             reviewToUpdate.Status = review.Status;
+            
             reviewToUpdate.UpdatedAt = DateTime.Now;
 
             Save();
@@ -159,27 +151,18 @@ namespace src.Services
             return reviewToUpdate;
         }
 
-        public async Task<List<SuccessfulReviewsDto>> GetAllSuccessfulReview()
+        public async Task<IEnumerable<ReviewForDisplayDto>> GetAllSuccessfulReviews()
         {
             var resultModel = new List<SuccessfulReviewsDto>();
 
-            var query = await _context.Reviews
-                .Where(x => x.Status == StatusType.Successful)
-                .Select(x => new SuccessfulReviewsDto()
-                {
-                    ReviewId = x.ReviewId,
-                    Email = x.Email,
-                    Status = x.Status,
-                    TimeStamp = x.TimeStamp,
-                    Message = x.ReviewString,
-                }).ToListAsync();
+            var reviewsFromDb = _context.Reviews
+                .Where(x => x.Status == StatusType.Successful);
 
-            if (query != null)
-            {
-                resultModel = query;
-            }
+            var reviews = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviewsFromDb).ToList();
 
-            return resultModel;
+
+
+            return reviews;
         }
 
         public IEnumerable<Review> GetReviewByStatusType(StatusType status)
@@ -365,8 +348,20 @@ namespace src.Services
             }
             else
             {
-                return emptyReviews as IEnumerable<Review>; ;
+                return emptyReviews;
             }
+        }
+
+        public Review UpdateReview(ReviewForUpdateDTO review, Guid reviewId)
+        {
+           var reviewToBeUpdated = _context.Reviews.Find(reviewId);
+           var updatedReview = _mapper.Map<Review>(reviewToBeUpdated);
+            reviewToBeUpdated.UpdatedAt = DateTime.Now;
+            reviewToBeUpdated.TimeStamp = DateTime.Now;
+            Save();
+            return reviewToBeUpdated;
+
+           
         }
     }
 }

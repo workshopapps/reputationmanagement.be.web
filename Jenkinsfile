@@ -11,7 +11,7 @@ pipeline {
 
 			steps {
 				sh "rm -rf ${WORKSPACE}/reputationmanagement.be.web"
-				sh "git clone -b development https://github.com/workshopapps/reputationmanagement.be.web.git"
+				//sh "git clone -b development https://github.com/workshopapps/reputationmanagement.be.web.git"
 				sh "sudo cp -r ${WORKSPACE}/reputationmanagement.be.web /home/ehmeeops/reputationmanagement.be.web"
 			}
 		}

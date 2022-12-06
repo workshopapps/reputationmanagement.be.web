@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Sentry;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
@@ -29,9 +30,11 @@ namespace src.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IContactUsMail _contactUsMail;
         private readonly IQuoteRepository _quoteRepo;
+        private readonly ISentryClient _sentry;
 
         public HomeController(IReviewRepository reviewRepo, 
-            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IQuoteRepository quoteRepo, IContactUsMail contactUsMail)
+            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IQuoteRepository quoteRepo, IContactUsMail contactUsMail,
+            ISentryClient sentry)
         {
             _reviewRepo = reviewRepo;
             _mapper = mapper;
@@ -39,6 +42,21 @@ namespace src.Controllers
             _signInManager = signInManager;
             _quoteRepo = quoteRepo;
             _contactUsMail = contactUsMail;
+            _sentry = sentry;
+        }
+
+        /// <summary>
+        /// Greets the user
+        /// </summary>
+        /// <returns>Hello customer!</returns>
+        [SwaggerOperation(Summary = "greet sentry")]
+        [HttpGet("sentry")]
+        [AllowAnonymous]
+        public IActionResult sentry()
+        {
+
+            var sentryId =  _sentry.CaptureMessage("Beans", SentryLevel.Info);
+            return Ok("This is the sentry Id");
         }
 
         /// <summary>
@@ -50,7 +68,7 @@ namespace src.Controllers
         [AllowAnonymous]
         public IActionResult greet()
         {
-           
+
             string greetings = "Hello customer!";
             return Ok(greetings);
         }

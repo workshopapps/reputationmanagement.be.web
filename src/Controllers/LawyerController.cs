@@ -1,21 +1,17 @@
 ﻿using AutoMapper;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
-using src.Helpers;
-using src.Models;
 using src.Models.Dtos;
 using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
-using System.Net;
 using System.Security.Claims;
-using System.Text.Json;
 
 namespace src.Controllers
 {
@@ -54,42 +50,46 @@ namespace src.Controllers
             return Ok(greetings);
         }
 
-
         /// <summary>
         /// Provides all the reviews for the lawyer, with pagination to avoid query delay
         /// </summary>
         /// <param name="reviewForUpdate"></param>
         /// <returns>A review</returns>
         [SwaggerOperation(Summary = "Update a review by Lawyer")]
-        [HttpPut("review/{reviewId}")]
+        [HttpPatch("review/{reviewId}")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        public async Task<ActionResult> UpdateReview(Guid reviewId, [FromBody]LawyerReviewForUpdateDTO reviewForUpdate)
+        public async Task<ActionResult> UpdateReview(Guid reviewId, JsonPatchDocument<LawyerReviewForUpdateDTO> reviewForUpdatePatchDoc)
         {
-           var updatedReview =_reviewRepo.UpdateReviewLawyer(reviewForUpdate, reviewId);
-            const string EMAIL_SUBJECT = "Review status update";
-
-            var review = _reviewRepo.GetReviewById(updatedReview.ReviewId);
-            var userId = review.UserId;
-            var userToNotify = await _userManager.FindByIdAsync(userId.ToString());
-            if (updatedReview == null)
-            {
-                return NotFound();
-            }
-
             try
             {
-                
-               await _emailSender.SendEmailAsync(userToNotify.Email, "Update on your review",
-                    $"The status of your review with id of {review.ReviewId} and review string of {review.ReviewString} has been updated to a status of " +
-                    $"{review.Status}" + $"check find the review at https://repute.hng.tech/review/{review.ReviewId}");
-                return Ok("Review is successfully updated");
+                if (reviewForUpdatePatchDoc is not null)
+                {
+                    var newReviewForUpdate = new LawyerReviewForUpdateDTO();
+                    reviewForUpdatePatchDoc.ApplyTo(newReviewForUpdate);
+
+                    if (ModelState.IsValid is false)
+                    {
+                        return BadRequest(ModelState);
+                    }
+                    var updatedReview = _reviewRepo.UpdateReviewLawyer(newReviewForUpdate, reviewId);
+                    var reviewForDisplay = _mapper.Map<ReviewForDisplayDto>(updatedReview);
+
+                    string emailSubject = "Review status update";
+                    var userToNotify = await _userManager.FindByIdAsync(updatedReview.UserId.ToString());
+                    
+                    await _emailSender.SendEmailAsync(userToNotify.Email, $"{emailSubject}",
+                         $"The status of your review with id of \"{updatedReview.ReviewId}\" and review string of \"{updatedReview.ReviewString}\" has been updated to " +
+                         $"\"{updatedReview.Status}\"" + $" check https://repute.hng.tech/review/{updatedReview.ReviewId}");
+                    return new ObjectResult(reviewForDisplay);
+                }
             }
             catch (SmtpCommandException ex)
             {
                 return BadRequest(ex.Message);
             }
-           
-            
+
+            return BadRequest(ModelState);
+
         }
 
         /// <summary>
@@ -102,8 +102,8 @@ namespace src.Controllers
         [Route("SuccessfulReview")]
         public async Task<ActionResult> SuccessReview()
         {
-           var successfulReviews = await _reviewRepo.GetAllSuccessfulReviews() as List<ReviewForDisplayDto>;
-           return Ok(successfulReviews);
+            var successfulReviews = await _reviewRepo.GetAllSuccessfulReviews() as List<ReviewForDisplayDto>;
+            return Ok(successfulReviews);
         }
 
         /// <summary>
@@ -116,12 +116,11 @@ namespace src.Controllers
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("reviews")]
         [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
-        public ActionResult GetAllReviews([FromQuery]int pageNumber = 0, [FromQuery]int pageSize = 10)
+        public ActionResult GetAllReviews([FromQuery] int pageNumber = 0, [FromQuery] int pageSize = 10)
         {
             var reviews = _reviewRepo.GetReviews(pageNumber, pageSize).ToList();
             var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews) as List<ReviewForDisplayDto>;
             return Ok(reviewsToReturn);
-
         }
 
         /// <summary>
@@ -186,7 +185,7 @@ namespace src.Controllers
         [HttpGet("GetReviewByStatus")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [SwaggerResponseExample(200, typeof(GoodReviewByStatusForCustomer))]
-        public IActionResult GetReviewByStatus([FromQuery]StatusType status)
+        public IActionResult GetReviewByStatus([FromQuery] StatusType status)
         {
             var reviewByStatus = _reviewRepo.GetReviewByStatusType(status);
 
@@ -196,9 +195,7 @@ namespace src.Controllers
             }
 
             return Ok(reviewByStatus);
-
         }
-
 
         /// <summary>
         /// Allows for sending of email to users of selected bad reviews
@@ -210,7 +207,7 @@ namespace src.Controllers
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [SwaggerResponseExample(400, typeof(BadSendingEmailTExample))]
         [SwaggerResponseExample(200, typeof(GoodSendingEmailTExample))]
-        public ActionResult SendEmail([FromBody]EmailDataDto emailData)
+        public ActionResult SendEmail([FromBody] EmailDataDto emailData)
         {
             const string EMAIL_SUBJECT = "Plea for removal of review";
             try
@@ -218,11 +215,10 @@ namespace src.Controllers
                 _emailSender.SendEmailAsync(emailData.EmailToId, EMAIL_SUBJECT, emailData.EmailBody);
                 return Ok("Success");
             }
-            catch(SmtpCommandException ex)
+            catch (SmtpCommandException ex)
             {
                 return BadRequest(ex.Message);
             }
-            
         }
 
         [SwaggerOperation(Summary = "Lawyer claims a review.")]
@@ -237,11 +233,11 @@ namespace src.Controllers
             }
             var LawyerEmail = this.User.FindFirstValue(ClaimTypes.Name);
             var result = _reviewRepo.ClaimReview(reviewId, LawyerEmail);
-            if(result == null)
+            if (result == null)
             {
                 return BadRequest();
             }
-            return Ok();  
+            return Ok();
         }
 
         [SwaggerOperation(Summary = "Getv all reviews claimed by lawyer")]
@@ -263,8 +259,5 @@ namespace src.Controllers
             var reviewsToReturn = _mapper.Map<List<ReviewForDisplayDto>>(reviews);
             return Ok(reviewsToReturn);
         }
-
-
-
     }
 }

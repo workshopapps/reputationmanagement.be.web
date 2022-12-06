@@ -3,6 +3,7 @@ using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Sentry;
@@ -144,11 +145,25 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPut("review/{reviewId}")]
-        public ActionResult EditReview([FromQuery] Guid reviewId, [FromBody] ReviewForUpdateDTO review)
+        [HttpPatch("review/{reviewId}")]
+        public IActionResult EditReview(Guid reviewId, [FromBody] JsonPatchDocument<ReviewForUpdateDTO> reviewPatchDoc)
         {
-            var reviews = _reviewRepo.UpdateReview(review, reviewId);
-            return Ok("Review was successfully updated");
+            if (reviewPatchDoc is not null)
+            {
+                var reviewToPatch = _reviewRepo.GetReviewById(reviewId);
+                var reviewForUpdateToPatch = _mapper.Map<ReviewForUpdateDTO>(reviewToPatch);
+                reviewPatchDoc.ApplyTo(reviewForUpdateToPatch);
+                if (ModelState.IsValid is false)
+                {
+                    return BadRequest(ModelState);
+                }
+                var review = _reviewRepo.UpdateReview(reviewForUpdateToPatch, reviewId);
+
+                var reviewForDisplay = _mapper.Map<ReviewForDisplayDto>(review);
+                return new ObjectResult(reviewForDisplay);
+            }
+            return BadRequest(ModelState);
+             
         }
 
         /// <summary>

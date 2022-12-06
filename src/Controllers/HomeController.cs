@@ -219,7 +219,7 @@ namespace src.Controllers
             if (complains == null)
                 return NoContent();
 
-            var query = _reviewRepo.PostUserComplains(complains);
+            var query = _reviewRepo.CreateComplaint(complains);
             if (query == null)
                 return NoContent();
 

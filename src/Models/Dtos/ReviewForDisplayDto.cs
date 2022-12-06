@@ -19,6 +19,9 @@ namespace src.Models.Dtos
         public DateTime TimeOfReview { get; set; }
         public DateTime LastUpdated { get; set; }
 
+        /// new reqs 5/12/2022
+        public string ComplainerName { get; set; } = "Ciroma Chukwuma Adekunle";
+
 
 
     }

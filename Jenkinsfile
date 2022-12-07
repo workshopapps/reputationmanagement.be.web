@@ -38,6 +38,8 @@ pipeline {
 		
 			steps {
 				sh "sudo cp -rf ${WORKSPACE}/src/* /home/ehmeeops/reputationmanagement.be.web/src"
+				sh "dotnet ef database update --context AppIdentityDbContext"
+				sh "dotnet ef database update --context ApplicationDbContext"
 				// sh "sudo pm2 start"
 			}		
 		}

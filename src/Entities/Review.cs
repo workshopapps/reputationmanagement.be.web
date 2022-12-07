@@ -37,6 +37,10 @@ namespace src.Entities
         public string WebsiteName { get; set; }
         [Required]
         public int Rating { get; set; }
+
+        /// new reqs 5/12/2022
+        [Required]
+        public string ComplainerName { get; set; } = "Ciroma Chukwuma Adekunle";
     }
 
     public enum StatusType

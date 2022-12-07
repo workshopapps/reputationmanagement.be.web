@@ -33,7 +33,7 @@ namespace src.Services
         IEnumerable<Review> GetPendingReview();
 
 
-        Task<UserComplains> PostUserComplains(CreateUserComplainsDto model);
+        Task<UserComplains> CreateComplaint(CreateUserComplainsDto model);
 
         ReviewForDisplayDto CreateReview(Review review);
         IEnumerable<Review> GetAllReviews(int pageNumber = 0, int pageSize = 0);

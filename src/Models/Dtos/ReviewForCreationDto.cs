@@ -14,13 +14,17 @@ namespace src.Models.Dtos
         public StatusType Status { get; set; }
         [Required]
         public PriorityType Priority { get; set; }
-        
+
         //New reqs
         [Required]
-        public string BusinessType { get; set; }
+        public string BusinessType { get; set; } = "Online Store";
         [Required]
-        public string WebsiteName { get; set; }
+        public string WebsiteName { get; set; } = "https://google.com";
         [Required]
         public int Rating { get; set; }
+
+        /// new reqs 5/12/2022
+        [Required]
+        public string ComplainerName { get; set; } = "Ciroma Chukwuma Adekunle";
     }
 }

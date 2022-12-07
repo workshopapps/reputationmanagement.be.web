@@ -20,11 +20,20 @@ using Microsoft.AspNetCore.Hosting;
 using Hellang.Middleware.ProblemDetails;
 using FluentValidation.AspNetCore;
 using FluentValidation;
+using Sentry;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.WebHost.UseSentry(options => options.SampleRate=1);
+
+
+
 // Add services to the container.
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+
+builder.Services.AddTransient<ISentryClient, SentryClient>();
 
 builder.Services.AddAuthentication(opt =>
 {
@@ -143,10 +152,12 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 builder.Services.AddTransient<IEmailSender, MailKitEmailSender>();
+builder.Services.AddTransient<IContactUsMail, ContactUsMailKit>();
 builder.Services.Configure<MailKitEmailSenderOptions>(
 builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));
 builder.Services.AddResponseCaching();
 var app = builder.Build();
+
 
 
 // Configure the HTTP request pipeline.
@@ -155,6 +166,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     app.UseStatusCodePages();
 }
+app.UseSentryTracing();
 app.UseProblemDetails();
 app.UseHttpsRedirection();
 app.UseSwagger();

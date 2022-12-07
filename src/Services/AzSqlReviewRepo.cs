@@ -177,14 +177,14 @@ namespace src.Services
             .Where(p => p.Status == StatusType.PendingReview);
         }
 
-        public async Task<UserComplains> PostUserComplains(CreateUserComplainsDto complains)
+        public async Task<UserComplains> CreateComplaint(CreateUserComplainsDto complains)
         {
             var data = new UserComplains()
             {
                 ComplaintId = Guid.NewGuid(),
                 ComplaintMessage = complains.ComplaintMessage,
                 TimeStamp = DateTime.Now,
-                UserId = complains.UserId
+                UserId = complains.UserId.ToString()
             };
 
             var saveData = await _context.UserComplaint.AddAsync(data);
@@ -355,7 +355,7 @@ namespace src.Services
         public Review UpdateReview(ReviewForUpdateDTO review, Guid reviewId)
         {
            var reviewToBeUpdated = _context.Reviews.Find(reviewId);
-           var updatedReview = _mapper.Map<Review>(reviewToBeUpdated);
+            _ = _mapper.Map(review, reviewToBeUpdated);
             reviewToBeUpdated.UpdatedAt = DateTime.Now;
             reviewToBeUpdated.TimeStamp = DateTime.Now;
             Save();

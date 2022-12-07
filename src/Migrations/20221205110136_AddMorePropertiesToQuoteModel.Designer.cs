@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using src.Data;
 
@@ -10,14 +11,75 @@ using src.Data;
 namespace src.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221205110136_AddMorePropertiesToQuoteModel")]
+    partial class AddMorePropertiesToQuoteModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("src.Entities.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("PostAddress")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApplicationUser");
+                });
 
             modelBuilder.Entity("src.Entities.CareerResponse", b =>
                 {
@@ -128,10 +190,6 @@ namespace src.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("ComplainerName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -220,13 +278,26 @@ namespace src.Migrations
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("UserId1")
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("ComplaintId");
 
+                    b.HasIndex("UserId1");
+
                     b.ToTable("UserComplaint");
+                });
+
+            modelBuilder.Entity("src.Entities.UserComplains", b =>
+                {
+                    b.HasOne("src.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -242,7 +242,7 @@ namespace src.Services
                 .Where(_x => _x.UserId == UserId && _x.UpdatedAt > _x.CreatedAt && _x.UpdatedAt > _x.ViewLastTime).ToListAsync();
 
             foreach (var review in reviews)
-            {
+            {   
                 review.TimeStamp = review.UpdatedAt = review.ViewLastTime = DateTime.Now;
                 _context.Reviews.Update(review);
             }

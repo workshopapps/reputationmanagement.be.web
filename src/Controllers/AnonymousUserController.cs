@@ -45,8 +45,9 @@ namespace src.Controllers
                 {
                     CoverLetterFileName = coverPath,
                     ResumeFileName = resumePath,
-                    FirstName = careerResponse.FIrstName,
+                    FirstName = careerResponse.FirstName,
                     LastName = careerResponse.LastName,
+                    Email = careerResponse.Email,
                     PhoneNumber = careerResponse.PhoneNumber,
                     Position= careerResponse.Position,
                     Reason = careerResponse.Reason,

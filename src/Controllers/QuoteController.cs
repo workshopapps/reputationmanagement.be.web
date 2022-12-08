@@ -1,16 +1,12 @@
 ﻿using AutoMapper;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using src.Entities;
+using src.Models.Dtos;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data;
-using src.Models.Dtos;
-using System.Security.Claims;
-using MailKit.Net.Smtp;
-using src.Models;
 
 namespace src.Controllers
 {
@@ -18,8 +14,8 @@ namespace src.Controllers
     [ApiController]
     [Route("api/quote")]
     [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-    public class QuoteController : ControllerBase {
-
+    public class QuoteController : ControllerBase
+    {
         private readonly IQuoteRepository _quoteRepo;
         private readonly IMapper _mapper;
         private readonly IEmailSender _emailSender;
@@ -31,7 +27,7 @@ namespace src.Controllers
             _mapper = mapper;
             _emailSender = emailSender;
         }
-      
+
         /// <summary>
         /// Create a Review with this endpoint
         /// </summary>
@@ -42,7 +38,6 @@ namespace src.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> CreateQuote([FromBody] QuoteForCreationDto quoteForCreationDto)
         {
-
             var quoteForDisplay = _quoteRepo.CreateQuote(quoteForCreationDto);
 
             var emailData = new EmailDataDto()
@@ -50,15 +45,12 @@ namespace src.Controllers
                 EmailToId = quoteForCreationDto.Email,
                 EmailBody = "We'll get back to you, your quote has been" +
                 "recorded",
-                
             };
             const string EMAIL_SUBJECT = "Repute - QuoteMail";
             try
             {
                 _emailSender.SendEmailAsync(emailData.EmailToId, EMAIL_SUBJECT, emailData.EmailBody);
-               
-                return CreatedAtAction(nameof(GetQuote), new {quoteId = new Guid(quoteForDisplay.Id)}, quoteForDisplay);
-                //return CreatedAtAction(nameof(GetQuote), new { quoteId = new Guid(quoteForDisplay.Id) });
+                return CreatedAtAction(nameof(GetQuote), new { quoteId = new Guid(quoteForDisplay.Id) }, quoteForDisplay);
             }
             catch (SmtpCommandException ex)
             {
@@ -76,7 +68,7 @@ namespace src.Controllers
         public async Task<ActionResult> GetQuote(Guid quoteId)
         {
             var quoteForDisplay = _quoteRepo.GetQuoteById(quoteId);
-            if(quoteForDisplay == null) { return NotFound(); }
+            if (quoteForDisplay == null) { return NotFound(); }
             return Ok(quoteForDisplay);
         }
 
@@ -88,8 +80,5 @@ namespace src.Controllers
             var quotes = _quoteRepo.Quotes.Select(x => x).ToList();
             return Ok(quotes);
         }
-
-
     }
-
 }

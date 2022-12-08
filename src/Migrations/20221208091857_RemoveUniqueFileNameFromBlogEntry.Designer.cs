@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using src.Data;
 
@@ -10,9 +11,10 @@ using src.Data;
 namespace src.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221208091857_RemoveUniqueFileNameFromBlogEntry")]
+    partial class RemoveUniqueFileNameFromBlogEntry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +47,7 @@ namespace src.Migrations
 
                     b.HasKey("BlogEntryId");
 
-                    b.ToTable("BlogEntries", (string)null);
+                    b.ToTable("BlogEntries");
                 });
 
             modelBuilder.Entity("src.Entities.CareerResponse", b =>
@@ -91,7 +93,7 @@ namespace src.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("CareerResponses", (string)null);
+                    b.ToTable("CareerResponses");
                 });
 
             modelBuilder.Entity("src.Entities.ChallengeReview", b =>
@@ -109,7 +111,7 @@ namespace src.Migrations
 
                     b.HasKey("ReviewId");
 
-                    b.ToTable("challengeReviews", (string)null);
+                    b.ToTable("challengeReviews");
                 });
 
             modelBuilder.Entity("src.Entities.Quote", b =>
@@ -148,7 +150,7 @@ namespace src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Quotes", (string)null);
+                    b.ToTable("Quotes");
                 });
 
             modelBuilder.Entity("src.Entities.Review", b =>
@@ -209,7 +211,7 @@ namespace src.Migrations
 
                     b.HasKey("ReviewId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("src.Entities.Transaction", b =>
@@ -240,7 +242,7 @@ namespace src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("src.Entities.UserComplains", b =>
@@ -262,7 +264,7 @@ namespace src.Migrations
 
                     b.HasKey("ComplaintId");
 
-                    b.ToTable("UserComplaint", (string)null);
+                    b.ToTable("UserComplaint");
                 });
 #pragma warning restore 612, 618
         }

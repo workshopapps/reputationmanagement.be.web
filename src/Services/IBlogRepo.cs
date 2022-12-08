@@ -5,8 +5,8 @@ namespace src.Services
 {
     public interface IBlogRepo
     {
-        Review GetBlogEntryById(Guid id);
-        IEnumerable<BlogEntryForDisplayDto> GetBlogEntries(int pageNumber, int pageSize, string? userGuid = null);
+        BlogEntryForDisplayDto GetBlogEntryById(Guid id);
+        IEnumerable<BlogEntryForDisplayDto> GetBlogEntries(int pageNumber=0, int pageSize=10, string? userGuid = null);
         public Task<BlogEntryForDisplayDto> AddBlogEntry(BlogEntryForCreationDto blogEntry);
 
 

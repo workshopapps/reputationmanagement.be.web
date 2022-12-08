@@ -6,7 +6,6 @@ namespace src.Models.Dtos
     {
         public string Description { get; set; } = "The description of the blog post";
         public string Title { get; set; } = "The title of the blog post";
-        public string UniqueNameOfFile { get; set; } = "VeryUniqueInFact.jpg";
         public string Url { get; set; } = "http://blogpost.com";
         public IFormFile Image { get; set; }
     }

@@ -20,8 +20,6 @@ namespace src.Services
         }
         public async Task<BlogEntryForDisplayDto> AddBlogEntry(BlogEntryForCreationDto blogEntry)
         {
-           
-
             var blogEntryToAdd = _mapper.Map<BlogEntry>(blogEntry);
             blogEntryToAdd.PathToImage =Path.GetFullPath("../", Path.Combine(Environment.CurrentDirectory, "BlogPostImages"));
             
@@ -32,12 +30,33 @@ namespace src.Services
 
         public IEnumerable<BlogEntryForDisplayDto> GetBlogEntries(int pageNumber, int pageSize, string? userGuid = null)
         {
-            throw new NotImplementedException();
+            int defaultPageSize = 10;
+            int defaultPageNumber = 0;
+            int maxPageSize = 100;
+            if (pageSize > maxPageSize || pageSize < 0)
+            {
+                pageSize = defaultPageSize;
+            }
+            int availableNumberOfPages = _context.BlogEntries.Count() / pageSize;
+            if (pageNumber > availableNumberOfPages)
+            {
+                pageNumber = defaultPageNumber;
+            }
+            var blogEntriesToDisplay = _mapper.Map<IEnumerable<BlogEntryForDisplayDto>>(_context.BlogEntries.Skip(pageSize * pageNumber).Take(pageSize).ToList());
+
+            return blogEntriesToDisplay;
         }
 
-        public Review GetBlogEntryById(Guid id)
+
+        public BlogEntryForDisplayDto GetBlogEntryById(Guid id)
         {
-            throw new NotImplementedException();
+            if (id == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
+            var blogEntry = _context.BlogEntries.Where(c => c.BlogEntryId == id).SingleOrDefault();
+            var blogEntryToReturn = _mapper.Map<BlogEntryForDisplayDto>(blogEntry);
+            return blogEntryToReturn;
         }
     }
 }

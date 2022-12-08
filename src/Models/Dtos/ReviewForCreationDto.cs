@@ -26,5 +26,11 @@ namespace src.Models.Dtos
         /// new reqs 5/12/2022
         [Required]
         public string ComplainerName { get; set; } = "Ciroma Chukwuma Adekunle";
+
+        // new req 12/8/2022
+        // Map time stamp to ActualReviewCreationDate date
+        [Required]
+        public DateTime TimeOfReview { get; set; } = default;
+
     }
 }

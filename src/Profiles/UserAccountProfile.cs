@@ -15,6 +15,10 @@ namespace EarlyMan.PL.Profiles
 
             CreateMap<src.Entities.ApplicationUser, src.Models.Dtos.UserDetailsDto>()
             .ForMember(x => x.BusinessEntityName, opt => opt.MapFrom(source => source.UserName.Replace("_", " ")));
+
+            CreateMap<src.Models.AccessibilityOptions, src.Entities.ApplicationUser>();
+            CreateMap<src.Entities.ApplicationUser, src.Models.AccessibilityOptions>();
+
         }
     }
 }

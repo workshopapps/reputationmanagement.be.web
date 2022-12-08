@@ -265,38 +265,53 @@ namespace src.Controllers
 
 
         /// <summary>
-        /// Gets the language preference of the currently signed in user
+        /// Gets the  preference settings of the currently signed in user
         /// </summary>
-        /// <returns>The Language preference of the signed in user</returns>
-        [HttpGet("customer/language")]
+        /// <returns>The accessibility settings of the signed in user</returns>
+        ///  [SwaggerOperation(Summary = "Notify user when a review's status changes ")]
+        [HttpGet("customer/accessibility")]
         [SwaggerOperation(Summary = "Gets the language preference of the currently signed in user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetLanguage()
+        public async Task<ActionResult> GetOptions()
         {
             var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value; 
             var user = await _userManager.FindByEmailAsync(userEmail);
-            return Ok(user.Language);
+
+            var options = _mapper.Map<AccessibilityOptions>(user);
+            return Ok(options);
         }
 
-        [HttpPost("customer/language")]
-        [SwaggerOperation(Summary = "Sets the language preference of the currently signed in user, select one of {\"english\", \"german\", \"russian\", \"chinese\"}")]
+        /// <summary>
+        /// Sets the  preference settings of the currently signed in user
+        /// </summary>
+        /// <returns>A accessibility settings of the signed in user</returns>
+        [HttpPost("customer/accessibility")]
+        [SwaggerOperation(Summary = "Sets the accessibility preference of the currently signed in user, select one of {\"english\", \"german\", \"russian\", \"chinese\"}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult> SetLanguage([FromQuery] string language)
+        public async Task<ActionResult> SetOptions(AccessibilityOptions options)
         {
+            options.Language = options.Language.ToLowerInvariant();
             List<string> listOfSupportedLanguages = new() { "english", "german", "russian", "chinese" };
-            
-            if (listOfSupportedLanguages.Contains(language.ToLowerInvariant()))
+
+            if (listOfSupportedLanguages.Contains(options.Language))
             {
                 var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
                 var user = await _userManager.FindByEmailAsync(userEmail);
-                user.Language = language.ToLowerInvariant();
+                _mapper.Map(options, user);
                 var updateResult = await _userManager.UpdateAsync(user);
                 if (updateResult.Succeeded)
                 {
-                    return CreatedAtAction("GetLanguage", language);
+                    return CreatedAtAction("GetOptions", options);
+                }
+                else
+                {
+                    return BadRequest(ModelState);
                 }
             }
-            return BadRequest("Invalid language string, please select one of {\"english\", \"german\", \"russian\", \"chinese\"}");
+            else 
+            {
+                return BadRequest("Invalid language string, please select one of {\"english\", \"german\", \"russian\", \"chinese\"}");
+            }
         }
 
         [SwaggerOperation(Summary = "Create multiple reviews")]

@@ -121,8 +121,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddTransient<IReviewRepository, AzSqlReviewRepo>();
 builder.Services.AddTransient<IQuoteRepository, QuoteRepo>();
-
-
+builder.Services.AddTransient<IBlogRepo,BlogEntryRepo>();
 
 // Allower Swagger to deal with JWT Auth fluently
 builder.Services.AddSwaggerGen(c =>
@@ -157,8 +156,6 @@ builder.Services.Configure<MailKitEmailSenderOptions>(
 builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));
 builder.Services.AddResponseCaching();
 var app = builder.Build();
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

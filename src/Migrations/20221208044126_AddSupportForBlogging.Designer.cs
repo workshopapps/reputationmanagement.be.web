@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using src.Data;
 
@@ -10,9 +11,10 @@ using src.Data;
 namespace src.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221208044126_AddSupportForBlogging")]
+    partial class AddSupportForBlogging
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,9 +23,8 @@ namespace src.Migrations
 
             modelBuilder.Entity("src.Entities.BlogEntry", b =>
                 {
-                    b.Property<Guid>("BlogEntryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                    b.Property<string>("BlogEntryId")
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime(6)");
@@ -39,26 +40,26 @@ namespace src.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("UniqueNameOfFile")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("BlogEntryId");
 
-                    b.ToTable("BlogEntries", (string)null);
+                    b.ToTable("BlogEntries");
                 });
 
             modelBuilder.Entity("src.Entities.CareerResponse", b =>
                 {
-                    b.Property<Guid>("id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<string>("CoverLetterFileName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -89,9 +90,9 @@ namespace src.Migrations
                     b.Property<DateTime>("SubmittedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
-                    b.ToTable("CareerResponses", (string)null);
+                    b.ToTable("CareerResponses");
                 });
 
             modelBuilder.Entity("src.Entities.ChallengeReview", b =>
@@ -109,7 +110,7 @@ namespace src.Migrations
 
                     b.HasKey("ReviewId");
 
-                    b.ToTable("challengeReviews", (string)null);
+                    b.ToTable("challengeReviews");
                 });
 
             modelBuilder.Entity("src.Entities.Quote", b =>
@@ -148,7 +149,7 @@ namespace src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Quotes", (string)null);
+                    b.ToTable("Quotes");
                 });
 
             modelBuilder.Entity("src.Entities.Review", b =>
@@ -209,7 +210,7 @@ namespace src.Migrations
 
                     b.HasKey("ReviewId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("src.Entities.Transaction", b =>
@@ -240,7 +241,7 @@ namespace src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("src.Entities.UserComplains", b =>
@@ -262,7 +263,7 @@ namespace src.Migrations
 
                     b.HasKey("ComplaintId");
 
-                    b.ToTable("UserComplaint", (string)null);
+                    b.ToTable("UserComplaint");
                 });
 #pragma warning restore 612, 618
         }

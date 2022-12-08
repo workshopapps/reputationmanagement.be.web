@@ -11,7 +11,7 @@ namespace src.Helpers
             {
                 if (file.Length > 0)
                 {
-                    path = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, typeOfDocument));
+                    path = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "Uploads", typeOfDocument));
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);

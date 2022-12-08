@@ -133,3 +133,6 @@ orleans.codegen.cs
 lib/
 /src/Properties/ServiceDependencies/rmapi-v1 - Web Deploy
 /src/Properties/ServiceDependencies/rmapi-v1 - Web Deploy1
+
+#Uploads folder for resume and coverletter
+Uploads/

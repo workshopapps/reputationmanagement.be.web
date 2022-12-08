@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace src.Entities
+﻿namespace src.Models
 {
-    public class ApplicationUser:IdentityUser
+    public class AccessibilityOptions
     {
-
-        public string PostAddress { get; set; }
         public string Language { get; set; } = "english";
         public bool LargeText { get; set; }
         public bool ScreenReader { get; set; }

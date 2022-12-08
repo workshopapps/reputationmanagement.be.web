@@ -62,7 +62,7 @@ namespace src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CareerResponses");
+                    b.ToTable("CareerResponses", (string)null);
                 });
 
             modelBuilder.Entity("src.Entities.ChallengeReview", b =>
@@ -80,7 +80,7 @@ namespace src.Migrations
 
                     b.HasKey("ReviewId");
 
-                    b.ToTable("challengeReviews");
+                    b.ToTable("challengeReviews", (string)null);
                 });
 
             modelBuilder.Entity("src.Entities.Quote", b =>
@@ -119,7 +119,7 @@ namespace src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Quotes");
+                    b.ToTable("Quotes", (string)null);
                 });
 
             modelBuilder.Entity("src.Entities.Review", b =>
@@ -180,7 +180,7 @@ namespace src.Migrations
 
                     b.HasKey("ReviewId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("src.Entities.Transaction", b =>
@@ -211,7 +211,7 @@ namespace src.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("src.Entities.UserComplains", b =>
@@ -233,7 +233,7 @@ namespace src.Migrations
 
                     b.HasKey("ComplaintId");
 
-                    b.ToTable("UserComplaint");
+                    b.ToTable("UserComplaint", (string)null);
                 });
 #pragma warning restore 612, 618
         }

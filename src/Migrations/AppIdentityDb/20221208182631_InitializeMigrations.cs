@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace src.Migrations.AppIdentityDb
 {
-    public partial class initialMigrations : Migration
+    public partial class InitializeMigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -39,6 +39,19 @@ namespace src.Migrations.AppIdentityDb
                     Id = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     PostAddress = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Language = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LargeText = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ScreenReader = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    HighContrast = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ComplaintStatus = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    InvoiceReceipt = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    FullName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BusinessWebsite = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BusinessDescription = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -199,17 +212,17 @@ namespace src.Migrations.AppIdentityDb
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "afd40973-2030-4306-873b-ecd2d6cc5786", "eca0a0e2-2d2b-4fb1-925b-abb54d7172f7", "Lawyer", "LAWYER" });
+                values: new object[] { "0e423901-ec27-4acc-b945-0df20de290a1", "a8b96fe6-9e91-451a-abf4-68f18200904a", "Customer", "CUSTOMER" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "d8c5b5eb-ec9e-433e-8ae4-86701f56b922", "2173189d-022e-4c32-a28b-3ff9b4f13a96", "Customer", "CUSTOMER" });
+                values: new object[] { "2c920691-baaa-46af-aa7c-ce0f1b0ee459", "06f8a363-9376-495c-a38c-c58490ff6d12", "Administrator", "ADMINISTRATOR" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "d97c020d-0df7-40a7-8b3d-0845a605d326", "0640d8dd-ecc6-41cc-bd34-59caeac51f67", "Administrator", "ADMINISTRATOR" });
+                values: new object[] { "f108a9f4-c488-48a1-839b-eba092e05d59", "327a6729-72eb-41bf-ac54-f82d50d816a2", "Lawyer", "LAWYER" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

@@ -48,13 +48,13 @@ namespace src.Services
         }
 
 
-        public BlogEntryForDisplayDto GetBlogEntryById(Guid id)
+        public BlogEntryForDisplayDto GetBlogEntryById(int id)
         {
-            if (id == Guid.Empty)
+            if (id == 0)
             {
                 throw new ArgumentNullException(nameof(id));
             }
-            var blogEntry = _context.BlogEntries.Where(c => c.BlogEntryId == id).SingleOrDefault();
+            var blogEntry = _context.BlogEntries.Where(c => c.Id == id).SingleOrDefault();
             var blogEntryToReturn = _mapper.Map<BlogEntryForDisplayDto>(blogEntry);
             return blogEntryToReturn;
         }

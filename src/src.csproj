@@ -46,8 +46,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\AppIdentityDb\" />
-    <Folder Include="Uploads\" />
-    <Folder Include="Uploads\BlogImageUpload\" />
   </ItemGroup>
 
   <!--<ItemGroup>

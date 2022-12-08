@@ -32,7 +32,7 @@ namespace src.Controllers
         }
         // GET: api/BlogEntries/5
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetBlogEntry(Guid id)
+        public async Task<ActionResult> GetBlogEntry(int id)
         {
             var blogEntry = _blogRepo.GetBlogEntryById(id);
 

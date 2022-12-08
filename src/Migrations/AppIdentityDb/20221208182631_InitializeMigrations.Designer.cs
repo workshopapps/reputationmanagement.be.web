@@ -11,8 +11,8 @@ using src.Data;
 namespace src.Migrations.AppIdentityDb
 {
     [DbContext(typeof(AppIdentityDbContext))]
-    [Migration("20221129195210_initialMigrations")]
-    partial class initialMigrations
+    [Migration("20221208182631_InitializeMigrations")]
+    partial class InitializeMigrations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -49,22 +49,22 @@ namespace src.Migrations.AppIdentityDb
                     b.HasData(
                         new
                         {
-                            Id = "d8c5b5eb-ec9e-433e-8ae4-86701f56b922",
-                            ConcurrencyStamp = "2173189d-022e-4c32-a28b-3ff9b4f13a96",
+                            Id = "0e423901-ec27-4acc-b945-0df20de290a1",
+                            ConcurrencyStamp = "a8b96fe6-9e91-451a-abf4-68f18200904a",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
-                            Id = "afd40973-2030-4306-873b-ecd2d6cc5786",
-                            ConcurrencyStamp = "eca0a0e2-2d2b-4fb1-925b-abb54d7172f7",
+                            Id = "f108a9f4-c488-48a1-839b-eba092e05d59",
+                            ConcurrencyStamp = "327a6729-72eb-41bf-ac54-f82d50d816a2",
                             Name = "Lawyer",
                             NormalizedName = "LAWYER"
                         },
                         new
                         {
-                            Id = "d97c020d-0df7-40a7-8b3d-0845a605d326",
-                            ConcurrencyStamp = "0640d8dd-ecc6-41cc-bd34-59caeac51f67",
+                            Id = "2c920691-baaa-46af-aa7c-ce0f1b0ee459",
+                            ConcurrencyStamp = "06f8a363-9376-495c-a38c-c58490ff6d12",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -180,6 +180,15 @@ namespace src.Migrations.AppIdentityDb
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("BusinessDescription")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BusinessWebsite")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("ComplaintStatus")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
@@ -189,6 +198,22 @@ namespace src.Migrations.AppIdentityDb
                         .HasColumnType("varchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("HighContrast")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("InvoiceReceipt")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("LargeText")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -217,6 +242,9 @@ namespace src.Migrations.AppIdentityDb
                     b.Property<string>("PostAddress")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("ScreenReader")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("longtext");

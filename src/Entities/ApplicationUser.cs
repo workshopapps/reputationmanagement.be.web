@@ -10,5 +10,14 @@ namespace src.Entities
         public bool LargeText { get; set; }
         public bool ScreenReader { get; set; }
         public bool HighContrast { get; set; }
+
+        // Notificaton Settings
+        public bool ComplaintStatus { get; set; } = true;
+        public bool InvoiceReceipt { get; set; } = true;
+
+        // More Identity
+        public string? FullName { get; set; }
+        public string? BusinessWebsite { get; set; }
+        public string? BusinessDescription { get; set; }
     }
 }

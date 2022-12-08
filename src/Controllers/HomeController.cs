@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Sentry;
 using src.Entities;
+//using src.Migrations;
 using src.Models;
 using src.Models.Dtos;
 using src.Models.ExampleModels;
@@ -32,10 +33,11 @@ namespace src.Controllers
         private readonly IContactUsMail _contactUsMail;
         private readonly IQuoteRepository _quoteRepo;
         private readonly ISentryClient _sentry;
+        private IEmailSender _emailSender;
 
         public HomeController(IReviewRepository reviewRepo, 
             UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IQuoteRepository quoteRepo, IContactUsMail contactUsMail,
-            ISentryClient sentry)
+            ISentryClient sentry, IEmailSender emailSender)
         {
             _reviewRepo = reviewRepo;
             _mapper = mapper;
@@ -44,6 +46,7 @@ namespace src.Controllers
             _quoteRepo = quoteRepo;
             _contactUsMail = contactUsMail;
             _sentry = sentry;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -214,15 +217,23 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Create Complaint for each User.")]
         [HttpPost]
         [Route("CreateComplaint")]
-        public IActionResult CreateComplaint(CreateUserComplainsDto complains)
+        public async Task<IActionResult> CreateComplaint(CreateUserComplainsDto complains)
         {
             if (complains == null)
                 return NoContent();
 
-            var query = _reviewRepo.CreateComplaint(complains);
+            var query = await _reviewRepo.CreateComplaint(complains);
             if (query == null)
                 return NoContent();
+            var userEmail = User.FindFirstValue(ClaimTypes.Name);
+            var user = await _userManager.FindByEmailAsync(userEmail);
 
+            if(user.ComplaintStatus == true)
+            {
+                string emailSubject = "Repute - Complaint Mail";
+                string emailBody = $"<p>Your Complaint</p><p><em>\"{query.ComplaintMessage}\"</em> has been recorded</p>";
+                await _emailSender.SendEmailAsync(userEmail, $"{emailSubject}", emailBody);       
+            }
             return Ok(query);
         }
         [SwaggerOperation(Summary = "Notify user when a review's status changes ")]

@@ -163,6 +163,9 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     app.UseStatusCodePages();
 }
+app.UseDeveloperExceptionPage();
+app.UseStatusCodePages();
+
 app.UseSentryTracing();
 app.UseProblemDetails();
 app.UseHttpsRedirection();

@@ -45,7 +45,7 @@ public class PaymentController : ControllerBase
                 Amount = payment.Amount,
                 Email = payment.Email,
                 TrxRef = request.Reference,
-                Name = payment.Name,
+                OrderNo = payment.OrderNo,
             };
             
             await _context.Transactions.AddAsync(transaction);

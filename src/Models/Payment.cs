@@ -4,7 +4,7 @@ namespace src.Models;
 
 public class Payment
 {
-    public string Name { get; set; }
+    public string OrderNo { get; set; }
 
     [EmailAddress]
     public string Email { get; set; }

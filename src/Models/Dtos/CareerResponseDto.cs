@@ -7,20 +7,20 @@ namespace src.Models.Dtos
     public class CareerResponseDto
     {
         [Required]
-        public string FirstName { get; set; }
+        public string firstName { get; set; }
         [Required]
-        public string LastName { get; set; }
+        public string lastName { get; set; }
         [Required]
-        public string Email { get; set; }
+        public string email { get; set; }
         [Required]
-        public string PhoneNumber { get; set; }
+        public string phoneNumber { get; set; }
         [Required]
-        public string Position { get; set; }
+        public string position { get; set; }
         [Required]
-        public string Reason { get; set; }
+        public string reason { get; set; }
         [Required]
-        public IFormFile Resume { get; set; }
+        public IFormFile resume { get; set; }
         [Required]
-        public IFormFile? CoverLetter { get; set; }
+        public IFormFile? coverLetter { get; set; }
     }
 }

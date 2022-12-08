@@ -5,26 +5,22 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Sentry;
 using src.Entities;
+
 //using src.Migrations;
 using src.Models;
 using src.Models.Dtos;
-using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
-using Swashbuckle.AspNetCore.Filters;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace src.Controllers
 {
-    
     [ApiController]
     [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
     [Route("api")]
-    public class HomeController:ControllerBase
+    public class HomeController : ControllerBase
     {
         private readonly IReviewRepository _reviewRepo;
         private readonly IMapper _mapper;
@@ -35,7 +31,7 @@ namespace src.Controllers
         private readonly ISentryClient _sentry;
         private IEmailSender _emailSender;
 
-        public HomeController(IReviewRepository reviewRepo, 
+        public HomeController(IReviewRepository reviewRepo,
             UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper, IQuoteRepository quoteRepo, IContactUsMail contactUsMail,
             ISentryClient sentry, IEmailSender emailSender)
         {
@@ -58,8 +54,7 @@ namespace src.Controllers
         [AllowAnonymous]
         public IActionResult sentry()
         {
-
-            var sentryId =  _sentry.CaptureMessage("Beans", SentryLevel.Info);
+            var sentryId = _sentry.CaptureMessage("Beans", SentryLevel.Info);
             return Ok("This is the sentry Id");
         }
 
@@ -72,7 +67,6 @@ namespace src.Controllers
         [AllowAnonymous]
         public IActionResult greet()
         {
-
             string greetings = "Hello customer!";
             return Ok(greetings);
         }
@@ -92,19 +86,19 @@ namespace src.Controllers
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var appUser = _userManager.FindByEmailAsync(userEmail).Result;
-            var reviews = _reviewRepo.GetReviews(pageNumber, pageSize,appUser.Id).ToList();
+            var reviews = _reviewRepo.GetReviews(pageNumber, pageSize, appUser.Id).ToList();
             var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews) as List<ReviewForDisplayDto>;
             return Ok(reviewsToReturn);
         }
 
         [HttpGet("review/{reviewId}")]
-        [Authorize(Roles = "Customer", AuthenticationSchemes ="Bearer")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         public ActionResult GetSingleReview(Guid reviewId)
         {
             if (reviewId == Guid.Empty)
             {
                 return BadRequest();
-            } 
+            }
             Review singleReview = _reviewRepo.GetReviewById(reviewId);
 
             if (singleReview == null)
@@ -126,19 +120,18 @@ namespace src.Controllers
         [HttpPost("review")]
         public async Task<ActionResult> CreateReview([FromBody] ReviewForCreationDto reviewForCreationDto)
         {
-            
             var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
             var user = await _userManager.FindByEmailAsync(userMail);
             var userId = new Guid(user.Id);
-            
+
             var reviewForCreation = _mapper.Map<Review>(reviewForCreationDto);
-            reviewForCreation.UserId = userId; 
+            reviewForCreation.UserId = userId;
             var reviewForDisplay = _reviewRepo.CreateReview(reviewForCreation);
-            return CreatedAtAction(nameof(GetSingleReview), new {reviewId = reviewForDisplay.ReviewId}, reviewForDisplay);
+            return CreatedAtAction(nameof(GetSingleReview), new { reviewId = reviewForDisplay.ReviewId }, reviewForDisplay);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="review"></param>
         /// <returns>Review is successfully updated</returns>
@@ -166,11 +159,10 @@ namespace src.Controllers
                 return new ObjectResult(reviewForDisplay);
             }
             return BadRequest(ModelState);
-             
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="reviewId"></param>
         /// <returns>Review is successfully deleted</returns>
@@ -182,7 +174,6 @@ namespace src.Controllers
         [HttpDelete("review/{reviewId}")]
         public ActionResult DeleteReview(Guid reviewId)
         {
-
             var result = _reviewRepo.DeleteReview(reviewId);
             if (!result)
             {
@@ -192,12 +183,11 @@ namespace src.Controllers
             return Ok("Review is successfully deleted");
         }
 
-
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="userId"></param>
-        /// <returns>Reviews successfully deleted</returns>     
+        /// <returns>Reviews successfully deleted</returns>
         [SwaggerOperation(Summary = "delete multiple reviews by a Customer")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -209,7 +199,7 @@ namespace src.Controllers
             var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
             var user = await _userManager.FindByEmailAsync(userMail);
             var userId = new Guid(user.Id);
-            _reviewRepo.DeleteReviews(userId); 
+            _reviewRepo.DeleteReviews(userId);
             _reviewRepo.Save();
             return Ok("Reviews successfully deleted");
         }
@@ -228,14 +218,15 @@ namespace src.Controllers
             var userEmail = User.FindFirstValue(ClaimTypes.Name);
             var user = await _userManager.FindByEmailAsync(userEmail);
 
-            if(user.ComplaintStatus == true)
+            if (user.ComplaintStatus == true)
             {
                 string emailSubject = "Repute - Complaint Mail";
                 string emailBody = $"<p>Your Complaint</p><p><em>\"{query.ComplaintMessage}\"</em> has been recorded</p>";
-                await _emailSender.SendEmailAsync(userEmail, $"{emailSubject}", emailBody);       
+                await _emailSender.SendEmailAsync(userEmail, $"{emailSubject}", emailBody);
             }
             return Ok(query);
         }
+
         [SwaggerOperation(Summary = "Notify user when a review's status changes ")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -247,7 +238,7 @@ namespace src.Controllers
             var userMail = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
             var user = await _userManager.FindByEmailAsync(userMail);
             var userId = new Guid(user.Id);
-           
+
             var updatedReviews = _reviewRepo.GetUpdatedReviews(userId).Result;
 
             if (updatedReviews == null)
@@ -256,9 +247,7 @@ namespace src.Controllers
             }
 
             return Ok(updatedReviews);
-
         }
-
 
         [HttpPost]
         [Route("PostChallengeReviews")]
@@ -274,7 +263,6 @@ namespace src.Controllers
             return Ok(query);
         }
 
-
         /// <summary>
         /// Gets the  preference settings of the currently signed in user
         /// </summary>
@@ -285,7 +273,7 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetOptions()
         {
-            var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value; 
+            var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             var user = await _userManager.FindByEmailAsync(userEmail);
 
             var options = _mapper.Map<AccessibilityOptions>(user);
@@ -319,7 +307,7 @@ namespace src.Controllers
                     return BadRequest(ModelState);
                 }
             }
-            else 
+            else
             {
                 return BadRequest("Invalid language string, please select one of {\"english\", \"german\", \"russian\", \"chinese\"}");
             }
@@ -339,14 +327,12 @@ namespace src.Controllers
         [HttpPost("createquote")]
         [AllowAnonymous]
         [SwaggerOperation(Summary = "Create a quote for an unauthorised user")]
-
         public IActionResult CreateAQuote(QuoteForCreationDto quoteDto)
         {
             var quoteForCreation = _mapper.Map<Quote>(quoteDto);
-            _quoteRepo.CreateQuote(quoteDto);       
-            return Created($"api/Admin/quote/{quoteForCreation.Id}",quoteForCreation);
+            _quoteRepo.CreateQuote(quoteDto);
+            return Created($"api/Admin/quote/{quoteForCreation.Id}", quoteForCreation);
         }
-
 
         [HttpPost("ContactUs")]
         [SwaggerOperation(Summary = "Allow user to mail the admin")]
@@ -362,6 +348,32 @@ namespace src.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpPost("notification_settings")]
+        [SwaggerOperation(Summary = "UpdateNotificationSettingForUser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> UpdateNotificationsSetting(UpdateNotificationForUserDto notifUpdate)
+        {
+            var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            _mapper.Map(notifUpdate, user);
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (updateResult.Succeeded) { return CreatedAtAction(nameof(GetNotificationSetting), null, notifUpdate); }
+            return BadRequest(ModelState);
+        }
+
+        [HttpGet("notification_settings")]
+        [SwaggerOperation(Summary = "UpdateNotificationSettingForUser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetNotificationSetting()
+        {
+            var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            var updateNotifDto = new UpdateNotificationForUserDto();
+            _mapper.Map(user, updateNotifDto);
+            return Ok(updateNotifDto);
         }
     }
 }

@@ -19,6 +19,9 @@ namespace EarlyMan.PL.Profiles
             CreateMap<src.Models.AccessibilityOptions, src.Entities.ApplicationUser>();
             CreateMap<src.Entities.ApplicationUser, src.Models.AccessibilityOptions>();
 
+            CreateMap<src.Entities.ApplicationUser, src.Models.Dtos.UpdateNotificationForUserDto>();
+            CreateMap<src.Models.Dtos.UpdateNotificationForUserDto, src.Entities.ApplicationUser>();
+
         }
     }
 }

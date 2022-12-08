@@ -7,7 +7,6 @@ namespace EarlyMan.PL.Profiles
         public ReviewProfile()
         {
             CreateMap<src.Entities.Review, src.Models.Dtos.ReviewForDisplayDto>()
-                .ForMember(dest => dest.TimeOfReview, opt => opt.MapFrom(src => src.CreatedAt))
                 .ForMember(dest => dest.LastUpdated, opt => opt.MapFrom(src =>
                 (src.UpdatedAt == new DateTime()) ? src.TimeStamp : src.UpdatedAt));
 

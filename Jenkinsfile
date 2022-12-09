@@ -21,10 +21,7 @@ pipeline {
 
 				//sh "dotnet tool install --global dotnet-ef --version 6.*"
 				sh "cd reputationmanagement.be.web"
-				sh "cd reputationmanagement.be.web/src"
-				sh "dotnet ef database update --context AppIdentityDbContext"
-				sh "dotnet ef database update --context ApplicationDbContext" 
-				sh "dotnet build && dotnet publish"
+				sh "cd reputationmanagement.be.web/src && dotnet build && dotnet publish"
 
 				}
 		}

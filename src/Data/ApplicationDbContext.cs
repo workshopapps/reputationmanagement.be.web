@@ -15,7 +15,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 1,
-                        PathToImage = "../../assets/images/blog_images/headlines_img1.png}",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1Ay8uRSkkC7t3fesB6Bv9uYPPMTDPoIsg",
                         Title = "How to Do Defamation Removal Online",
                         Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                         Url = "https://notion.com",
@@ -24,7 +24,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 2,
-                        PathToImage = "../../assets/images/blog_images/post_img1.png}",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1BfStpnrw0gp9KgwhghQY2MauokSpZgmc",
                         Title = "Why You Need An Online Reputation",
                         Description = "If you’re well known in your region, the United States, or the world, you’ve likely put a lot of time and resources,,,",
                         Url = "https://notion.com",
@@ -33,7 +33,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 3,
-                        PathToImage = "../../assets/images/blog_images/reddit.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=17ihd1n1_xPrEPDdQTO2S87ERAxQqkoJQ",
                         Title = "How to Remove Info from Reddit",
                         Description = "Fast People Search removal can help protect your privacy online. Learn how to complete the r/reddit.com ...",
                         Url = "https://google.com",
@@ -42,7 +42,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 4,
-                        PathToImage = "../../assets/images/blog_images/headlines_img3.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1b8srGH7MPKV0kw9apnc5XllJF24OuW0A",
                         Title = "5 Strategies for Customer Review Management in 2022",
                         Description = "Since most customers will interact with as business for the first time on the internet, having an effective customer ....",
                         Url = "https://google.com",
@@ -51,7 +51,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 5,
-                        PathToImage = "../../assets/images/blog_images/privacy.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1ULJjgPxnEGkLEO9VIX_5m7dkKCjwLayk",
                         Title = "How to Remove Personal Information from Google",
                         Description = "Having a great Google review management strategy is very important. They act as an icebreaker to....",
                         Url = "https://google.com",
@@ -60,7 +60,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 6,
-                        PathToImage = "../../assets/images/blog_images/hall.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1eJQLcMxgObTqbKYc3jujQsvgAd72fQa-",
                         Title = "Reputation Management for Politicians: What to Know",
                         Description = "Fast People Search removal can help protect your privacy online. Learn how to complete the FastPeopleSearch...",
                         Url = "https://google.com",
@@ -69,7 +69,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 7,
-                        PathToImage = "../../assets/images/blog_images/post_img7.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1-r54A5pU0NAVTwr8IQZ9mxvWUG37Zxu2",
                         Title = "How to Remove My Information from Been Verified",
                         Description = "Your public perception is known as your online reputation, telling others who you are, what …",
                         Url = "https://google.com",
@@ -78,7 +78,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 8,
-                        PathToImage = "../../assets/images/blog_images/headlines_img6.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1YNXXb3_mVJePpK3JPbknuTomNpvuBIAl",
                         Title = "7 Software Development Models to Organize Your Team",
                         Description = "If you’re well known in your region, the United States, or the world, you’ve likely put a lot of time and...",
                         Url = "https://google.com",
@@ -87,7 +87,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 9,
-                        PathToImage = "../../assets/images/blog_images/headlines_img7.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1NZY_9xSFlzQ2_OrOThoZlXQUap77k18A",
                         Title = "How to Remove My Information from Instagram",
                         Description = "Your public perception is known as your online reputation, telling others who you are, what values...",
                         Url = "https://google.com",
@@ -96,7 +96,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 10,
-                        PathToImage = "../../assets/images/blog_images/headlines_img8.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1NZY_9xSFlzQ2_OrOThoZlXQUap77k18A",
                         Title = "How to Do Defamation Removal Online",
                         Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                         Url = "https://google.com",
@@ -105,7 +105,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 11,
-                        PathToImage = "../../assets/images/blog_images/headlines_img8.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1YNXXb3_mVJePpK3JPbknuTomNpvuBIAl",
                         Title = "How to Do Defamation Removal Online",
                         Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                         Url = "https://google.com",
@@ -114,7 +114,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 12,
-                        PathToImage = "../../assets/images/blog_images/headlines_img8.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=1eJQLcMxgObTqbKYc3jujQsvgAd72fQa-",
                         Title = "How to Do Defamation Removal Online",
                         Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                         Url = "https://google.com",
@@ -123,7 +123,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 13,
-                        PathToImage = "../../assets/images/blog_images/headlines_img8.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=17ihd1n1_xPrEPDdQTO2S87ERAxQqkoJQ",
                         Title = "How to Do Defamation Removal Online",
                         Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                         Url = "https://google.com",
@@ -132,7 +132,7 @@ namespace src.Data
                     new BlogEntry
                     {
                         Id = 14,
-                        PathToImage = "../../assets/images/blog_images/headlines_img8.png",
+                        PathToImage = "https://drive.google.com/uc?export=view&id=17ihd1n1_xPrEPDdQTO2S87ERAxQqkoJQ",
                         Title = "How to Do Defamation Removal Online",
                         Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                         Url = "https://google.com",

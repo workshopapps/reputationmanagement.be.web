@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using src.Entities;
@@ -31,16 +32,18 @@ public class AdminAccountsController : ControllerBase
     /// configuartion setting for JWT
     /// </summary>
     private readonly IConfigurationSection _jwtSettings;
+    private readonly IEmailSender _emailSender;
 
     /// <summary>
     /// constructor <c>AdminAccountController</c> initializes an AdminAccount instance
     /// (<paramref name="userManager"/>,<paramref name="configuration"/>).
     /// </summary>
-    public AdminAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration)
+    public AdminAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration, IEmailSender emailSender)
     {
         _mapper = mapper;
         _userManager = userManager;
         _jwtSettings = configuration.GetSection("JwtSettings");
+        _emailSender = emailSender;
     }
 
     /// <summary>
@@ -53,6 +56,19 @@ public class AdminAccountsController : ControllerBase
     [HttpPost("create_account")]
     public async Task<IActionResult> Register([FromBody, SwaggerRequestBody("Account details payload", Required = true)] LawyerAccountForCreationDto adminRegisterModel)
     {
+        const string EMAIL_BODY =
+            "Hi, this is <h2 style='font-size: 18px;'>Leo with Repute</h2><br>" +
+            "<p>I am the Head of Sales and I have been assigned to your case.</p>" +
+            " I know you may have filled out an onboarding form, but if you could give me any more information that would really help, so I can speed up the process by studying your reviews and finding out the best way we can help and get you pricing." +
+            " <p>I need;</p>" +
+            "1. The Full name of your business as it appears online. " +
+            "<p>2. The site/sites that the reviews you want us to look at are on.</p> " +
+            "3. How many reviews you want us to look at." +
+            "<p style='margin-top: 90px;'>Many thanks,</p>" +
+            "Leo Hyperion" +
+            "<p>HEAD OF PARTNERSHIPS</p>";
+
+
         var existingAdmin = await _userManager.FindByEmailAsync(adminRegisterModel.Email);
 
         if(existingAdmin == null)
@@ -66,6 +82,7 @@ public class AdminAccountsController : ControllerBase
             }
 
             await _userManager.AddToRoleAsync(admin, "Administrator");
+            await _emailSender.SendEmailAsync(adminRegisterModel.Email, "Negative Reviews Inquiry", EMAIL_BODY);
             return StatusCode(201);
         }
 

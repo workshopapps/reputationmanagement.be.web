@@ -11,8 +11,6 @@ namespace src.Models.Dtos
         [Required]
         public string ReviewString { get; set; }
         [Required]
-        public StatusType Status { get; set; }
-        [Required]
         public PriorityType Priority { get; set; }
 
         //New reqs

@@ -13,9 +13,7 @@ namespace src.Models.ExampleModels
                 {
                     Email = "bestogbeide@gmail.com",
                     ReviewString = "This is a very good product",
-                    Status = 0,
                     Priority = 0
-
                 });
         }
 
@@ -30,7 +28,6 @@ namespace src.Models.ExampleModels
                {
                    Email = "bestogbeide",
                    ReviewString = "This is a very good product",
-                   Status = 0,
                    Priority = 0
                });
 

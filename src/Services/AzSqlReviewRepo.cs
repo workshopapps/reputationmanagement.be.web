@@ -195,6 +195,7 @@ namespace src.Services
 
         public ReviewForDisplayDto CreateReview(Review review)
         {
+            review.Status = StatusType.PendingReview;
             _context.Reviews.Add(review);
             var reviewToReturn = _mapper.Map<ReviewForDisplayDto>(review);
             Save();
@@ -262,16 +263,17 @@ namespace src.Services
             // var userId = SignInManager.AuthenticationManager.AuthenticationResponseGrant.Identity.GetUserId();
 
             var review = _context.Reviews.FirstOrDefault(c => c.ReviewId == reviewId);
+            
             if (review == null)
             {
                 return null;
             }
+            
 
             if (review.LawyerEmail != null)
             {
                 return null;
             }
-
             review.LawyerEmail = email;
             _context.SaveChanges();
             return review.LawyerEmail;

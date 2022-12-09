@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
@@ -17,7 +14,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
-using static PayStack.Net.TransferRecipient;
 
 namespace src.Controllers
 {
@@ -94,7 +90,6 @@ namespace src.Controllers
             return Ok();
         }
 
-
         /// <returns>Use bearer auth token</returns>
         /// <response code="200">Returns OK with the raw auth token as the only content.</response>
         /// <response code="400">If the authentication was unsuccessful.</response>
@@ -131,7 +126,6 @@ namespace src.Controllers
         [HttpPost("change_password")]
         public async Task<IActionResult> ChangePassword([FromBody] PasswordChangeModelForSignedInUser passwordResetModel)
         {
-
             //string? userEmail = HttpContext.User.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.Email).Value;
             var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             var user = await _userManager.FindByEmailAsync(userEmail);
@@ -157,8 +151,6 @@ namespace src.Controllers
             }
 
             return BadRequest();
-
-
         }
 
         private SigningCredentials GetSigningCredentials()
@@ -193,7 +185,6 @@ namespace src.Controllers
             return claims;
         }
 
-
         [SwaggerOperation(Summary = "send a password reset token to user that is not logged in")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -210,10 +201,11 @@ namespace src.Controllers
             var valueBytes = Encoding.UTF8.GetBytes(token);
             var code = Convert.ToBase64String(valueBytes);
 
-            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this {code}");
+            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this \n {code}");
 
             return Ok("Please check your email for the password reset link");
         }
+
         [SwaggerOperation(Summary = "reset users password.")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -252,7 +244,6 @@ namespace src.Controllers
 
             var detailsToReturn = _mapper.Map<UserDetailsDto>(SignedInUser);
             return Ok(detailsToReturn);
-
         }
 
         /// <returns>Use details of the user</returns>
@@ -270,6 +261,9 @@ namespace src.Controllers
             signedInUser.Email = newUserDetails.Email;
             signedInUser.PhoneNumber = newUserDetails.PhoneNumber;
             signedInUser.UserName = newUserDetails.BusinessEntityName.Replace(" ", "_");
+            signedInUser.FullName = newUserDetails.FullName;
+            signedInUser.BusinessWebsite = newUserDetails.BusinessWebsite;
+            signedInUser.BusinessDescription = newUserDetails.BusinessDescription;
 
             var updateAllResult = await _userManager.UpdateAsync(signedInUser);
 
@@ -277,11 +271,6 @@ namespace src.Controllers
             await _userManager.UpdateNormalizedUserNameAsync(signedInUser);
 
             return Ok();
-
-
-
-
         }
-
     }
 }

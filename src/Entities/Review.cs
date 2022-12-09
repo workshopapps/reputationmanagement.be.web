@@ -41,6 +41,10 @@ namespace src.Entities
         /// new reqs 5/12/2022
         [Required]
         public string ComplainerName { get; set; } = "Ciroma Chukwuma Adekunle";
+
+        // new req 12/8/2022
+        [Required]
+        public DateTime TimeOfReview { get; set; } = default;
     }
 
     public enum StatusType

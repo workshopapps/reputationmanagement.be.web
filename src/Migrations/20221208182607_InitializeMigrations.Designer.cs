@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using src.Data;
 
@@ -10,9 +11,10 @@ using src.Data;
 namespace src.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221208182607_InitializeMigrations")]
+    partial class InitializeMigrations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,9 +57,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 1,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(301),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7154),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1Ay8uRSkkC7t3fesB6Bv9uYPPMTDPoIsg",
+                            PathToImage = "../../assets/images/blog_images/headlines_img1.png}",
                             Tag = "Reputation Management",
                             Title = "How to Do Defamation Removal Online",
                             Url = "https://notion.com"
@@ -65,9 +67,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 2,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(324),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7172),
                             Description = "If you’re well known in your region, the United States, or the world, you’ve likely put a lot of time and resources,,,",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1BfStpnrw0gp9KgwhghQY2MauokSpZgmc",
+                            PathToImage = "../../assets/images/blog_images/post_img1.png}",
                             Tag = "Reputation Management",
                             Title = "Why You Need An Online Reputation",
                             Url = "https://notion.com"
@@ -75,9 +77,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 3,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(326),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7173),
                             Description = "Fast People Search removal can help protect your privacy online. Learn how to complete the r/reddit.com ...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=17ihd1n1_xPrEPDdQTO2S87ERAxQqkoJQ",
+                            PathToImage = "../../assets/images/blog_images/reddit.png",
                             Tag = "Social Media",
                             Title = "How to Remove Info from Reddit",
                             Url = "https://google.com"
@@ -85,9 +87,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 4,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(327),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7175),
                             Description = "Since most customers will interact with as business for the first time on the internet, having an effective customer ....",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1b8srGH7MPKV0kw9apnc5XllJF24OuW0A",
+                            PathToImage = "../../assets/images/blog_images/headlines_img3.png",
                             Tag = "Reputation Management",
                             Title = "5 Strategies for Customer Review Management in 2022",
                             Url = "https://google.com"
@@ -95,9 +97,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 5,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(329),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7176),
                             Description = "Having a great Google review management strategy is very important. They act as an icebreaker to....",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1ULJjgPxnEGkLEO9VIX_5m7dkKCjwLayk",
+                            PathToImage = "../../assets/images/blog_images/privacy.png",
                             Tag = "Google Review",
                             Title = "How to Remove Personal Information from Google",
                             Url = "https://google.com"
@@ -105,9 +107,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 6,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(332),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7223),
                             Description = "Fast People Search removal can help protect your privacy online. Learn how to complete the FastPeopleSearch...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1eJQLcMxgObTqbKYc3jujQsvgAd72fQa-",
+                            PathToImage = "../../assets/images/blog_images/hall.png",
                             Tag = "Politics",
                             Title = "Reputation Management for Politicians: What to Know",
                             Url = "https://google.com"
@@ -115,9 +117,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 7,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(333),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7224),
                             Description = "Your public perception is known as your online reputation, telling others who you are, what …",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1-r54A5pU0NAVTwr8IQZ9mxvWUG37Zxu2",
+                            PathToImage = "../../assets/images/blog_images/post_img7.png",
                             Tag = "Reputation Management",
                             Title = "How to Remove My Information from Been Verified",
                             Url = "https://google.com"
@@ -125,9 +127,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 8,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(334),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7225),
                             Description = "If you’re well known in your region, the United States, or the world, you’ve likely put a lot of time and...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1YNXXb3_mVJePpK3JPbknuTomNpvuBIAl",
+                            PathToImage = "../../assets/images/blog_images/headlines_img6.png",
                             Tag = "Reputation Management",
                             Title = "7 Software Development Models to Organize Your Team",
                             Url = "https://google.com"
@@ -135,9 +137,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 9,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(335),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7226),
                             Description = "Your public perception is known as your online reputation, telling others who you are, what values...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1NZY_9xSFlzQ2_OrOThoZlXQUap77k18A",
+                            PathToImage = "../../assets/images/blog_images/headlines_img7.png",
                             Tag = "Social Media",
                             Title = "How to Remove My Information from Instagram",
                             Url = "https://google.com"
@@ -145,9 +147,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 10,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(337),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7228),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1NZY_9xSFlzQ2_OrOThoZlXQUap77k18A",
+                            PathToImage = "../../assets/images/blog_images/headlines_img8.png",
                             Tag = "Reputation Management",
                             Title = "How to Do Defamation Removal Online",
                             Url = "https://google.com"
@@ -155,9 +157,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 11,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(338),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7229),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1YNXXb3_mVJePpK3JPbknuTomNpvuBIAl",
+                            PathToImage = "../../assets/images/blog_images/headlines_img8.png",
                             Tag = "Reputation Management",
                             Title = "How to Do Defamation Removal Online",
                             Url = "https://google.com"
@@ -165,9 +167,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 12,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(339),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7230),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=1eJQLcMxgObTqbKYc3jujQsvgAd72fQa-",
+                            PathToImage = "../../assets/images/blog_images/headlines_img8.png",
                             Tag = "Reputation Management",
                             Title = "How to Do Defamation Removal Online",
                             Url = "https://google.com"
@@ -175,9 +177,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 13,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(340),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7231),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=17ihd1n1_xPrEPDdQTO2S87ERAxQqkoJQ",
+                            PathToImage = "../../assets/images/blog_images/headlines_img8.png",
                             Tag = "Reputation Management",
                             Title = "How to Do Defamation Removal Online",
                             Url = "https://google.com"
@@ -185,9 +187,9 @@ namespace src.Migrations
                         new
                         {
                             Id = 14,
-                            CreationDate = new DateTime(2022, 12, 9, 5, 43, 16, 144, DateTimeKind.Local).AddTicks(341),
+                            CreationDate = new DateTime(2022, 12, 8, 19, 26, 7, 524, DateTimeKind.Local).AddTicks(7232),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
-                            PathToImage = "https://drive.google.com/uc?export=view&id=17ihd1n1_xPrEPDdQTO2S87ERAxQqkoJQ",
+                            PathToImage = "../../assets/images/blog_images/headlines_img8.png",
                             Tag = "Reputation Management",
                             Title = "How to Do Defamation Removal Online",
                             Url = "https://google.com"

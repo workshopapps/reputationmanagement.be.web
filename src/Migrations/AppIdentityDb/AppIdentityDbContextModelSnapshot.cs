@@ -47,22 +47,22 @@ namespace src.Migrations.AppIdentityDb
                     b.HasData(
                         new
                         {
-                            Id = "49db1b15-129f-477e-9886-c7b7ca4bc0cd",
-                            ConcurrencyStamp = "086c97f5-77cf-470a-843d-a2d88508cd14",
+                            Id = "0e423901-ec27-4acc-b945-0df20de290a1",
+                            ConcurrencyStamp = "a8b96fe6-9e91-451a-abf4-68f18200904a",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
-                            Id = "eac65fdd-02be-41ff-950e-292448d73fc2",
-                            ConcurrencyStamp = "91cf3d0f-3109-45ec-bf65-b72676001d18",
+                            Id = "f108a9f4-c488-48a1-839b-eba092e05d59",
+                            ConcurrencyStamp = "327a6729-72eb-41bf-ac54-f82d50d816a2",
                             Name = "Lawyer",
                             NormalizedName = "LAWYER"
                         },
                         new
                         {
-                            Id = "7ab0cd2a-6971-4a96-a4c1-c13d5b6d5f8a",
-                            ConcurrencyStamp = "df2ae1c6-2149-4fa4-976c-cce2d511ebe0",
+                            Id = "2c920691-baaa-46af-aa7c-ce0f1b0ee459",
+                            ConcurrencyStamp = "06f8a363-9376-495c-a38c-c58490ff6d12",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -178,6 +178,15 @@ namespace src.Migrations.AppIdentityDb
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("BusinessDescription")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BusinessWebsite")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("ComplaintStatus")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
@@ -189,9 +198,21 @@ namespace src.Migrations.AppIdentityDb
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<string>("FullName")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("HighContrast")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("InvoiceReceipt")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Language")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("LargeText")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("tinyint(1)");
@@ -219,6 +240,9 @@ namespace src.Migrations.AppIdentityDb
                     b.Property<string>("PostAddress")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("ScreenReader")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("longtext");

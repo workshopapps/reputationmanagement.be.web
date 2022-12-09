@@ -11,8 +11,6 @@ namespace src.Models.Dtos
         [Required]
         public string ReviewString { get; set; }
         [Required]
-        public StatusType Status { get; set; }
-        [Required]
         public PriorityType Priority { get; set; }
 
         //New reqs
@@ -26,5 +24,11 @@ namespace src.Models.Dtos
         /// new reqs 5/12/2022
         [Required]
         public string ComplainerName { get; set; } = "Ciroma Chukwuma Adekunle";
+
+        // new req 12/8/2022
+        // Map time stamp to ActualReviewCreationDate date
+        [Required]
+        public DateTime TimeOfReview { get; set; } = default;
+
     }
 }

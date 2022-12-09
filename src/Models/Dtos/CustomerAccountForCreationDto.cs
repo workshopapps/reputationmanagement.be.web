@@ -14,5 +14,9 @@ namespace src.Models.Dtos
         [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+
+        public string? FullName { get; set; }
+        public string? BusinessWebsite { get; set; }
+        public string? BusinessDescription { get; set; }
     }
 }

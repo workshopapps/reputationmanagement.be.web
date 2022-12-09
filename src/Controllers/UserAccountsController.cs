@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
@@ -206,12 +207,10 @@ namespace src.Controllers
                 return BadRequest("No user with this email exists");
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            string link = $"http://localhost:7234/UserAccounts/reset-password?userEmail=" +
-                   HttpUtility.UrlEncode(user.Email) +
-                   "&code=" + HttpUtility.UrlEncode(token) +
-                   "&Scheme=" + HttpUtility.UrlEncode(HttpContext.Request.Scheme);
+            var valueBytes = Encoding.UTF8.GetBytes(token);
+            var code = Convert.ToBase64String(valueBytes);
 
-            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this <a href=\"{link}\">link</a>");
+            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this {code}");
 
             return Ok("Please check your email for the password reset link");
         }
@@ -227,8 +226,10 @@ namespace src.Controllers
             {
                 return BadRequest("No user with this email exists");
             }
+            var valueBytes = System.Convert.FromBase64String(datamodel.Token);
+            var code = Encoding.UTF8.GetString(valueBytes);
 
-            var result = await _userManager.ResetPasswordAsync(user, datamodel.Token, datamodel.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, code, datamodel.NewPassword);
 
             if (result.Succeeded)
             {

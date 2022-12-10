@@ -7,6 +7,7 @@ namespace src.Services
     {
         public IQueryable<Quote> Quotes{ get; }
         public Quote CreateQuote(QuoteForCreationDto quoteForCreation);
+        public Quote CreateQuoteFromBlog(QuoteForCreationFromBlogDto quoteForCreation);
         public Quote GetQuoteById(Guid id);
         public void Save();
         public IEnumerable<Quote> GetAll();

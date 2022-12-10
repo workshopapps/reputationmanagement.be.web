@@ -69,7 +69,7 @@ namespace src.Controllers
                 }
                 else
                 {
-                    badResponse = "Bad Input";
+                    return BadRequest(result.Errors.First().Description);
                 }
 
                 return BadRequest(badResponse);
@@ -84,6 +84,12 @@ namespace src.Controllers
                     var claims = GetClaims(user);
                     var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
                     var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+                    string email_title = "Support From Repute";
+                    string email_body = "<p style=\"background-color:powderblue;\">Hi, this is Leo with Repute,\r\n\r\n " +
+                        "I am the Head of Sales and I have been assigned to your case.\r\n\r\n I know you may have filled out an onboarding form," +
+                        " but if you could give me any more information that would really help, so I can speed up the process by studying your reviews and finding out the best way we can help and get you pricing.\r\n\r\n I need;\r\n\r\n 1. The Full name of your business as it appears online.\r\n\r\n 2. The site/sites that the reviews you want us to look at are on.\r\n\r\n 3. How many reviews you want us to look at.\r\n\r\n\r\n\r\n\r\n\r\nMany thanks,\r\n\r\n       Leo Hyperion\r\n HEAD OF PARTNERSHIPS\r\n</p>";
+                    await _emailSender.SendEmailAsync(userModel.Email, email_title, email_body);
                     return Ok(token);
                 }
             }

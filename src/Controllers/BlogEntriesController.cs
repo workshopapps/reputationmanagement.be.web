@@ -92,11 +92,7 @@ namespace src.Controllers
             var emailData = new EmailDataDto()
             {
                 EmailToId = quoteForCreationDto.Email,
-                EmailBody = "<p><h4>Hi, this is Leo with Repute</h4>\r\n\r\n " +
-                "I am the Head of Sales and I have been assigned to your case.\r\n\r\n " +
-                "I know you may have filled out an onboarding form, one of our agents will " +
-                "reach out to you via a phone call to find out the best way we can help you. \r\n\r\nMany thanks,\r\n\r\n       " +
-                "Leo Hyperion\r\n HEAD OF PARTNERSHIPS</p>\r\n"
+                EmailBody = StringTemplates.QuoteTemplate
             };
             string EMAIL_SUBJECT = "Follow up email from the form you filled at https://repute.hng.tech";
             try

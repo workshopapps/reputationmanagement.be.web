@@ -168,12 +168,13 @@ namespace src.Controllers
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         public IActionResult UnclaimedReviews()
         {
-            var pendingReview = _reviewRepo.GetPendingReview();
-            if (pendingReview == null)
+            var pendingReviews = _reviewRepo.GetPendingReview();
+            var reviewsForDisplay = _mapper.Map<List<ReviewForDisplayDto>>(pendingReviews);
+            if (pendingReviews == null)
             {
                 return NotFound("No pending reviews");
             }
-            return Ok(pendingReview);
+            return Ok(reviewsForDisplay);
         }
 
         /// <summary>

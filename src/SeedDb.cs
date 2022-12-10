@@ -133,7 +133,7 @@ namespace src
                     if (addUserToRoleResult.Succeeded) {  }
                     else { throw new InvalidOperationException(); }
                 }
-                Review badReview = new() { Email = "baduser@test.com", ReviewString = "Bad product, won't recommend",ReviewId = Guid.NewGuid(), Status = StatusType.PendingReview, UserId = new Guid(user.Id), TimeStamp = DateTime.Now };
+                Review badReview = new() { Email = "baduser@test.com", ReviewString = "Bad product, won't recommend",ReviewId = Guid.NewGuid(), Status = StatusType.pending, UserId = new Guid(user.Id), TimeStamp = DateTime.Now };
                 reviewRepository.AddReview(badReview);
                 scope.Dispose();
             }

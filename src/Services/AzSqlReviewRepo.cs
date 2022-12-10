@@ -82,7 +82,7 @@ namespace src.Services
         public IEnumerable<ReviewForDisplayDto> GetInconclusiveReviews()
         {
             var reviewsFromdb = _context.Reviews
-                .Where(review => review.Status == StatusType.Inconclusive).ToList();
+                .Where(review => review.Status == StatusType.inconclusive).ToList();
 
             var reviews = _mapper.Map<List<ReviewForDisplayDto>>(reviewsFromdb);
 
@@ -156,7 +156,7 @@ namespace src.Services
             var resultModel = new List<SuccessfulReviewsDto>();
 
             var reviewsFromDb = _context.Reviews
-                .Where(x => x.Status == StatusType.Successful);
+                .Where(x => x.Status == StatusType.completed);
 
             var reviews = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviewsFromDb).ToList();
 
@@ -174,7 +174,7 @@ namespace src.Services
         public IEnumerable<Review> GetPendingReview()
         {
             return _context.Reviews
-            .Where(p => p.Status == StatusType.PendingReview);
+            .Where(p => p.Status == StatusType.pending);
         }
 
         public async Task<UserComplains> CreateComplaint(CreateUserComplainsDto complains)
@@ -195,7 +195,7 @@ namespace src.Services
 
         public ReviewForDisplayDto CreateReview(Review review)
         {
-            review.Status = StatusType.PendingReview;
+            review.Status = StatusType.pending;
             _context.Reviews.Add(review);
             var reviewToReturn = _mapper.Map<ReviewForDisplayDto>(review);
             Save();
@@ -275,6 +275,7 @@ namespace src.Services
                 return null;
             }
             review.LawyerEmail = email;
+            review.Status = StatusType.InProgress;
             _context.SaveChanges();
             return review.LawyerEmail;
         }

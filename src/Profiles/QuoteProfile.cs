@@ -10,6 +10,9 @@ namespace src.Profiles
         {
             CreateMap<QuoteForCreationDto, Quote>();
             CreateMap<Quote, QuoteForCreationDto>();
+
+            CreateMap<QuoteForCreationFromBlogDto, Quote>();
+            CreateMap<Quote, QuoteForCreationFromBlogDto>();
         }
     }
 }

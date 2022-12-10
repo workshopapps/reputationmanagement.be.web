@@ -26,6 +26,13 @@ namespace src.Services
             Save();
             return quote;
         }
+        public Quote CreateQuoteFromBlog(QuoteForCreationFromBlogDto quoteForCreation)
+        {
+            var quote = _mapper.Map<Quote>(quoteForCreation);
+            _context.Quotes.Add(quote);
+            Save();
+            return quote;
+        }
 
         public Quote GetQuoteById(Guid id)
         {

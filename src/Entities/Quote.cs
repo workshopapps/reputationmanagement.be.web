@@ -23,6 +23,8 @@ namespace src.Entities
         [Required]
         public string ReviewLocation { get; set; }
 
+        public string? AboutTheReview { get; set; }
+
         public DateTime DateCreated { get; set; } = DateTime.Now;
         public DateTime DateUpdated { get; set; } = default;
         public DateTime LastAccessed { get; set; } = default;

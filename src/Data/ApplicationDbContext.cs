@@ -148,5 +148,6 @@ namespace src.Data
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<CareerResponse> CareerResponses { get; set; }
         public DbSet<BlogEntry> BlogEntries { get; set; }
+        public DbSet<ContactUs> ContactUs {get; set;}
     }
 }

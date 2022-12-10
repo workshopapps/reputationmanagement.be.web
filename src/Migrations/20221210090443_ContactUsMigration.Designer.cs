@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using src.Data;
 
@@ -10,9 +11,10 @@ using src.Data;
 namespace src.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221210090443_ContactUsMigration")]
+    partial class ContactUsMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +57,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 1,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 269, DateTimeKind.Local).AddTicks(9951),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(877),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1Ay8uRSkkC7t3fesB6Bv9uYPPMTDPoIsg",
                             Tag = "Reputation Management",
@@ -65,7 +67,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 2,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 269, DateTimeKind.Local).AddTicks(9978),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(924),
                             Description = "If you’re well known in your region, the United States, or the world, you’ve likely put a lot of time and resources,,,",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1BfStpnrw0gp9KgwhghQY2MauokSpZgmc",
                             Tag = "Reputation Management",
@@ -75,7 +77,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 3,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 269, DateTimeKind.Local).AddTicks(9982),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(930),
                             Description = "Fast People Search removal can help protect your privacy online. Learn how to complete the r/reddit.com ...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=17ihd1n1_xPrEPDdQTO2S87ERAxQqkoJQ",
                             Tag = "Social Media",
@@ -85,7 +87,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 4,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 269, DateTimeKind.Local).AddTicks(9984),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(932),
                             Description = "Since most customers will interact with as business for the first time on the internet, having an effective customer ....",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1b8srGH7MPKV0kw9apnc5XllJF24OuW0A",
                             Tag = "Reputation Management",
@@ -95,7 +97,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 5,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 269, DateTimeKind.Local).AddTicks(9986),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(935),
                             Description = "Having a great Google review management strategy is very important. They act as an icebreaker to....",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1ULJjgPxnEGkLEO9VIX_5m7dkKCjwLayk",
                             Tag = "Google Review",
@@ -105,7 +107,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 6,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 269, DateTimeKind.Local).AddTicks(9992),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(944),
                             Description = "Fast People Search removal can help protect your privacy online. Learn how to complete the FastPeopleSearch...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1eJQLcMxgObTqbKYc3jujQsvgAd72fQa-",
                             Tag = "Politics",
@@ -115,7 +117,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 7,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 269, DateTimeKind.Local).AddTicks(9994),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(946),
                             Description = "Your public perception is known as your online reputation, telling others who you are, what …",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1-r54A5pU0NAVTwr8IQZ9mxvWUG37Zxu2",
                             Tag = "Reputation Management",
@@ -125,7 +127,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 8,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 269, DateTimeKind.Local).AddTicks(9995),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(949),
                             Description = "If you’re well known in your region, the United States, or the world, you’ve likely put a lot of time and...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1YNXXb3_mVJePpK3JPbknuTomNpvuBIAl",
                             Tag = "Reputation Management",
@@ -135,7 +137,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 9,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 269, DateTimeKind.Local).AddTicks(9996),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(951),
                             Description = "Your public perception is known as your online reputation, telling others who you are, what values...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1NZY_9xSFlzQ2_OrOThoZlXQUap77k18A",
                             Tag = "Social Media",
@@ -145,7 +147,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 10,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 270, DateTimeKind.Local),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(956),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1NZY_9xSFlzQ2_OrOThoZlXQUap77k18A",
                             Tag = "Reputation Management",
@@ -155,7 +157,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 11,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 270, DateTimeKind.Local).AddTicks(2),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(1072),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1YNXXb3_mVJePpK3JPbknuTomNpvuBIAl",
                             Tag = "Reputation Management",
@@ -165,7 +167,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 12,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 270, DateTimeKind.Local).AddTicks(4),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(1075),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=1eJQLcMxgObTqbKYc3jujQsvgAd72fQa-",
                             Tag = "Reputation Management",
@@ -175,7 +177,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 13,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 270, DateTimeKind.Local).AddTicks(6),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(1077),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=17ihd1n1_xPrEPDdQTO2S87ERAxQqkoJQ",
                             Tag = "Reputation Management",
@@ -185,7 +187,7 @@ namespace src.Migrations
                         new
                         {
                             Id = 14,
-                            CreationDate = new DateTime(2022, 12, 10, 11, 31, 42, 270, DateTimeKind.Local).AddTicks(8),
+                            CreationDate = new DateTime(2022, 12, 10, 10, 4, 43, 439, DateTimeKind.Local).AddTicks(1080),
                             Description = "Defamation removal can be challenging. With our step-by-step guide, learn how to protect ...",
                             PathToImage = "https://drive.google.com/uc?export=view&id=17ihd1n1_xPrEPDdQTO2S87ERAxQqkoJQ",
                             Tag = "Reputation Management",
@@ -285,9 +287,6 @@ namespace src.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
-
-                    b.Property<string>("AboutTheReview")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("BusinessName")
                         .IsRequired()

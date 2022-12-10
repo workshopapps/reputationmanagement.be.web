@@ -122,6 +122,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IReviewRepository, AzSqlReviewRepo>();
 builder.Services.AddTransient<IQuoteRepository, QuoteRepo>();
 builder.Services.AddTransient<IBlogRepo,BlogEntryRepo>();
+builder.Services.AddTransient<IAnonContactRepository, AnonContactUsRepo>();
 
 // Allower Swagger to deal with JWT Auth fluently
 builder.Services.AddSwaggerGen(c =>

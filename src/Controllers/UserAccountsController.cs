@@ -204,14 +204,12 @@ namespace src.Controllers
                 return BadRequest("No user with this email exists");
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            string link = $"http://localhost:7234/UserAccounts/reset-password?userEmail=" +
-                   HttpUtility.UrlEncode(user.Email) +
-                   "&code=" + HttpUtility.UrlEncode(token) +
-                   "&Scheme=" + HttpUtility.UrlEncode(HttpContext.Request.Scheme);
+            string link = $"https://repute.hng.tech/password-recovery/change?"+
+                   $"token={token}";
 
-            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this <a href=\"{link}\">link</a>");
+           await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this <a href=\"{link}\">link</a>");
 
-            return Ok("Please check your email for the password reset link");
+           return Ok("Please check your email for the password reset link");
         }
 
         [SwaggerOperation(Summary = "reset users password.")]

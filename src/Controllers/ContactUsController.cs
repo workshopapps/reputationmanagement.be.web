@@ -20,7 +20,7 @@ public class ContactUsController : ControllerBase
         /// <summary>
         /// Recieves message from user
         /// </summary>
-        [SwaggerOperation(Summary = "Greets the customer")]
+        [SwaggerOperation(Summary = "customer send message")]
         [HttpPost("send")]
         public IActionResult SendMessage(ContactUs contactUs)
         {

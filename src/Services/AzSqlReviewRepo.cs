@@ -177,22 +177,6 @@ namespace src.Services
             .Where(p => p.Status == StatusType.pending);
         }
 
-        public async Task<UserComplains> CreateComplaint(CreateUserComplainsDto complains)
-        {
-            var data = new UserComplains()
-            {
-                ComplaintId = Guid.NewGuid(),
-                ComplaintMessage = complains.ComplaintMessage,
-                TimeStamp = DateTime.Now,
-                UserId = complains.UserId.ToString()
-            };
-
-            var saveData = await _context.UserComplaint.AddAsync(data);
-            Save();
-
-            return data;
-        }
-
         public ReviewForDisplayDto CreateReview(Review review)
         {
             review.Status = StatusType.pending;
@@ -208,7 +192,7 @@ namespace src.Services
             {
                 return Enumerable.Empty<Review>();
             }
-            return _context.Reviews;
+            return _context.Reviews.Skip(pageNumber * pageSize).Take(pageSize).ToList();
         }
 
         public IEnumerable<Review> GetReviewByPropirity(PriorityType priority)

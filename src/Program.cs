@@ -125,6 +125,7 @@ builder.Services.AddTransient<IReviewRepository, AzSqlReviewRepo>();
 builder.Services.AddTransient<IQuoteRepository, QuoteRepo>();
 builder.Services.AddTransient<IBlogRepo,BlogEntryRepo>();
 builder.Services.AddTransient<IAnonContactRepository, AnonContactUsRepo>();
+builder.Services.AddTransient<IDisputeRepo, DisputeRepo>();
 
 // Allower Swagger to deal with JWT Auth fluently
 builder.Services.AddSwaggerGen(c =>

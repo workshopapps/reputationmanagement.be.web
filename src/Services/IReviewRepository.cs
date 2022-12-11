@@ -32,9 +32,6 @@ namespace src.Services
         IEnumerable<Review> GetReviewByStatusType(StatusType status);
         IEnumerable<Review> GetPendingReview();
 
-
-        Task<UserComplains> CreateComplaint(CreateUserComplainsDto model);
-
         ReviewForDisplayDto CreateReview(Review review);
         IEnumerable<Review> GetAllReviews(int pageNumber = 0, int pageSize = 0);
         IEnumerable<Review> GetReviewByPropirity(PriorityType priority);

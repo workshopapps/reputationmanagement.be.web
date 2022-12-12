@@ -65,6 +65,14 @@ public class PaymentController : ControllerBase
             var transaction = _context.Transactions.Where(x => x.TrxRef == reference).FirstOrDefault();
             if (transaction != null)
             {
+                var review = _context.Reviews.Where(x => x.ReviewId.ToString() == transaction.OrderNo).FirstOrDefault();
+                if(review != null)
+                {
+                    review.Status = StatusType.paid;
+                    _context.Reviews.Update(review);
+                }
+                 
+
                 transaction.Status = true;
                 _context.Transactions.Update(transaction);
                 await _context.SaveChangesAsync();

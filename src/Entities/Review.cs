@@ -53,7 +53,8 @@ namespace src.Entities
         InProgress,
         inconclusive,
         completed,
-        failed
+        failed,
+        paid
     }
     public enum PriorityType
     {

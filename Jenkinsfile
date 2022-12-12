@@ -1,46 +1,45 @@
 pipeline {
-	
-	environment {
-        CI = 'false'
-    	}
 
-	agent any
-	stages {
-        
-	//stage("Get repo"){
+  agent any
+  
+  stages {
+    
+    stage("Build Backend"){
+      
+      steps{
+            sh "cd src && dotnet build"
+	    sh "cd src && dotnet publish"
+      
+      }
+    
+    }
+	  
+    stage("test backend"){
 
-			//steps {
-				//sh "rm -rf ${WORKSPACE}/reputationmanagement.be.web"
-				//sh "git clone -b development https://github.com/workshopapps/reputationmanagement.be.web.git"
-				//sh "sudo cp -r ${WORKSPACE}/reputationmanagement.be.web /home/ehmeeops/reputationmanagement.be.web"
-			//}
-		//}
-	
-        	stage('Build') {
-			steps {
-
-				//sh "dotnet tool install --global dotnet-ef --version 6.*"
-				sh "cd reputationmanagement.be.web"
-				sh "cd reputationmanagement.be.web/src && dotnet build && dotnet publish"
-
-				}
-		}
-
-		stage("test backend"){
-
-			steps {
-				sh "cd reputationmanagement.be.web"
-				sh "cd reputationmanagement.be.web/src && dotnet test"
-			}
-        	}
-		
-		stage("Deploy") {
-		
-			steps {
-				sh "sudo cp -rf ${WORKSPACE}/src/* /home/ehmeeops/reputationmanagement.be.web/src"
-				
-				// sh "sudo pm2 start"
-			}		
-		}
-	}
+	steps {
+		//sh "cd reputationmanagement.be.web"
+		sh "cd src && dotnet test"
+	 	}
+     }
+    
+    stage("Deploy App"){
+      
+      steps{
+	    sh "sudo cp -rf ${WORKSPACE}/src/* /home/ehmeeops/reputationmanagement.be.web/src/bin/Debug/net6.0/publish"
+            sh "sudo systemctl restart reputeapi.service"
+      }
+    }
+  
+  } 
+  
+  post{
+    failure{
+        emailext attachLog: true, 
+        to: 'mhizxeryl@gmail.com@gmail.com',
+        subject: '${BUILD_TAG} Build failed',
+        body: '${BUILD_TAG} Build Failed \nMore Info can be found here: ${BUILD_URL} or in the log file below'
+    }
+  }
+  
 }
+

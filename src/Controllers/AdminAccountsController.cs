@@ -90,17 +90,26 @@ public class AdminAccountsController : ControllerBase
     [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody, SwaggerRequestBody("Account details payload", Required = true)] UserLoginModel adminLogin)
     {
-        var admin = await _userManager.FindByEmailAsync(adminLogin.Email);
+        var user = await _userManager.FindByEmailAsync(adminLogin.Email);
+        if (user is null) { return BadRequest($"User with email {adminLogin.Email} does not exist"); }
 
-        if (admin != null && await _userManager.CheckPasswordAsync(admin, adminLogin.Password))
+        if (await _userManager.IsInRoleAsync(user, "Administrator"))
+        {
+            if (await _userManager.CheckPasswordAsync(user, adminLogin.Password))
             {
                 var signingCredentials = GetSigningCredentials();
-                var claims = GetClaims(admin);
+                var claims = GetClaims(user);
                 var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
                 var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
                 return Ok(token);
             }
-        return Unauthorized("Invalid Authentication");
+            else
+            {
+                return BadRequest("Username and password don't match");
+            }
+        }
+        return BadRequest("Invalid Authentication");
     }
 
 

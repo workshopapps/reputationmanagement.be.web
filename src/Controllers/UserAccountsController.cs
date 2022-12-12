@@ -106,19 +106,24 @@ namespace src.Controllers
         public async Task<IActionResult> Login([FromBody] UserLoginModel userModel)
         {
             var user = await _userManager.FindByEmailAsync(userModel.Email);
+            
             if (user is null) { return BadRequest($"User with email {userModel.Email} does not exist"); }
-            if (user != null && await _userManager.CheckPasswordAsync(user, userModel.Password))
+            if (await _userManager.IsInRoleAsync(user, "Customer"))
             {
-                var signingCredentials = GetSigningCredentials();
-                var claims = GetClaims(user);
-                var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
-                var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-                return Ok(token);
+                if (await _userManager.CheckPasswordAsync(user, userModel.Password))
+                {
+                    var signingCredentials = GetSigningCredentials();
+                    var claims = GetClaims(user);
+                    var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
+                    var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+                    return Ok(token);
+                }
+                else
+                {
+                    return BadRequest("Username and password don't match");
+                }
             }
-            else
-            {
-                return BadRequest("Username and password don't match");
-            }
+            return BadRequest("Invalid Authentication");
         }
 
         /// <returns>Use bearer auth token</returns>

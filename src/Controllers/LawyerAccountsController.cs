@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using src.Entities;
 using src.Models;
 using src.Models.Dtos;
+using Swashbuckle.AspNetCore.Annotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -109,6 +111,50 @@ namespace src.Controllers
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
             return claims;
+        }
+
+        /// <returns>Use details of the user</returns>
+        /// <response code="200">With the details of the signed in user</response>
+        /// <response code="400">If the authentication was unsuccessful.</response>
+        [SwaggerOperation(Summary = "Get User details")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        [HttpPut("details")]
+        public async Task<IActionResult> UpdateSignedInLawyerDetails(LawyerDetailsDto newLawyerDetails)
+        {
+            var lawyerEmail = User.FindFirstValue(ClaimTypes.Name);
+            var signedInLawyer = _userManager.FindByEmailAsync(lawyerEmail).Result;
+
+            _mapper.Map(newLawyerDetails, signedInLawyer);
+
+            var updateAllResult = await _userManager.UpdateAsync(signedInLawyer);
+            if (updateAllResult.Succeeded)
+            {
+                var updateSecurityStampResult = await _userManager.UpdateSecurityStampAsync(signedInLawyer);
+                await _userManager.UpdateNormalizedUserNameAsync(signedInLawyer);
+            }
+            else
+            {
+                return BadRequest(updateAllResult.Errors?.FirstOrDefault()?.Description);
+            }
+
+            return Ok();
+        }
+
+        /// <returns>Use details of the user</returns>
+        /// <response code="200">With the details of the signed in user</response>
+        /// <response code="400">If the authentication was unsuccessful.</response>
+        [SwaggerOperation(Summary = "Get User details")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        [HttpGet("details")]
+        public async Task<IActionResult> GetSignedInLawyerDetails()
+        {
+            var lawyerEmail = User.FindFirstValue(ClaimTypes.Name);
+            var signedInLawyer = _userManager.FindByEmailAsync(lawyerEmail).Result;
+
+            var detailsToReturn = _mapper.Map<LawyerDetailsDto>(signedInLawyer);
+            return Ok(detailsToReturn);
         }
     }
 }

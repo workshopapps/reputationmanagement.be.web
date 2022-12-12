@@ -219,7 +219,7 @@ namespace src.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPost("reset-password.")]
+        [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto datamodel)
         {
             var user = await _userManager.FindByEmailAsync(datamodel.Email);

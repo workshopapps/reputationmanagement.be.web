@@ -10,7 +10,8 @@ namespace src.Profiles
         {
             CreateMap<DisputeForCreationDto, Dispute>();
             CreateMap<Dispute, DisputeForCreationDto>();
-            CreateMap<Dispute, DisputeForDisplayDto>();
+            CreateMap<Dispute, DisputeForDisplayForLawyerDto>();
+            CreateMap<Dispute, DisputeForDisplayForCustomerDto>();
         }
     }
 }

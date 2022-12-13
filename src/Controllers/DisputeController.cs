@@ -36,7 +36,7 @@ namespace src.Controllers
         }
 
 
-        [SwaggerOperation(Summary = "Create dispute for User.")]
+        [SwaggerOperation(Summary = "Create dispute for Customer.")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [HttpPost("/dispute")]
         public async Task<IActionResult> CreateDispute(DisputeForCreationDto dispute)
@@ -51,7 +51,7 @@ namespace src.Controllers
             if (createdComplaint == null)
                 return NoContent();
 
-            var complaintToDisplay = _mapper.Map<DisputeForDisplayDto>(createdComplaint);
+            var complaintToDisplay = _mapper.Map<DisputeForDisplayForCustomerDto>(createdComplaint);
             
             if (user.ComplaintStatus == true)
             {
@@ -62,17 +62,25 @@ namespace src.Controllers
             return Ok(complaintToDisplay);
         }
         [SwaggerOperation(Summary = "Get dispute by Id.")]
-        [Authorize(Roles = "Customer,Lawyer,Administrator", AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "Lawyer,Administrator", AuthenticationSchemes = "Bearer")]
         [HttpGet("{disputeId}")]
         public async Task<IActionResult> GetDisputeById(string disputeId)
         {
             return Ok(_disputeRepo.GetDisputeById(disputeId));
         }
+        [SwaggerOperation(Summary = "Get dispute by Id for a customer.")]
+        [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
+        [HttpGet("customer/{disputeId}")]
+        public async Task<ActionResult> GetDisputeByIdForCustomer(string disputeId)
+        {
+            return Ok(_disputeRepo.GetDisputeById(disputeId));
+        }
+
 
         [SwaggerOperation(Summary = "Get disputes for Lawyer user.")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("lawyer")]
-        public async Task<IActionResult> GetAllDisputesForLawyer([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 0)
+        public async Task<ActionResult> GetAllDisputesForLawyer([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 0)
         {
             var disputeForLawyer = _disputeRepo.GetAllDisputesForALawyer(this.User.FindFirstValue(ClaimTypes.Name), pageSize, pageNumber);
             return Ok(disputeForLawyer);
@@ -81,11 +89,29 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get dispute for customer user.")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [HttpGet("Customer")]
-        public async Task<IActionResult> GetAllDisputesForCustomer([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 0)
+        public async Task<ActionResult> GetAllDisputesForCustomer([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 0)
         {
-            var disputeForCustomer = _disputeRepo.GetAllDisputesForUser(_userManager.FindByEmailAsync(this.User.FindFirstValue(ClaimTypes.Name)).Result.Id.ToString(),
+            var disputeForCustomer = _disputeRepo.GetAllDisputesForCustomer(_userManager.FindByEmailAsync(this.User.FindFirstValue(ClaimTypes.Name)).Result.Id.ToString(),
                 pageSize, pageNumber);
             return Ok(disputeForCustomer);
+        }
+
+        [SwaggerOperation(Summary = "update dispute status for lawyer")]
+        [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+        [HttpPut("lawyer/{disputeId}")]
+        public async Task<ActionResult> GetAllDisputesForLawyer(string disputeId)
+        {
+            _disputeRepo.UpdateDisputeStatus(disputeId);
+            var dispute = _context.Disputes.Find(disputeId);
+            var customer = await _userManager.FindByIdAsync(dispute.UserId);
+            if (customer.ComplaintStatus == true)
+            {
+                string userMail = customer.Email;
+                string emailSubject = "Repute - Dispute Mail";
+                string emailBody = $"<p>Your Dispute</p><p><em>\"{dispute.Complaint}\"</em> has been resolved</p>";
+                await _emailSender.SendEmailAsync(userMail, $"{emailSubject}", emailBody);
+            }
+            return Ok();
         }
     }
 }

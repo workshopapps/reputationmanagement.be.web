@@ -73,7 +73,7 @@ namespace src.Controllers
         [HttpGet("customer/{disputeId}")]
         public async Task<ActionResult> GetDisputeByIdForCustomer(string disputeId)
         {
-            return Ok(_disputeRepo.GetDisputeById(disputeId));
+            return Ok(_disputeRepo.GetDisputeByIdForCustomer(disputeId));
         }
 
 

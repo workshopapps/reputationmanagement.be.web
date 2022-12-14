@@ -21,6 +21,8 @@ namespace EarlyMan.PL.Profiles
 
             CreateMap<src.Entities.Review, src.Models.Dtos.UpdatedRequestDTO>().ReverseMap()
                 .ForMember(x => x.ViewLastTime, opt => opt.MapFrom(time => time.UpdatedAt));
+
+            CreateMap<src.Models.Dtos.CreateQuotationDto, src.Entities.Review>();
         }
     }
 }

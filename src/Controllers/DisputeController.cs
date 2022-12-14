@@ -80,16 +80,16 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Get disputes for Lawyer user.")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         [HttpGet("lawyer")]
-        public async Task<ActionResult> GetAllDisputesForLawyer([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 0)
+        public async Task<ActionResult<IEnumerable<DisputeForDisplayForLawyerDto>>> GetAllDisputesForLawyer([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 0)
         {
             var disputeForLawyer = _disputeRepo.GetAllDisputesForALawyer(this.User.FindFirstValue(ClaimTypes.Name), pageSize, pageNumber);
-            return Ok(disputeForLawyer);
+            return new ObjectResult(disputeForLawyer);
         }
 
         [SwaggerOperation(Summary = "Get dispute for customer user.")]
         [Authorize(Roles = "Customer", AuthenticationSchemes = "Bearer")]
         [HttpGet("Customer")]
-        public async Task<ActionResult> GetAllDisputesForCustomer([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 0)
+        public async Task<ActionResult<IEnumerable<DisputeForDisplayForCustomerDto>>> GetAllDisputesForCustomer([FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 0)
         {
             var disputeForCustomer = _disputeRepo.GetAllDisputesForCustomer(_userManager.FindByEmailAsync(this.User.FindFirstValue(ClaimTypes.Name)).Result.Id.ToString(),
                 pageSize, pageNumber);

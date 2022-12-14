@@ -45,6 +45,8 @@ namespace src.Entities
         // new req 12/8/2022
         [Required]
         public DateTime TimeOfReview { get; set; } = default;
+
+        public decimal? Price { get; set; }
     }
 
     public enum StatusType

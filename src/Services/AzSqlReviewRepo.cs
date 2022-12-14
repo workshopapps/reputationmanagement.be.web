@@ -143,6 +143,7 @@ namespace src.Services
 
            
             reviewToUpdate.Status = review.Status;
+            reviewToUpdate.Price = review.Price;
             
             reviewToUpdate.UpdatedAt = DateTime.Now;
 

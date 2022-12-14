@@ -14,3 +14,5 @@ namespace src.Models.Dtos
         public string EmailBody { get; set; }
     }
 }
+
+

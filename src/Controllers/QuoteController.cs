@@ -7,6 +7,7 @@ using src.Models.Dtos;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data;
+using src.Helpers;
 
 namespace src.Controllers
 {
@@ -43,10 +44,9 @@ namespace src.Controllers
             var emailData = new EmailDataDto()
             {
                 EmailToId = quoteForCreationDto.Email,
-                EmailBody = "We'll get back to you, your quote has been" +
-                "recorded",
+                EmailBody = StringTemplates.QuoteTemplate
             };
-            const string EMAIL_SUBJECT = "Repute - QuoteMail";
+            string EMAIL_SUBJECT = "Follow up email from the form you filled at https://repute.hng.tech";
             try
             {
                 _emailSender.SendEmailAsync(emailData.EmailToId, EMAIL_SUBJECT, emailData.EmailBody);

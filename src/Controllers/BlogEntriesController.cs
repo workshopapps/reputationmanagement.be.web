@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +13,7 @@ using src.Data;
 using src.Entities;
 using src.Models.Dtos;
 using src.Services;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace src.Controllers
 {
@@ -22,13 +25,18 @@ namespace src.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IBlogRepo _blogRepo;
+        private readonly IQuoteRepository _quoteRepo;
+        private readonly IEmailSender _emailSender;
 
-        public BlogEntriesController(IBufferedFileUploadService bufferedFileUploadServices, ApplicationDbContext context, IMapper mapper, IBlogRepo blogRepo)
+        public BlogEntriesController(IBufferedFileUploadService bufferedFileUploadServices, ApplicationDbContext context,
+            IMapper mapper, IBlogRepo blogRepo, IQuoteRepository quoteRepo, IEmailSender emailSender)
         {
             _bufferedFileUploadService = bufferedFileUploadServices;
             _context = context;
             _mapper = mapper;
             _blogRepo = blogRepo;
+            _quoteRepo = quoteRepo;
+            _emailSender= emailSender;
         }
         // GET: api/BlogEntries/5
         [HttpGet("{id}")]
@@ -66,5 +74,41 @@ namespace src.Controllers
             }
             return BadRequest();
         }
+
+        // POST: api/blogging/quote
+
+        /// <summary>
+        /// Create a Review with this endpoint
+        /// </summary>
+        /// <param name="CreateReview"></param>
+        /// <returns></returns>
+        [SwaggerOperation(Summary = "Create a Quote with this endpoint")]
+        [HttpPost("quote")]
+        [AllowAnonymous]
+        public async Task<ActionResult> CreateQuote([FromBody] QuoteForCreationFromBlogDto quoteForCreationDto)
+        {
+            var quoteForDisplay = _quoteRepo.CreateQuoteFromBlog(quoteForCreationDto);
+
+            var emailData = new EmailDataDto()
+            {
+                EmailToId = quoteForCreationDto.Email,
+                EmailBody = StringTemplates.QuoteTemplate
+            };
+            string EMAIL_SUBJECT = "Follow up email from the form you filled at https://repute.hng.tech";
+            try
+            {
+               await _emailSender.SendEmailAsync(emailData.EmailToId, EMAIL_SUBJECT, emailData.EmailBody);
+               return CreatedAtAction("GetQuote", "Quote", new { quoteId = new Guid(quoteForDisplay.Id) }, quoteForDisplay);                 
+            }
+            catch (SmtpCommandException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
     }
 }

@@ -9,7 +9,7 @@ namespace src.Models.ExampleModels
             public IEnumerable<SwaggerExample<StatusType>> GetExamples()
             {
             yield return SwaggerExample.Create("Good input that will return Ok + your auth token",
-                StatusType.PendingReview);
+                StatusType.pending);
             }
 
         }

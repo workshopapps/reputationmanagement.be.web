@@ -21,6 +21,8 @@ using Hellang.Middleware.ProblemDetails;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using Sentry;
+using System.Configuration;
+using Atatus.NetCoreAll;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,6 +124,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddTransient<IReviewRepository, AzSqlReviewRepo>();
 builder.Services.AddTransient<IQuoteRepository, QuoteRepo>();
 builder.Services.AddTransient<IBlogRepo,BlogEntryRepo>();
+builder.Services.AddTransient<IAnonContactRepository, AnonContactUsRepo>();
+builder.Services.AddTransient<IDisputeRepo, DisputeRepo>();
 
 // Allower Swagger to deal with JWT Auth fluently
 builder.Services.AddSwaggerGen(c =>
@@ -155,8 +159,11 @@ builder.Services.AddTransient<IContactUsMail, ContactUsMailKit>();
 builder.Services.Configure<MailKitEmailSenderOptions>(
 builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));
 builder.Services.AddResponseCaching();
+
+
 var app = builder.Build();
 
+app.UseAllAtatus(app.Configuration);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

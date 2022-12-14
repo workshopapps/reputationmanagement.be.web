@@ -78,8 +78,8 @@ namespace src.Controllers
                     var userToNotify = await _userManager.FindByIdAsync(updatedReview.UserId.ToString());
                     
                     await _emailSender.SendEmailAsync(userToNotify.Email, $"{emailSubject}",
-                         $"The status of your review with id of \"{updatedReview.ReviewId}\" and review string of \"{updatedReview.ReviewString}\" has been updated to " +
-                         $"\"{updatedReview.Status}\"" + $" check https://repute.hng.tech/review/{updatedReview.ReviewId}");
+                         $"The status of your review with id of \"{updatedReview.ReviewId}\" and review string of \"{updatedReview.ReviewString}\" from {updatedReview.Email} has been updated to " +
+                         $"\"{updatedReview.Status}\"" + $" check https://repute.hng.tech/request?requestId={updatedReview.ReviewId} to view the review");
                     return new ObjectResult(reviewForDisplay);
                 }
             }
@@ -168,12 +168,13 @@ namespace src.Controllers
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
         public IActionResult UnclaimedReviews()
         {
-            var pendingReview = _reviewRepo.GetPendingReview();
-            if (pendingReview == null)
+            var pendingReviews = _reviewRepo.GetPendingReview();
+            var reviewsForDisplay = _mapper.Map<List<ReviewForDisplayDto>>(pendingReviews);
+            if (pendingReviews == null)
             {
                 return NotFound("No pending reviews");
             }
-            return Ok(pendingReview);
+            return Ok(reviewsForDisplay);
         }
 
         /// <summary>

@@ -69,7 +69,7 @@ namespace src.Controllers
                 }
                 else
                 {
-                    badResponse = "Bad Input";
+                    return BadRequest(result.Errors.First().Description);
                 }
 
                 return BadRequest(badResponse);
@@ -84,6 +84,10 @@ namespace src.Controllers
                     var claims = GetClaims(user);
                     var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
                     var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+                    string email_title = "Support From Repute";
+                    string email_body = StringTemplates.AdminAccountTemplate;
+                    await _emailSender.SendEmailAsync(userModel.Email, email_title, email_body);
                     return Ok(token);
                 }
             }
@@ -102,19 +106,24 @@ namespace src.Controllers
         public async Task<IActionResult> Login([FromBody] UserLoginModel userModel)
         {
             var user = await _userManager.FindByEmailAsync(userModel.Email);
+            
             if (user is null) { return BadRequest($"User with email {userModel.Email} does not exist"); }
-            if (user != null && await _userManager.CheckPasswordAsync(user, userModel.Password))
+            if (await _userManager.IsInRoleAsync(user, "Customer"))
             {
-                var signingCredentials = GetSigningCredentials();
-                var claims = GetClaims(user);
-                var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
-                var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-                return Ok(token);
+                if (await _userManager.CheckPasswordAsync(user, userModel.Password))
+                {
+                    var signingCredentials = GetSigningCredentials();
+                    var claims = GetClaims(user);
+                    var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
+                    var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+                    return Ok(token);
+                }
+                else
+                {
+                    return BadRequest("Username and password don't match");
+                }
             }
-            else
-            {
-                return BadRequest("Username and password don't match");
-            }
+            return BadRequest("Invalid Authentication");
         }
 
         /// <returns>Use bearer auth token</returns>
@@ -198,19 +207,19 @@ namespace src.Controllers
                 return BadRequest("No user with this email exists");
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var valueBytes = Encoding.UTF8.GetBytes(token);
-            var code = Convert.ToBase64String(valueBytes);
+            string link = $"https://repute.hng.tech/password-recovery/change?"+
+                   $"token={token}";
 
-            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this \n {code}");
+           await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this <a href=\"{link}\">link</a>");
 
-            return Ok("Please check your email for the password reset link");
+           return Ok("Please check your email for the password reset link");
         }
 
         [SwaggerOperation(Summary = "reset users password.")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPost("reset-password.")]
+        [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto datamodel)
         {
             var user = await _userManager.FindByEmailAsync(datamodel.Email);

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using src.Entities;
@@ -31,16 +32,18 @@ public class AdminAccountsController : ControllerBase
     /// configuartion setting for JWT
     /// </summary>
     private readonly IConfigurationSection _jwtSettings;
+    private readonly IEmailSender _emailSender;
 
     /// <summary>
     /// constructor <c>AdminAccountController</c> initializes an AdminAccount instance
     /// (<paramref name="userManager"/>,<paramref name="configuration"/>).
     /// </summary>
-    public AdminAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration)
+    public AdminAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration, IEmailSender emailSender)
     {
         _mapper = mapper;
         _userManager = userManager;
         _jwtSettings = configuration.GetSection("JwtSettings");
+        _emailSender = emailSender;
     }
 
     /// <summary>
@@ -53,6 +56,9 @@ public class AdminAccountsController : ControllerBase
     [HttpPost("create_account")]
     public async Task<IActionResult> Register([FromBody, SwaggerRequestBody("Account details payload", Required = true)] LawyerAccountForCreationDto adminRegisterModel)
     {
+        string EMAIL_BODY = StringTemplates.AdminAccountTemplate;
+
+
         var existingAdmin = await _userManager.FindByEmailAsync(adminRegisterModel.Email);
 
         if(existingAdmin == null)
@@ -66,6 +72,7 @@ public class AdminAccountsController : ControllerBase
             }
 
             await _userManager.AddToRoleAsync(admin, "Administrator");
+            await _emailSender.SendEmailAsync(adminRegisterModel.Email, "Negative Reviews Inquiry", EMAIL_BODY);
             return StatusCode(201);
         }
 
@@ -83,17 +90,26 @@ public class AdminAccountsController : ControllerBase
     [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody, SwaggerRequestBody("Account details payload", Required = true)] UserLoginModel adminLogin)
     {
-        var admin = await _userManager.FindByEmailAsync(adminLogin.Email);
+        var user = await _userManager.FindByEmailAsync(adminLogin.Email);
+        if (user is null) { return BadRequest($"User with email {adminLogin.Email} does not exist"); }
 
-        if (admin != null && await _userManager.CheckPasswordAsync(admin, adminLogin.Password))
+        if (await _userManager.IsInRoleAsync(user, "Administrator"))
+        {
+            if (await _userManager.CheckPasswordAsync(user, adminLogin.Password))
             {
                 var signingCredentials = GetSigningCredentials();
-                var claims = GetClaims(admin);
+                var claims = GetClaims(user);
                 var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
                 var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
                 return Ok(token);
             }
-        return Unauthorized("Invalid Authentication");
+            else
+            {
+                return BadRequest("Username and password don't match");
+            }
+        }
+        return BadRequest("Invalid Authentication");
     }
 
 

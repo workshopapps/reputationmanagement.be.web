@@ -49,10 +49,12 @@ namespace src.Entities
 
     public enum StatusType
     {
-        PendingReview,
-        Successful,
-        Inconclusive, 
-        Failed
+        pending,
+        InProgress,
+        inconclusive,
+        completed,
+        failed,
+        paid
     }
     public enum PriorityType
     {

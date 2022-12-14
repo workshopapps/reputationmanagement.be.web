@@ -204,29 +204,6 @@ namespace src.Controllers
             return Ok("Reviews successfully deleted");
         }
 
-        [SwaggerOperation(Summary = "Create Complaint for each User.")]
-        [HttpPost]
-        [Route("CreateComplaint")]
-        public async Task<IActionResult> CreateComplaint(CreateUserComplainsDto complains)
-        {
-            if (complains == null)
-                return NoContent();
-
-            var query = await _reviewRepo.CreateComplaint(complains);
-            if (query == null)
-                return NoContent();
-            var userEmail = User.FindFirstValue(ClaimTypes.Name);
-            var user = await _userManager.FindByEmailAsync(userEmail);
-
-            if (user.ComplaintStatus == true)
-            {
-                string emailSubject = "Repute - Complaint Mail";
-                string emailBody = $"<p>Your Complaint</p><p><em>\"{query.ComplaintMessage}\"</em> has been recorded</p>";
-                await _emailSender.SendEmailAsync(userEmail, $"{emailSubject}", emailBody);
-            }
-            return Ok(query);
-        }
-
         [SwaggerOperation(Summary = "Notify user when a review's status changes ")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

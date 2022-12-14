@@ -227,10 +227,8 @@ namespace src.Controllers
             {
                 return BadRequest("No user with this email exists");
             }
-            var valueBytes = System.Convert.FromBase64String(datamodel.Token);
-            var code = Encoding.UTF8.GetString(valueBytes);
-
-            var result = await _userManager.ResetPasswordAsync(user, code, datamodel.NewPassword);
+           
+            var result = await _userManager.ResetPasswordAsync(user, datamodel.Token, datamodel.NewPassword);
 
             if (result.Succeeded)
             {

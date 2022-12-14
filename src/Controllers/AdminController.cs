@@ -58,14 +58,16 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [SwaggerResponseExample(400, typeof(BadUserUpdateExampleDetailsForCustomer))]
     [SwaggerResponseExample(200, typeof(GoodUserUpdateExampleDetailsForCustomer))]
-    public async Task<IActionResult> UpdateUser(CustomerAccountForCreationDto userDetails)
+    public async Task<IActionResult> UpdateUser(CustomerUpdateDto userDetails)
     {
         var user = await _userManager.FindByEmailAsync(userDetails.Email);
         if (user != null)
         {
             user.Email = userDetails.Email;
             user.UserName = userDetails.BusinessEntityName;
-            user.PasswordHash = userDetails.Password;
+            user.PhoneNumber= userDetails.PhoneNumber;
+            user.BusinessDescription = userDetails.BusinessDescription;
+            user.BusinessWebsite = userDetails.BusinessWebsite;
             IdentityResult result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {

@@ -11,6 +11,9 @@ namespace EarlyMan.PL.Profiles
             CreateMap<src.Models.Dtos.CustomerAccountForCreationDto, src.Entities.ApplicationUser>()
                 .ForMember(x => x.UserName, opt => opt.MapFrom(source => source.BusinessEntityName.Replace(" ", "_")))
                 .ForMember(x=>x.PostAddress, o => o.MapFrom(str => string.Empty));
+         
+            //    .ForMember(x => x.UserName, opt => opt.MapFrom(source => source.BusinessEntityName.Replace(" ", "_")))
+            //.ForMember(x => x.PostAddress, o => o.MapFrom(str => string.Empty));
             CreateMap<src.Models.Dtos.LawyerAccountForCreationDto, src.Entities.ApplicationUser>()
                 .ForMember(x => x.UserName, opt => opt.MapFrom(source => source.FirstName +"_"+ source.LastName))
                 .ForMember(x => x.PostAddress, o => o.MapFrom(str => string.Empty))
@@ -33,6 +36,11 @@ namespace EarlyMan.PL.Profiles
 
             CreateMap<src.Entities.ApplicationUser, src.Models.Dtos.UpdateNotificationForUserDto>();
             CreateMap<src.Models.Dtos.UpdateNotificationForUserDto, src.Entities.ApplicationUser>();
+
+            CreateMap<src.Entities.ApplicationUser, src.Models.Dtos.CustomerUpdateDto>();
+            CreateMap<src.Models.Dtos.CustomerUpdateDto, src.Entities.ApplicationUser>();
+           
+
 
         }
     }

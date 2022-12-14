@@ -12,7 +12,7 @@ namespace src.Models.ExampleModels
 
                 new CustomerUpdateDto()
                 {
-                  Email = "usermail@gmail.com",
+                 
                   BusinessEntityName ="A Unigue business name",
                   PhoneNumber =  "08055667788",
                   FullName = "Customer FullName",
@@ -30,7 +30,7 @@ namespace src.Models.ExampleModels
 
                 new CustomerUpdateDto()
                 {
-                    Email = "usermail@gmail",
+                  
                     BusinessEntityName = "oopojm,nmnbnvbv",
                     PhoneNumber = "",
                     FullName = "",

@@ -39,6 +39,8 @@ namespace EarlyMan.PL.Profiles
 
             CreateMap<src.Entities.ApplicationUser, src.Models.Dtos.CustomerUpdateDto>();
             CreateMap<src.Models.Dtos.CustomerUpdateDto, src.Entities.ApplicationUser>();
+
+            CreateMap<ApplicationUser, UserForDisplayDto>();
            
 
 

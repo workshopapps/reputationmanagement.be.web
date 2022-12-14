@@ -9,6 +9,7 @@ using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System.Linq;
 
 namespace src.Controllers;
 
@@ -61,47 +62,28 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [SwaggerResponseExample(400, typeof(BadUserUpdateExampleDetailsForCustomer))]
     [SwaggerResponseExample(200, typeof(GoodUserUpdateExampleDetailsForCustomer))]
-    public async Task<IActionResult> UpdateUser( string userEmail, [FromBody] JsonPatchDocument<CustomerUpdateDto>  userDetails)
+    public async Task<ActionResult> UpdateUser( string userEmail, [FromBody] JsonPatchDocument<CustomerUpdateDto>  userDetails)
     {
         if (userDetails !=null)
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
          
-                var userToPatch = _mapper.Map<CustomerUpdateDto>(user);
-                userDetails.ApplyTo(userToPatch);
+            var userToPatch = _mapper.Map<CustomerUpdateDto>(user);
+            userDetails.ApplyTo(userToPatch);
             
-                var result = _mapper.Map(userToPatch, user);
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                var results = await _userManager.UpdateAsync(result);
-            if (results.Succeeded)
-                {
-                    return Ok("updated");
-                }
+            var _ = _mapper.Map(userToPatch, user);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var updateUserCredentialsResult = await _userManager.UpdateAsync(user);
+            if (updateUserCredentialsResult.Succeeded)
+            {
+               return Ok();
+            }
         }
 
         return BadRequest("unsuccessful");
-    }
-
-    [HttpGet("GetUsers")]
-    public IActionResult GetUsers()
-
-    {
-        var user = _userManager.Users;
-
-        if (user != null)
-        {
-            var query = user.Select(x => new CustomerAccountForCreationDto()
-            {
-                BusinessEntityName = x.UserName,
-                Email = x.Email,
-                Password = x.PasswordHash,
-            }).ToList();
-            return Ok(query);
-        }
-        return BadRequest();
     }
 
     //[SwaggerOperation(Summary = "Create a Review with this endpoint")]
@@ -232,17 +214,17 @@ public class AdminController : ControllerBase
     [SwaggerOperation(Summary = "Gets All lawyers by an Admin")]
     [HttpGet("users/lawyers")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult> GetAllLawyers()
+    public async Task<ActionResult<IEnumerable<UserForDisplayDto>>> GetAllLawyers()
     {
-        var lawyers = await _adminRepository.GetAllLawyers();
+        var lawyers = _mapper.Map<IEnumerable<UserForDisplayDto>>(await _adminRepository.GetAllLawyers());
         return Ok(lawyers);
     }
     [SwaggerOperation(Summary = "Gets All customers by an Admin")]
     [HttpGet("users/customers")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult> GetAllCustomers()
+    public async Task<ActionResult<IEnumerable<UserForDisplayDto>>> GetAllCustomers()
     {
-        var customers = await _adminRepository.GetAllCustomers();
+        var customers = _mapper.Map<IEnumerable<UserForDisplayDto>>(await _adminRepository.GetAllCustomers());
         return Ok(customers);
     }
 }

@@ -73,6 +73,15 @@ public class AdminAccountsController : ControllerBase
 
             await _userManager.AddToRoleAsync(admin, "Administrator");
             await _emailSender.SendEmailAsync(adminRegisterModel.Email, "Negative Reviews Inquiry", EMAIL_BODY);
+            var newAdmin = await _userManager.FindByEmailAsync(adminRegisterModel.Email);
+            if(newAdmin != null && await _userManager.CheckPasswordAsync(newAdmin, adminRegisterModel.Password))
+            {
+                var signingCredentials = GetSigningCredentials();
+                var claims = GetClaims(admin);
+                var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
+                var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+                return Ok(token);
+            }
             return StatusCode(201);
         }
 

@@ -18,10 +18,13 @@ namespace src.Models.Dtos
         /// new reqs 5/12/2022
         public string ComplainerName { get; set; } = "Ciroma Chukwuma Adekunle";
         public DateTime TimeOfReview { get; set; }
+
     }
 
     public class LawyerReviewForUpdateDTO
     {
         public StatusType Status { get; set; }
+        [Required]
+        public decimal? Price { get; set; }
     }
 }

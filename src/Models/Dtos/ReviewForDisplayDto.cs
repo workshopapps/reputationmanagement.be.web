@@ -11,7 +11,7 @@ namespace src.Models.Dtos
         public string BusinessType { get; set; }
         public string WebsiteName { get; set; }
         public int Rating { get; set; }
-     
+        public string ReviewLink { get; set; }
         public StatusType Status { get; set; }
         public PriorityType Priority { get; set; }
 

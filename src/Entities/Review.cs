@@ -1,5 +1,3 @@
-
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace src.Entities
@@ -35,6 +33,8 @@ namespace src.Entities
         public string BusinessType { get; set; }
         [Required]
         public string WebsiteName { get; set; }
+        [Required]
+        public string ReviewLink { get; set; }
         [Required]
         public int Rating { get; set; }
 

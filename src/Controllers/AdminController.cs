@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
 using src.Models.Dtos;
@@ -113,9 +114,13 @@ public class AdminController : ControllerBase
     public ActionResult GetAllReviews(int pageNumber = 0, int pageSize = 10)
     {
         var reviews = _reviewRepo.GetAllReviews(pageNumber, pageSize).ToList();
-        var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
-        return Ok(reviewsToReturn);
+        //var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
+        return Ok(reviews);
     }
+
+
+
+
 
     [SwaggerOperation(Summary = "Get a particular reviews for Admin")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
@@ -166,18 +171,28 @@ public class AdminController : ControllerBase
         return Ok(query);
     }
 
-    [SwaggerOperation(Summary = "Update a review by an Admin")]
-    [HttpPut]
-    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    [Route("reviews/{reviewId}")]
-    public ActionResult UpdateReview([FromQuery] Guid reviewId, [FromBody] ReviewForUpdateDTO review)
+    [SwaggerOperation(Summary = "Update a review for an admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpPatch("review/{reviewId}")]
+    public ActionResult<Review> EditReview(Guid reviewId, [FromBody] JsonPatchDocument<ReviewForUpdateDTO> reviewPatchDoc)
     {
-        var reviews = _reviewRepo.UpdateReview(review, reviewId);
-        if (review == null)
+        if (reviewPatchDoc is not null)
         {
-            return BadRequest();
+            var reviewToPatch = _reviewRepo.GetReviewById(reviewId);
+            var reviewForUpdateToPatch = _mapper.Map<ReviewForUpdateDTO>(reviewToPatch);
+            reviewPatchDoc.ApplyTo(reviewForUpdateToPatch);
+            if (ModelState.IsValid is false)
+            {
+                return BadRequest(ModelState);
+            }
+            var review = _reviewRepo.UpdateReview(reviewForUpdateToPatch, reviewId);
+            var updatedReview =_reviewRepo.GetReviewById(reviewId);
+
+            return Ok(updatedReview);
         }
-        return Ok("Review was successfully updated");
+        return BadRequest(ModelState);
     }
 
     [SwaggerOperation(Summary = "delete a review by an Admin")]

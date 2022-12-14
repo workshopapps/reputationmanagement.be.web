@@ -19,6 +19,8 @@ namespace src.Models.Dtos
         public string ComplainerName { get; set; } = "Ciroma Chukwuma Adekunle";
         public DateTime TimeOfReview { get; set; }
 
+        public decimal? Price { get; set; }
+
     }
 
     public class LawyerReviewForUpdateDTO

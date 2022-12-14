@@ -25,7 +25,7 @@ namespace EarlyMan.PL.Profiles
             CreateMap<ApplicationUser, LawyerDetailsDto>()
                     .ForMember(x => x.FirstName, opt => opt.MapFrom(source => source.UserName.Split("_", StringSplitOptions.None)[0]))
                     .ForMember(x => x.LastName, opt => opt.MapFrom(source => source.UserName.Split("_", StringSplitOptions.None)[1]));
-                    
+              
 
 
             CreateMap<src.Models.AccessibilityOptions, src.Entities.ApplicationUser>();

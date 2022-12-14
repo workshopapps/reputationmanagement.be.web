@@ -21,13 +21,15 @@ public class AdminController : ControllerBase
     private readonly IReviewRepository _reviewRepo;
     private readonly IMapper _mapper;
     private readonly IQuoteRepository _quoteRepo;
+    private readonly IAdminRepository _adminRepository;
 
-    public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper, IQuoteRepository quoteRepo)
+    public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper, IQuoteRepository quoteRepo, IAdminRepository adminRepository)
     {
         _userManager = userManager;
         _reviewRepo = reviewRepository;
         _mapper = mapper;
         _quoteRepo = quoteRepo;
+        _adminRepository = adminRepository;
     }
 
     [HttpDelete("DeleteUser")]
@@ -203,5 +205,22 @@ public class AdminController : ControllerBase
     public ActionResult Getall()
     {
         return Ok(_quoteRepo.GetAll().ToList());
+    }
+
+    [SwaggerOperation(Summary = "Gets All lawyers by an Admin")]
+    [HttpGet("users/lawyers")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> GetAllLawyers()
+    {
+        var lawyers = await _adminRepository.GetAllLawyers();
+        return Ok(lawyers);
+    }
+    [SwaggerOperation(Summary = "Gets All customers by an Admin")]
+    [HttpGet("users/customers")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> GetAllCustomers()
+    {
+        var customers = await _adminRepository.GetAllCustomers();
+        return Ok(customers);
     }
 }

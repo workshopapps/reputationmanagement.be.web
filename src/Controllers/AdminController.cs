@@ -57,25 +57,32 @@ public class AdminController : ControllerBase
     /// <returns>Returns the updated information</returns>
 
     [SwaggerOperation(Summary = "Updates user details")]
-    [HttpPut("UpdateUserAccount")]
-    [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+    [HttpPatch("UpdateUserAccount/{userEmail}")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [SwaggerResponseExample(400, typeof(BadUserUpdateExampleDetailsForCustomer))]
     [SwaggerResponseExample(200, typeof(GoodUserUpdateExampleDetailsForCustomer))]
-    public async Task<IActionResult> UpdateUser(CustomerAccountForCreationDto userDetails)
+    public async Task<IActionResult> UpdateUser( string userEmail, [FromBody] JsonPatchDocument<CustomerUpdateDto>  userDetails)
     {
-        var user = await _userManager.FindByEmailAsync(userDetails.Email);
-        if (user != null)
+        if (userDetails !=null)
         {
-            user.Email = userDetails.Email;
-            user.UserName = userDetails.BusinessEntityName;
-            user.PasswordHash = userDetails.Password;
-            IdentityResult result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
-            {
-                return Ok("updated");
-            }
+            var user = await _userManager.FindByEmailAsync(userEmail);
+         
+                var userToPatch = _mapper.Map<CustomerUpdateDto>(user);
+                userDetails.ApplyTo(userToPatch);
+            
+                var result = _mapper.Map(userToPatch, user);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var results = await _userManager.UpdateAsync(result);
+            if (results.Succeeded)
+                {
+                    return Ok("updated");
+                }
         }
-        return Ok(user);
+
+        return BadRequest("unsuccessful");
     }
 
     [HttpGet("GetUsers")]

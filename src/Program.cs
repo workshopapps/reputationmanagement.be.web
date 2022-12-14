@@ -84,6 +84,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddTransient<IBufferedFileUploadService, BufferedFileUploadLocalService>();
+builder.Services.AddTransient<IAdminRepository, AdminRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

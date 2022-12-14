@@ -30,5 +30,11 @@ namespace src.Services
             var businessUsers = await _userManager.GetUsersInRoleAsync("Customer");
             return _mapper.Map<IEnumerable<ApplicationUser>>(businessUsers).ToList();
         }
+
+        public async Task<ApplicationUser> GetUserById(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            return user;
+        }
     }
 }

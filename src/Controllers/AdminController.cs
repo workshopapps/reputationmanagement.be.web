@@ -107,10 +107,6 @@ public class AdminController : ControllerBase
         return Ok(reviews);
     }
 
-
-
-
-
     [SwaggerOperation(Summary = "Get a particular reviews for Admin")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [HttpGet("reviews/{reviewId}")]
@@ -219,6 +215,7 @@ public class AdminController : ControllerBase
         var lawyers = _mapper.Map<IEnumerable<UserForDisplayDto>>(await _adminRepository.GetAllLawyers());
         return Ok(lawyers);
     }
+
     [SwaggerOperation(Summary = "Gets All customers by an Admin")]
     [HttpGet("users/customers")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
@@ -227,4 +224,16 @@ public class AdminController : ControllerBase
         var customers = _mapper.Map<IEnumerable<UserForDisplayDto>>(await _adminRepository.GetAllCustomers());
         return Ok(customers);
     }
+
+    [SwaggerOperation(Summary = "Gets user by Id")]
+    [HttpGet("users/{userId}")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<UserForDisplayDto>> GetCustomerById(string userId)
+    {
+        var customer = await _adminRepository.GetUserById(userId);
+        var customerToDisplay = _mapper.Map<UserForDisplayDto>(customer);
+        if (customerToDisplay is not null) {return Ok(customerToDisplay);}
+        return BadRequest();
+    }   
+
 }

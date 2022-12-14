@@ -8,5 +8,6 @@ namespace src.Services
     {
         Task<IEnumerable<ApplicationUser>> GetAllLawyers();   
         Task<IEnumerable<ApplicationUser>> GetAllCustomers();
+        Task<ApplicationUser> GetUserById(string userId);
     }
 }

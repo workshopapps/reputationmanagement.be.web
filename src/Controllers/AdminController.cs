@@ -211,12 +211,12 @@ public class AdminController : ControllerBase
     [HttpGet("get_contact_details_of_lawyer_as_csv")]
     public IActionResult ExportContactDetailsAsCSV()
     {
-        var users = _userManager.GetUsersInRoleAsync("Lawyers").Result.ToList()
+        var users = _userManager.GetUsersInRoleAsync("Lawyer").Result.ToList()
             .Select(user => new LawyersContactDetailDto()
             {
                 FullName = user.UserName,
                 Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
+                PhoneNumber = user.PhoneNumber is null ? "null" : user.PhoneNumber,
             });
         var stream = new MemoryStream();
         using (var writeFile = new StreamWriter(stream, leaveOpen: true))
@@ -225,6 +225,6 @@ public class AdminController : ControllerBase
             csv.WriteRecords(users);
         }
         stream.Position = 0; //reset stream
-        return File(stream, "application/octet-stream", "Contact details.csv");
+        return File(stream, "application/octet-stream", "Details.csv");
     }
 }

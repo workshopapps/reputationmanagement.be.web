@@ -22,13 +22,15 @@ public class AdminController : ControllerBase
     private readonly IReviewRepository _reviewRepo;
     private readonly IMapper _mapper;
     private readonly IQuoteRepository _quoteRepo;
+    private readonly IAdminRepository _adminRepository;
 
-    public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper, IQuoteRepository quoteRepo)
+    public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper, IQuoteRepository quoteRepo, IAdminRepository adminRepository)
     {
         _userManager = userManager;
         _reviewRepo = reviewRepository;
         _mapper = mapper;
         _quoteRepo = quoteRepo;
+        _adminRepository = adminRepository;
     }
 
     [HttpDelete("DeleteUser")]
@@ -119,9 +121,13 @@ public class AdminController : ControllerBase
     public ActionResult GetAllReviews(int pageNumber = 0, int pageSize = 10)
     {
         var reviews = _reviewRepo.GetAllReviews(pageNumber, pageSize).ToList();
-        var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
-        return Ok(reviewsToReturn);
+        //var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
+        return Ok(reviews);
     }
+
+
+
+
 
     [SwaggerOperation(Summary = "Get a particular reviews for Admin")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
@@ -172,18 +178,28 @@ public class AdminController : ControllerBase
         return Ok(query);
     }
 
-    [SwaggerOperation(Summary = "Update a review by an Admin")]
-    [HttpPut]
-    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    [Route("reviews/{reviewId}")]
-    public ActionResult UpdateReview([FromQuery] Guid reviewId, [FromBody] ReviewForUpdateDTO review)
+    [SwaggerOperation(Summary = "Update a review for an admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpPatch("review/{reviewId}")]
+    public ActionResult<Review> EditReview(Guid reviewId, [FromBody] JsonPatchDocument<ReviewForUpdateDTO> reviewPatchDoc)
     {
-        var reviews = _reviewRepo.UpdateReview(review, reviewId);
-        if (review == null)
+        if (reviewPatchDoc is not null)
         {
-            return BadRequest();
+            var reviewToPatch = _reviewRepo.GetReviewById(reviewId);
+            var reviewForUpdateToPatch = _mapper.Map<ReviewForUpdateDTO>(reviewToPatch);
+            reviewPatchDoc.ApplyTo(reviewForUpdateToPatch);
+            if (ModelState.IsValid is false)
+            {
+                return BadRequest(ModelState);
+            }
+            var review = _reviewRepo.UpdateReview(reviewForUpdateToPatch, reviewId);
+            var updatedReview =_reviewRepo.GetReviewById(reviewId);
+
+            return Ok(updatedReview);
         }
-        return Ok("Review was successfully updated");
+        return BadRequest(ModelState);
     }
 
     [SwaggerOperation(Summary = "delete a review by an Admin")]
@@ -211,5 +227,22 @@ public class AdminController : ControllerBase
     public ActionResult Getall()
     {
         return Ok(_quoteRepo.GetAll().ToList());
+    }
+
+    [SwaggerOperation(Summary = "Gets All lawyers by an Admin")]
+    [HttpGet("users/lawyers")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> GetAllLawyers()
+    {
+        var lawyers = await _adminRepository.GetAllLawyers();
+        return Ok(lawyers);
+    }
+    [SwaggerOperation(Summary = "Gets All customers by an Admin")]
+    [HttpGet("users/customers")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult> GetAllCustomers()
+    {
+        var customers = await _adminRepository.GetAllCustomers();
+        return Ok(customers);
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
+using src.Models;
 using src.Models.Dtos;
 using src.Models.ExampleModels;
 using src.Services;
@@ -206,14 +207,16 @@ namespace src.Controllers
         [SwaggerOperation(Summary = "Sends email to the user from reviewer")]
         [HttpPost("email/create")]
         [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
-        [SwaggerResponseExample(400, typeof(BadSendingEmailTExample))]
-        [SwaggerResponseExample(200, typeof(GoodSendingEmailTExample))]
-        public ActionResult SendEmail([FromBody] EmailDataDto emailData)
+        public async Task<ActionResult> SendEmail([FromBody] CreateQuotationDto emailData)
         {
-            const string EMAIL_SUBJECT = "Plea for removal of review";
+            var review = _reviewRepo.GetReviewById(emailData.ReviewId);
+            var user = await _userManager.FindByIdAsync(review.UserId.ToString());
+            review.Price = emailData.Price;
+            _reviewRepo.Save();
+            string emailSubject = $"Quotation for removal of review on {review.ReviewLink} by {review.ComplainerName}";
             try
             {
-                _emailSender.SendEmailAsync(emailData.EmailToId, EMAIL_SUBJECT, emailData.EmailBody);
+                await _emailSender.SendEmailAsync(user.Email, emailSubject, emailData.Emailbody + $"\n Link to review https://repute.hng.tech/request?requestId={review.ReviewId}" );
                 return Ok("Success");
             }
             catch (SmtpCommandException ex)

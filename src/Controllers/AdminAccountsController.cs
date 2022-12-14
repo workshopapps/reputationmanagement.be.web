@@ -61,12 +61,12 @@ public class AdminAccountsController : ControllerBase
 
         var existingAdmin = await _userManager.FindByEmailAsync(adminRegisterModel.Email);
 
-        if(existingAdmin == null)
+        if (existingAdmin == null)
         {
             var admin = _mapper.Map<ApplicationUser>(adminRegisterModel);
             var result = await _userManager.CreateAsync(admin, adminRegisterModel.Password);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, result.Errors);
             }
@@ -74,7 +74,7 @@ public class AdminAccountsController : ControllerBase
             await _userManager.AddToRoleAsync(admin, "Administrator");
             await _emailSender.SendEmailAsync(adminRegisterModel.Email, "Negative Reviews Inquiry", EMAIL_BODY);
             var newAdmin = await _userManager.FindByEmailAsync(adminRegisterModel.Email);
-            if(newAdmin != null && await _userManager.CheckPasswordAsync(newAdmin, adminRegisterModel.Password))
+            if (newAdmin != null && await _userManager.CheckPasswordAsync(newAdmin, adminRegisterModel.Password))
             {
                 var signingCredentials = GetSigningCredentials();
                 var claims = GetClaims(admin);
@@ -123,42 +123,42 @@ public class AdminAccountsController : ControllerBase
 
 
 
-        /// <summary>
-        /// Generates digital signing and signature for admin
-        /// </summary>
-        /// <returns>Digiitally signed key for account login operation</returns>
-        private SigningCredentials GetSigningCredentials()
-        {
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.GetSection("securityKey").Value);
-            var secret = new SymmetricSecurityKey(key);
-            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-        }
+    /// <summary>
+    /// Generates digital signing and signature for admin
+    /// </summary>
+    /// <returns>Digiitally signed key for account login operation</returns>
+    private SigningCredentials GetSigningCredentials()
+    {
+        var key = Encoding.UTF8.GetBytes(_jwtSettings.GetSection("securityKey").Value);
+        var secret = new SymmetricSecurityKey(key);
+        return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+    }
 
     /// <summary>
     /// Generates digital signing and signature for admin
     /// </summary>
     /// <returns>Digiitally signed key for account login operation</returns>
     private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
-        {
-            var tokenOptions = new JwtSecurityToken(
-            issuer: _jwtSettings.GetSection("ValidIssuer").Value,
-            audience: _jwtSettings.GetSection("validAudience").Value,
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings.GetSection("expiryInMinutes").Value)),
-            signingCredentials: signingCredentials);
-            return tokenOptions;
-        }
-        private async Task<List<Claim>> GetClaims(ApplicationUser user)
-        {
-            var claims = new List<Claim>
+    {
+        var tokenOptions = new JwtSecurityToken(
+        issuer: _jwtSettings.GetSection("ValidIssuer").Value,
+        audience: _jwtSettings.GetSection("validAudience").Value,
+        claims: claims,
+        expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings.GetSection("expiryInMinutes").Value)),
+        signingCredentials: signingCredentials);
+        return tokenOptions;
+    }
+    private async Task<List<Claim>> GetClaims(ApplicationUser user)
+    {
+        var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Email)
             };
-            var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-            return claims;
+        var roles = await _userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
         }
+        return claims;
+    }
 }

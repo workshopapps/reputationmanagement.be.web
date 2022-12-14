@@ -1,4 +1,5 @@
 using AutoMapper;
+using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System.Globalization;
 
 namespace src.Controllers;
 
@@ -203,5 +205,26 @@ public class AdminController : ControllerBase
     public ActionResult Getall()
     {
         return Ok(_quoteRepo.GetAll().ToList());
+    }
+
+    [SwaggerOperation(Summary = "Gets details of all the Lawyers in csv")]
+    [HttpGet("get_contact_details_of_lawyer_as_csv")]
+    public IActionResult ExportContactDetailsAsCSV()
+    {
+        var users = _userManager.GetUsersInRoleAsync("Lawyers").Result.ToList()
+            .Select(user => new LawyersContactDetailDto()
+            {
+                FullName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+            });
+        var stream = new MemoryStream();
+        using (var writeFile = new StreamWriter(stream, leaveOpen: true))
+        {
+            var csv = new CsvWriter(writeFile, CultureInfo.InvariantCulture);
+            csv.WriteRecords(users);
+        }
+        stream.Position = 0; //reset stream
+        return File(stream, "application/octet-stream", "Contact details.csv");
     }
 }

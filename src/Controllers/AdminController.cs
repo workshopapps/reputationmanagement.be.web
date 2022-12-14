@@ -55,7 +55,7 @@ public class AdminController : ControllerBase
 
     [SwaggerOperation(Summary = "Updates user details")]
     [HttpPut("UpdateUserAccount")]
-    [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [SwaggerResponseExample(400, typeof(BadUserUpdateExampleDetailsForCustomer))]
     [SwaggerResponseExample(200, typeof(GoodUserUpdateExampleDetailsForCustomer))]
     public async Task<IActionResult> UpdateUser(CustomerAccountForCreationDto userDetails)

@@ -2,6 +2,7 @@ using AutoMapper;
 using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
 using src.Models.Dtos;
@@ -9,6 +10,7 @@ using src.Models.ExampleModels;
 using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System.Linq;
 using System.Globalization;
 
 namespace src.Controllers;
@@ -23,13 +25,15 @@ public class AdminController : ControllerBase
     private readonly IReviewRepository _reviewRepo;
     private readonly IMapper _mapper;
     private readonly IQuoteRepository _quoteRepo;
+    private readonly IAdminRepository _adminRepository;
 
-    public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper, IQuoteRepository quoteRepo)
+    public AdminController(UserManager<ApplicationUser> userManager, IReviewRepository reviewRepository, IMapper mapper, IQuoteRepository quoteRepo, IAdminRepository adminRepository)
     {
         _userManager = userManager;
         _reviewRepo = reviewRepository;
         _mapper = mapper;
         _quoteRepo = quoteRepo;
+        _adminRepository = adminRepository;
     }
 
     [HttpDelete("DeleteUser")]
@@ -56,44 +60,32 @@ public class AdminController : ControllerBase
     /// <returns>Returns the updated information</returns>
 
     [SwaggerOperation(Summary = "Updates user details")]
-    [HttpPut("UpdateUserAccount")]
-    [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]
+    [HttpPatch("UpdateUserAccount/{userEmail}")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [SwaggerResponseExample(400, typeof(BadUserUpdateExampleDetailsForCustomer))]
     [SwaggerResponseExample(200, typeof(GoodUserUpdateExampleDetailsForCustomer))]
-    public async Task<IActionResult> UpdateUser(CustomerAccountForCreationDto userDetails)
+    public async Task<ActionResult> UpdateUser( string userEmail, [FromBody] JsonPatchDocument<CustomerUpdateDto>  userDetails)
     {
-        var user = await _userManager.FindByEmailAsync(userDetails.Email);
-        if (user != null)
+        if (userDetails !=null)
         {
-            user.Email = userDetails.Email;
-            user.UserName = userDetails.BusinessEntityName;
-            user.PasswordHash = userDetails.Password;
-            IdentityResult result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
+            var user = await _userManager.FindByEmailAsync(userEmail);
+         
+            var userToPatch = _mapper.Map<CustomerUpdateDto>(user);
+            userDetails.ApplyTo(userToPatch);
+            
+            var _ = _mapper.Map(userToPatch, user);
+            if (!ModelState.IsValid)
             {
-                return Ok("updated");
+                return BadRequest(ModelState);
+            }
+            var updateUserCredentialsResult = await _userManager.UpdateAsync(user);
+            if (updateUserCredentialsResult.Succeeded)
+            {
+               return Ok();
             }
         }
-        return Ok(user);
-    }
 
-    [HttpGet("GetUsers")]
-    public IActionResult GetUsers()
-
-    {
-        var user = _userManager.Users;
-
-        if (user != null)
-        {
-            var query = user.Select(x => new CustomerAccountForCreationDto()
-            {
-                BusinessEntityName = x.UserName,
-                Email = x.Email,
-                Password = x.PasswordHash,
-            }).ToList();
-            return Ok(query);
-        }
-        return BadRequest();
+        return BadRequest("unsuccessful");
     }
 
     //[SwaggerOperation(Summary = "Create a Review with this endpoint")]
@@ -113,8 +105,8 @@ public class AdminController : ControllerBase
     public ActionResult GetAllReviews(int pageNumber = 0, int pageSize = 10)
     {
         var reviews = _reviewRepo.GetAllReviews(pageNumber, pageSize).ToList();
-        var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
-        return Ok(reviewsToReturn);
+        //var reviewsToReturn = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
+        return Ok(reviews);
     }
 
     [SwaggerOperation(Summary = "Get a particular reviews for Admin")]
@@ -166,18 +158,28 @@ public class AdminController : ControllerBase
         return Ok(query);
     }
 
-    [SwaggerOperation(Summary = "Update a review by an Admin")]
-    [HttpPut]
-    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    [Route("reviews/{reviewId}")]
-    public ActionResult UpdateReview([FromQuery] Guid reviewId, [FromBody] ReviewForUpdateDTO review)
+    [SwaggerOperation(Summary = "Update a review for an admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpPatch("review/{reviewId}")]
+    public ActionResult<Review> EditReview(Guid reviewId, [FromBody] JsonPatchDocument<ReviewForUpdateDTO> reviewPatchDoc)
     {
-        var reviews = _reviewRepo.UpdateReview(review, reviewId);
-        if (review == null)
+        if (reviewPatchDoc is not null)
         {
-            return BadRequest();
+            var reviewToPatch = _reviewRepo.GetReviewById(reviewId);
+            var reviewForUpdateToPatch = _mapper.Map<ReviewForUpdateDTO>(reviewToPatch);
+            reviewPatchDoc.ApplyTo(reviewForUpdateToPatch);
+            if (ModelState.IsValid is false)
+            {
+                return BadRequest(ModelState);
+            }
+            var review = _reviewRepo.UpdateReview(reviewForUpdateToPatch, reviewId);
+            var updatedReview =_reviewRepo.GetReviewById(reviewId);
+
+            return Ok(updatedReview);
         }
-        return Ok("Review was successfully updated");
+        return BadRequest(ModelState);
     }
 
     [SwaggerOperation(Summary = "delete a review by an Admin")]
@@ -207,24 +209,33 @@ public class AdminController : ControllerBase
         return Ok(_quoteRepo.GetAll().ToList());
     }
 
-    [SwaggerOperation(Summary = "Gets details of all the Lawyers in csv")]
-    [HttpGet("get_contact_details_of_lawyer_as_csv")]
-    public IActionResult ExportContactDetailsAsCSV()
+    [SwaggerOperation(Summary = "Gets All lawyers by an Admin")]
+    [HttpGet("users/lawyers")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<IEnumerable<UserForDisplayDto>>> GetAllLawyers()
     {
-        var users = _userManager.GetUsersInRoleAsync("Lawyer").Result.ToList()
-            .Select(user => new LawyersContactDetailDto()
-            {
-                FullName = user.UserName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber is null ? "null" : user.PhoneNumber,
-            });
-        var stream = new MemoryStream();
-        using (var writeFile = new StreamWriter(stream, leaveOpen: true))
-        {
-            var csv = new CsvWriter(writeFile, CultureInfo.InvariantCulture);
-            csv.WriteRecords(users);
-        }
-        stream.Position = 0; //reset stream
-        return File(stream, "application/octet-stream", "Details.csv");
+        var lawyers = _mapper.Map<IEnumerable<UserForDisplayDto>>(await _adminRepository.GetAllLawyers());
+        return Ok(lawyers);
     }
+
+    [SwaggerOperation(Summary = "Gets All customers by an Admin")]
+    [HttpGet("users/customers")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<IEnumerable<UserForDisplayDto>>> GetAllCustomers()
+    {
+        var customers = _mapper.Map<IEnumerable<UserForDisplayDto>>(await _adminRepository.GetAllCustomers());
+        return Ok(customers);
+    }
+
+    [SwaggerOperation(Summary = "Gets user by Id")]
+    [HttpGet("users/{userId}")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<UserForDisplayDto>> GetCustomerById(string userId)
+    {
+        var customer = await _adminRepository.GetUserById(userId);
+        var customerToDisplay = _mapper.Map<UserForDisplayDto>(customer);
+        if (customerToDisplay is not null) {return Ok(customerToDisplay);}
+        return BadRequest();
+    }   
+
 }

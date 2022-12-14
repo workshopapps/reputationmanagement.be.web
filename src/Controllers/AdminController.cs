@@ -54,7 +54,7 @@ public class AdminController : ControllerBase
     /// <returns>Returns the updated information</returns>
 
     [SwaggerOperation(Summary = "Updates user details")]
-    [HttpPut("UpdateUserAccount")]
+    [HttpPatch("UpdateUserAccount")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [SwaggerResponseExample(400, typeof(BadUserUpdateExampleDetailsForCustomer))]
     [SwaggerResponseExample(200, typeof(GoodUserUpdateExampleDetailsForCustomer))]

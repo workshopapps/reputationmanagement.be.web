@@ -250,7 +250,7 @@ public class AdminController : ControllerBase
     }
 
     [SwaggerOperation(Summary = "Gets full review")]
-    [HttpGet]
+    [HttpGet("FullReview")]
     public ActionResult GetFullReview(Guid reviewId)
     {
         var review = _reviewRepo.GetFullReview(reviewId);

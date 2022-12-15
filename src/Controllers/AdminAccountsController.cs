@@ -121,6 +121,44 @@ public class AdminAccountsController : ControllerBase
         return BadRequest("Invalid Authentication");
     }
 
+    #region DeleteUsersAccount
+    [SwaggerOperation(Summary = "This allows the Admin to delete a customer user account")]
+    [HttpDelete("DeleteCustomerAccount")]
+    public async Task<IActionResult> DeleteCustomerAccount(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user is null) { return BadRequest($"User with email {email} does not exist"); }
+        if (await _userManager.IsInRoleAsync(user, "Customer"))
+        {
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok("Customer User Deleted");
+            }
+        }
+        return BadRequest("Invalid Authentication");
+    }
+
+
+    [SwaggerOperation(Summary = "Admin to delete a lawyer account with this endpoint")]
+    [HttpDelete("DeleteLawyerAccount")]
+    public async Task<IActionResult> DeleteLawyerAccount(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user is null) { return BadRequest($"User with email {email} does not exist"); }
+        if (await _userManager.IsInRoleAsync(user, "Lawyer"))
+        {
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok("Lawyer User Deleted");
+            }
+        }
+        return BadRequest("Invalid Authentication");
+    }
+    #endregion
 
 
     /// <summary>
@@ -128,11 +166,11 @@ public class AdminAccountsController : ControllerBase
     /// </summary>
     /// <returns>Digiitally signed key for account login operation</returns>
     private SigningCredentials GetSigningCredentials()
-    {
-        var key = Encoding.UTF8.GetBytes(_jwtSettings.GetSection("securityKey").Value);
-        var secret = new SymmetricSecurityKey(key);
-        return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-    }
+        {
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.GetSection("securityKey").Value);
+            var secret = new SymmetricSecurityKey(key);
+            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+        }
 
     /// <summary>
     /// Generates digital signing and signature for admin

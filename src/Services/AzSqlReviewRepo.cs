@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using src.Data;
 using src.Entities;
 using src.Models.Dtos;
+using System.Drawing.Printing;
 
 namespace src.Services
 {
@@ -350,6 +351,51 @@ namespace src.Services
             return reviewToBeUpdated;
 
            
+        }
+
+        public async Task<IEnumerable<Review>> GetReviewsByCustomerEmail(string email, int pageNumber = 0, int pageSize = 10)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            var userId = user.Id;
+
+            return _context.Reviews.Where(x => x.UserId.ToString() == userId).Skip(pageNumber).Take(pageSize).ToList();
+        }
+
+        public async Task<int> CountCustomerReviews(string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            var userId = user.Id;
+
+            return _context.Reviews.Where(x => x.UserId.ToString() == userId).Count();
+        }
+
+        public Review ReassignReview(Guid reviewId, string lawyerEmail)
+        {
+            var newLawyer = _userManager.FindByEmailAsync(lawyerEmail);
+            if(newLawyer != null)
+            {
+                var review = _context.Reviews.FirstOrDefault(x => x.ReviewId == reviewId);
+                if(review != null)
+                {
+                    review.LawyerEmail = lawyerEmail;
+                    review.UpdatedAt = DateTime.Now;
+                    review.TimeStamp = DateTime.Now;
+                    Save();
+                    return review;
+                }
+            }
+            return null;
+            
+        }
+
+        public Review GetFullReview(Guid reviewId)
+        {
+            var review = _context.Reviews.FirstOrDefault(x => x.ReviewId == reviewId);
+            if(review != null)
+            {
+                return review;
+            }
+            return null;
         }
     }
 }

@@ -19,7 +19,7 @@ using System.Security.Claims;
 namespace src.Controllers
 {
     /// <permission cref="lawyer">description</permission>
-    [SwaggerTag("For Lawyer Authorization")]
+    [SwaggerTag("Use this for stuff that concerns lawyers but doesn't deal with auth")]
     [ApiController]
     [Route("api/lawyer")]
     [Authorize(Roles = "Lawyer", AuthenticationSchemes = "Bearer")]

@@ -52,5 +52,10 @@ namespace src.Services
         public Task<int> CountCustomerReviews(string userEmail);
 
 
+
+        public Review ReassignReview(Guid reviewId, string lawyerEmail);
+
+        public Review GetFullReview(Guid reviewId);
+     
     }
 }

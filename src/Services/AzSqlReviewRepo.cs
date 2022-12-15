@@ -351,5 +351,34 @@ namespace src.Services
 
            
         }
+
+        public Review ReassignReview(Guid reviewId, string lawyerEmail)
+        {
+            var newLawyer = _userManager.FindByEmailAsync(lawyerEmail);
+            if(newLawyer != null)
+            {
+                var review = _context.Reviews.FirstOrDefault(x => x.ReviewId == reviewId);
+                if(review != null)
+                {
+                    review.LawyerEmail = lawyerEmail;
+                    review.UpdatedAt = DateTime.Now;
+                    review.TimeStamp = DateTime.Now;
+                    Save();
+                    return review;
+                }
+            }
+            return null;
+            
+        }
+
+        public Review GetFullReview(Guid reviewId)
+        {
+            var review = _context.Reviews.FirstOrDefault(x => x.ReviewId == reviewId);
+            if(review != null)
+            {
+                return review;
+            }
+            return null;
+        }
     }
 }

@@ -47,6 +47,10 @@ namespace src.Services
         public Task<dynamic> ReviewsBulkUpload(IFormFile file);
 
         public IEnumerable<Review> GetReviewsByBusinessName(string businessName);
+
+        public Review ReassignReview(Guid reviewId, string lawyerEmail);
+
+        public Review GetFullReview(Guid reviewId);
      
     }
 }

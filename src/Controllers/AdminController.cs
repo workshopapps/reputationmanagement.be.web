@@ -234,6 +234,50 @@ public class AdminController : ControllerBase
         var customerToDisplay = _mapper.Map<UserForDisplayDto>(customer);
         if (customerToDisplay is not null) {return Ok(customerToDisplay);}
         return BadRequest();
-    }   
+    }
+
+    [SwaggerOperation(Summary = "Gets customer by email")]
+    [HttpGet("users/{userEmai}")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<UserForDisplayDto>> GetCustomerByEmail(string userEmail)
+    {
+        var customer = await _userManager.FindByEmailAsync(userEmail);
+        var customerToDisplay = _mapper.Map<UserForDisplayDto>(customer);
+        var customerIsInRoleResult = await _userManager.IsInRoleAsync(customer, "Customer");
+        if (customerToDisplay is not null && customerIsInRoleResult)
+        { return Ok(customerToDisplay); }
+        return BadRequest($"user with email \"{userEmail}\" does not exist or is not a customer");
+    }
+
+
+
+
+    [SwaggerOperation(Summary = "Gets reviews by a user email")]
+    [HttpGet("reviews/{userEmail}")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<IEnumerable<ReviewForDisplayDto>>> GetReviewsCustomerByEmail(string userEmail, 
+        int pageNumber = 0, int pageSize = 10)
+    {
+        var reviews = _reviewRepo.GetReviewsByCustomerEmail(userEmail, pageNumber, pageSize);
+        
+        if (reviews is not null)
+        {
+            //var reviewsToDisplayForAdmin = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);  
+            return Ok(reviews);
+        }
+        return BadRequest("No review for this user");
+    }
+
+
+    [SwaggerOperation(Summary = "Count all review by a lawyer, user this for pagination")]
+    [HttpGet("reviews/{userEmail}/count")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<int>> CountReviewsCustomerByEmail(string userEmail)
+    {
+        var count = await _reviewRepo.CountCustomerReviews(userEmail);
+        return count;
+    }
+
+
 
 }

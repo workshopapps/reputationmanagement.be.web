@@ -47,6 +47,10 @@ namespace src.Services
         public Task<dynamic> ReviewsBulkUpload(IFormFile file);
 
         public IEnumerable<Review> GetReviewsByBusinessName(string businessName);
-     
+
+        public Task<IEnumerable<Review>> GetReviewsByCustomerEmail(string email, int pageNumber = 0, int pageSize = 10);
+        public Task<int> CountCustomerReviews(string userEmail);
+
+
     }
 }

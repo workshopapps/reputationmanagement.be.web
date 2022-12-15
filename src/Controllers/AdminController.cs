@@ -236,4 +236,28 @@ public class AdminController : ControllerBase
         return BadRequest();
     }   
 
+
+    [SwaggerOperation(Summary = "Re-assign review to another lawyer")]
+    [HttpPatch("ReassignReview")]
+    public ActionResult ReassignRewview(Guid reviewId, string lawyerEmail)
+    {
+        var review = _reviewRepo.ReassignReview(reviewId, lawyerEmail);
+        if(review == null)
+        {
+            return BadRequest();
+        }
+        return Ok(review);
+    }
+
+    [SwaggerOperation(Summary = "Gets full review")]
+    [HttpGet("FullReview")]
+    public ActionResult GetFullReview(Guid reviewId)
+    {
+        var review = _reviewRepo.GetFullReview(reviewId);
+        if (review == null)
+        {
+            return BadRequest();
+        }
+        return Ok(review);
+    }
 }

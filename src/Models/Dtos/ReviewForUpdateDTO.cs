@@ -14,6 +14,7 @@ namespace src.Models.Dtos
         public string WebsiteName { get; set; } 
         public int Rating { get; set; }
         public string Email { get; set; }
+        public string ReviewLink { get; set; }
 
         /// new reqs 5/12/2022
         public string ComplainerName { get; set; } = "Ciroma Chukwuma Adekunle";

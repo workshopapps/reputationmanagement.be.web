@@ -11,7 +11,6 @@ using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
-using System.Linq;
 
 namespace src.Controllers;
 
@@ -64,15 +63,15 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [SwaggerResponseExample(400, typeof(BadUserUpdateExampleDetailsForCustomer))]
     [SwaggerResponseExample(200, typeof(GoodUserUpdateExampleDetailsForCustomer))]
-    public async Task<ActionResult> UpdateUser( string userEmail, [FromBody] JsonPatchDocument<CustomerUpdateDto>  userDetails)
+    public async Task<ActionResult> UpdateUser(string userEmail, [FromBody] JsonPatchDocument<CustomerUpdateDto> userDetails)
     {
-        if (userDetails !=null)
+        if (userDetails != null)
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
-         
+
             var userToPatch = _mapper.Map<CustomerUpdateDto>(user);
             userDetails.ApplyTo(userToPatch);
-            
+
             var _ = _mapper.Map(userToPatch, user);
             if (!ModelState.IsValid)
             {
@@ -81,7 +80,7 @@ public class AdminController : ControllerBase
             var updateUserCredentialsResult = await _userManager.UpdateAsync(user);
             if (updateUserCredentialsResult.Succeeded)
             {
-               return Ok();
+                return Ok();
             }
         }
 
@@ -168,13 +167,21 @@ public class AdminController : ControllerBase
         {
             var reviewToPatch = _reviewRepo.GetReviewById(reviewId);
             var reviewForUpdateToPatch = _mapper.Map<ReviewForUpdateDTO>(reviewToPatch);
-            reviewPatchDoc.ApplyTo(reviewForUpdateToPatch);
+
+            try
+            {
+                reviewPatchDoc.ApplyTo(reviewForUpdateToPatch);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+                    }
             if (ModelState.IsValid is false)
             {
                 return BadRequest(ModelState);
             }
             var review = _reviewRepo.UpdateReview(reviewForUpdateToPatch, reviewId);
-            var updatedReview =_reviewRepo.GetReviewById(reviewId);
+            var updatedReview = _reviewRepo.GetReviewById(reviewId);
 
             return Ok(updatedReview);
         }
@@ -233,7 +240,7 @@ public class AdminController : ControllerBase
     {
         var customer = await _adminRepository.GetUserById(userId);
         var customerToDisplay = _mapper.Map<UserForDisplayDto>(customer);
-        if (customerToDisplay is not null) {return Ok(customerToDisplay);}
+        if (customerToDisplay is not null) { return Ok(customerToDisplay); }
         return BadRequest();
     }
 
@@ -260,7 +267,7 @@ public class AdminController : ControllerBase
 
         if (reviews is not null)
         {
-            //var reviewsToDisplayForAdmin = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);  
+            //var reviewsToDisplayForAdmin = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);
             return Ok(reviews);
         }
         return BadRequest("No review for this user");
@@ -299,7 +306,7 @@ public class AdminController : ControllerBase
     public ActionResult ReassignRewview(Guid reviewId, string lawyerEmail)
     {
         var review = _reviewRepo.ReassignReview(reviewId, lawyerEmail);
-        if(review == null)
+        if (review == null)
         {
             return BadRequest();
         }
@@ -317,6 +324,7 @@ public class AdminController : ControllerBase
         }
         return Ok(review);
     }
+
     [SwaggerOperation(Summary = "Return the list of all Lawyer contacts in csv")]
     [HttpGet("GetAllLawyerDetails")]
     public ActionResult ExportAllLawyerContactAsCSV()
@@ -336,6 +344,5 @@ public class AdminController : ControllerBase
         }
         stream.Position = 0; //reset stream
         return File(stream, "application/octet-stream", "Details.csv");
-
     }
 }

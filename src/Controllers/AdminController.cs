@@ -265,7 +265,7 @@ public class AdminController : ControllerBase
         return BadRequest("No review for this user");
     }
 
-    [SwaggerOperation(Summary = "Count all review by a lawyer, user this for pagination")]
+    [SwaggerOperation(Summary = "Count all review created by a customer, use this endpoint for pagination")]
     [HttpGet("reviews/{userEmail}/count")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<int>> CountReviewsCustomerByEmail(string userEmail)
@@ -274,8 +274,8 @@ public class AdminController : ControllerBase
         return count;
     }
 
-    [SwaggerOperation(Summary = "Gets reviews by a user email")]
-    [HttpGet("reviews/{userEmail}")]
+    [SwaggerOperation(Summary = "Gets reviews claimed by a lawyer")]
+    [HttpGet("claimed-reviews/{lawyerEmail}")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     public async Task<ActionResult<IEnumerable<Review>>> GetReviewsLawyerByEmail(string lawyerEmail,
     int pageNumber = 0, int pageSize = 10)
@@ -284,12 +284,12 @@ public class AdminController : ControllerBase
         return Ok(reviews.ToList());
     }
 
-    [SwaggerOperation(Summary = "Count all review by a lawyer, user this for pagination")]
-    [HttpGet("reviews/{userEmail}/count")]
+    [SwaggerOperation(Summary = "Count all reviews claimed by lawyer, user this for pagination")]
+    [HttpGet("claimed-reviews/{lawyerEmail}/count")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult<int>> CountReviewsLawyerByEmail(string userEmail)
+    public async Task<ActionResult<int>> CountReviewsLawyerByEmail(string lawyerEmail)
     {
-        var count = await _reviewRepo.CountLawyerReviews(userEmail);
+        var count = await _reviewRepo.CountLawyerReviews(lawyerEmail);
         return count;
     }
 

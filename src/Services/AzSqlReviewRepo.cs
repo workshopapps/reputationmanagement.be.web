@@ -11,9 +11,8 @@ namespace src.Services
 {
     public class AzSqlReviewRepo : IReviewRepository
     {
-        public readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public IQueryable<Review> Reviews => throw new NotImplementedException();
@@ -353,31 +352,32 @@ namespace src.Services
            
         }
 
-        public async Task<IEnumerable<Review>> GetReviewsByCustomerEmail(string email, int pageNumber = 0, int pageSize = 10)
+        public async Task<IEnumerable<Review>> GetReviewsByCustomerEmail(string customerEmail, int pageNumber = 0, int pageSize = 10)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(customerEmail);
             var userId = user.Id;
 
             return _context.Reviews.Where(x => x.UserId.ToString() == userId).Skip(pageNumber).Take(pageSize).ToList();
         }
 
-        public async Task<int> CountCustomerReviews(string userEmail)
+        public async Task<int> CountCustomerReviews(string customerEmail)
         {
-            var user = await _userManager.FindByEmailAsync(userEmail);
-            var userId = user.Id;
-
-            return _context.Reviews.Where(x => x.UserId.ToString() == userId).Count();
+            var user = await _userManager.FindByEmailAsync(customerEmail);
+            if (user is not null)
+                return _context.Reviews.Where(x => x.UserId.ToString() == user.Id).Count();
+            else
+                return 0;
         }
 
-        public async Task<IEnumerable<Review>> GetReviewsByLawyerEmail(string email, int pageNumber = 0, int pageSize = 10)
+        public async Task<IEnumerable<Review>> GetReviewsByLawyerEmail(string lawyerEmail, int pageNumber = 0, int pageSize = 10)
         {
-          return _context.Reviews.Where(x => x.LawyerEmail == email).
+          return _context.Reviews.Where(x => x.LawyerEmail == lawyerEmail).
                 Skip(pageNumber).Take(pageSize).ToList();
         }
 
         public async Task<int> CountLawyerReviews(string lawyerEmail)
         {
-            return _context.Reviews.Where(x => x.Email == lawyerEmail).Count();
+          return _context.Reviews.Where(x => x.LawyerEmail == lawyerEmail).Count();
         }
 
         public Review ReassignReview(Guid reviewId, string lawyerEmail)

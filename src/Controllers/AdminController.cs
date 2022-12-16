@@ -252,7 +252,7 @@ public class AdminController : ControllerBase
     [SwaggerOperation(Summary = "Gets reviews by a user email")]
     [HttpGet("reviews/{userEmail}")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult<IEnumerable<ReviewForDisplayDto>>> GetReviewsLawyerByEmail(string userEmail,
+    public async Task<ActionResult<IEnumerable<ReviewForDisplayDto>>> GetReviewsCustomerByEmail(string userEmail,
     int pageNumber = 0, int pageSize = 10)
     {
         var reviews = _reviewRepo.GetReviewsByCustomerEmail(userEmail, pageNumber, pageSize);
@@ -264,22 +264,6 @@ public class AdminController : ControllerBase
         }
         return BadRequest("No review for this user");
     }
-    [SwaggerOperation(Summary = "Gets reviews by a user email")]
-    [HttpGet("reviews/{userEmail}")]
-    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult<IEnumerable<ReviewForDisplayDto>>> GetReviewsCustomerByEmail(string userEmail, 
-        int pageNumber = 0, int pageSize = 10)
-    {
-        var reviews = _reviewRepo.GetReviewsByCustomerEmail(userEmail, pageNumber, pageSize);
-        
-        if (reviews is not null)
-        {
-            //var reviewsToDisplayForAdmin = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);  
-            return Ok(reviews);
-        }
-        return BadRequest("No review for this user");
-    }
-
 
     [SwaggerOperation(Summary = "Count all review by a lawyer, user this for pagination")]
     [HttpGet("reviews/{userEmail}/count")]
@@ -290,8 +274,24 @@ public class AdminController : ControllerBase
         return count;
     }
 
+    [SwaggerOperation(Summary = "Gets reviews by a user email")]
+    [HttpGet("reviews/{userEmail}")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<IEnumerable<Review>>> GetReviewsLawyerByEmail(string lawyerEmail,
+    int pageNumber = 0, int pageSize = 10)
+    {
+        var reviews = await _reviewRepo.GetReviewsByLawyerEmail(lawyerEmail, pageNumber, pageSize);
+        return Ok(reviews.ToList());
+    }
 
-
+    [SwaggerOperation(Summary = "Count all review by a lawyer, user this for pagination")]
+    [HttpGet("reviews/{userEmail}/count")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<int>> CountReviewsLawyerByEmail(string userEmail)
+    {
+        var count = await _reviewRepo.CountLawyerReviews(userEmail);
+        return count;
+    }
 
     [SwaggerOperation(Summary = "Re-assign review to another lawyer")]
     [HttpPatch("ReassignReview")]

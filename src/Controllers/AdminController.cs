@@ -99,7 +99,6 @@ public class AdminController : ControllerBase
     [SwaggerOperation(Summary = "Get all reviews for Admin")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [HttpGet("reviews")]
-    [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
     public ActionResult GetAllReviews(int pageNumber = 0, int pageSize = 10)
     {
         var reviews = _reviewRepo.GetAllReviews(pageNumber, pageSize).ToList();

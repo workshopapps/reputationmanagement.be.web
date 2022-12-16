@@ -25,7 +25,7 @@ pipeline {
     stage("Deploy App"){
       
       steps{
-	    sh "sudo cp -rf ${WORKSPACE}/src/* /home/ehmeeops/reputationmanagement.be.web/src/bin/Debug/net6.0/publish"
+	    sh "sudo cp -rf ${WORKSPACE}/src/* /home/ehmeeops/reputationmanagement.be.web/src/"
             sh "sudo systemctl restart reputeapi.service"
       }
     }

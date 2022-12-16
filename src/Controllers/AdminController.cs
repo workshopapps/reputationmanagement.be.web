@@ -108,10 +108,10 @@ public class AdminController : ControllerBase
         return Ok(reviews);
     }
 
-    [SwaggerOperation(Summary = "Get a particular reviews for Admin")]
+    [SwaggerOperation(Summary = "Get a particular review for Admin")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    [HttpGet("reviews/{reviewId}")]
-    public IActionResult GetSingleReview(Guid reviewId)
+    [HttpGet("review/{reviewId}")]
+    public ActionResult<Review> GetSingleReview(Guid reviewId)
     {
         if (reviewId == Guid.Empty)
         {

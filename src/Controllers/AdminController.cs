@@ -234,28 +234,30 @@ public class AdminController : ControllerBase
     }
 
     [SwaggerOperation(Summary = "Gets user by Id")]
-    [HttpGet("users/{userId}")]
+    [HttpGet("user/{userId}")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult<UserForDisplayDto>> GetCustomerById(string userId)
+    public async Task<ActionResult<UserForDisplayDto>> GetCustomerById(Guid userId)
     {
-        var customer = await _adminRepository.GetUserById(userId);
-        var customerToDisplay = _mapper.Map<UserForDisplayDto>(customer);
-        if (customerToDisplay is not null) { return Ok(customerToDisplay); }
-        return BadRequest();
-    }
-
-    [SwaggerOperation(Summary = "Gets customer by email")]
-    [HttpGet("users/{userEmai}")]
-    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    public async Task<ActionResult<UserForDisplayDto>> GetCustomerByEmail(string userEmail)
-    {
-        var customer = await _userManager.FindByEmailAsync(userEmail);
+        var customer = await _userManager.FindByIdAsync(userId.ToString());
         var customerToDisplay = _mapper.Map<UserForDisplayDto>(customer);
         var customerIsInRoleResult = await _userManager.IsInRoleAsync(customer, "Customer");
         if (customerToDisplay is not null && customerIsInRoleResult)
         { return Ok(customerToDisplay); }
-        return BadRequest($"user with email \"{userEmail}\" does not exist or is not a customer");
+        return BadRequest($"user with Id \"{userId}\" does not exist or is not a customer");
     }
+
+    //[SwaggerOperation(Summary = "Gets customer by email")]
+    //[HttpGet("user/{userEmail}")]
+    //[Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    //public async Task<ActionResult<UserForDisplayDto>> GetCustomerByEmail(string userEmail)
+    //{
+    //    var customer = await _userManager.FindByEmailAsync(userEmail);
+    //    var customerToDisplay = _mapper.Map<UserForDisplayDto>(customer);
+    //    var customerIsInRoleResult = await _userManager.IsInRoleAsync(customer, "Customer");
+    //    if (customerToDisplay is not null && customerIsInRoleResult)
+    //    { return Ok(customerToDisplay); }
+    //    return BadRequest($"user with email \"{userEmail}\" does not exist or is not a customer");
+    //}
 
     [SwaggerOperation(Summary = "Gets reviews by a user email")]
     [HttpGet("reviews/{userEmail}")]

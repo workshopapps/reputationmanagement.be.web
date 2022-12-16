@@ -249,9 +249,21 @@ public class AdminController : ControllerBase
         return BadRequest($"user with email \"{userEmail}\" does not exist or is not a customer");
     }
 
+    [SwaggerOperation(Summary = "Gets reviews by a user email")]
+    [HttpGet("reviews/{userEmail}")]
+    [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
+    public async Task<ActionResult<IEnumerable<ReviewForDisplayDto>>> GetReviewsLawyerByEmail(string userEmail,
+    int pageNumber = 0, int pageSize = 10)
+    {
+        var reviews = _reviewRepo.GetReviewsByCustomerEmail(userEmail, pageNumber, pageSize);
 
-
-
+        if (reviews is not null)
+        {
+            //var reviewsToDisplayForAdmin = _mapper.Map<IEnumerable<ReviewForDisplayDto>>(reviews);  
+            return Ok(reviews);
+        }
+        return BadRequest("No review for this user");
+    }
     [SwaggerOperation(Summary = "Gets reviews by a user email")]
     [HttpGet("reviews/{userEmail}")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]

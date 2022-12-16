@@ -51,7 +51,8 @@ namespace src.Services
         public Task<IEnumerable<Review>> GetReviewsByCustomerEmail(string email, int pageNumber = 0, int pageSize = 10);
         public Task<int> CountCustomerReviews(string userEmail);
 
-
+        public Task<IEnumerable<Review>> GetReviewsByLawyerEmail(string email, int pageNumber = 0, int pageSize = 10);
+        public Task<int> CountLawyerReviews(string userEmail);
 
         public Review ReassignReview(Guid reviewId, string lawyerEmail);
 

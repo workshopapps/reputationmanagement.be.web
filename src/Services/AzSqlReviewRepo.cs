@@ -369,6 +369,17 @@ namespace src.Services
             return _context.Reviews.Where(x => x.UserId.ToString() == userId).Count();
         }
 
+        public async Task<IEnumerable<Review>> GetReviewsByLawyerEmail(string email, int pageNumber = 0, int pageSize = 10)
+        {
+          return _context.Reviews.Where(x => x.LawyerEmail == email).
+                Skip(pageNumber).Take(pageSize).ToList();
+        }
+
+        public async Task<int> CountLawyerReviews(string lawyerEmail)
+        {
+            return _context.Reviews.Where(x => x.Email == lawyerEmail).Count();
+        }
+
         public Review ReassignReview(Guid reviewId, string lawyerEmail)
         {
             var newLawyer = _userManager.FindByEmailAsync(lawyerEmail);

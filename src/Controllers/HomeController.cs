@@ -148,7 +148,14 @@ namespace src.Controllers
             {
                 var reviewToPatch = _reviewRepo.GetReviewById(reviewId);
                 var reviewForUpdateToPatch = _mapper.Map<ReviewForUpdateDTO>(reviewToPatch);
-                reviewPatchDoc.ApplyTo(reviewForUpdateToPatch);
+                try
+                {
+                    reviewPatchDoc.ApplyTo(reviewForUpdateToPatch);
+                }
+                catch(Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
                 if (ModelState.IsValid is false)
                 {
                     return BadRequest(ModelState);

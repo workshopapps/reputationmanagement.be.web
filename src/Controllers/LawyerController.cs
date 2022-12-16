@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using src.Entities;
-using src.Models;
 using src.Models.Dtos;
 using src.Models.ExampleModels;
 using src.Services;
@@ -66,7 +65,11 @@ namespace src.Controllers
                 if (reviewForUpdatePatchDoc is not null)
                 {
                     var newReviewForUpdate = new LawyerReviewForUpdateDTO();
-                    reviewForUpdatePatchDoc.ApplyTo(newReviewForUpdate);
+                    try
+                    {
+                        reviewForUpdatePatchDoc.ApplyTo(newReviewForUpdate);
+                    }
+                    catch (Exception ex) { return BadRequest(ex.Message); }
 
                     if (ModelState.IsValid is false)
                     {
@@ -77,7 +80,7 @@ namespace src.Controllers
 
                     string emailSubject = "Review status update";
                     var userToNotify = await _userManager.FindByIdAsync(updatedReview.UserId.ToString());
-                    
+
                     await _emailSender.SendEmailAsync(userToNotify.Email, $"{emailSubject}",
                          $"The status of your review with id of \"{updatedReview.ReviewId}\" and review string of \"{updatedReview.ReviewString}\" from {updatedReview.Email} has been updated to " +
                          $"\"{updatedReview.Status}\"" + $" check https://repute.hng.tech/request?requestId={updatedReview.ReviewId} to view the review");
@@ -90,7 +93,6 @@ namespace src.Controllers
             }
 
             return BadRequest(ModelState);
-
         }
 
         /// <summary>
@@ -216,7 +218,7 @@ namespace src.Controllers
             string emailSubject = $"Quotation for removal of review on {review.ReviewLink} by {review.ComplainerName}";
             try
             {
-                await _emailSender.SendEmailAsync(user.Email, emailSubject, emailData.Emailbody + $"\n Link to review https://repute.hng.tech/request?requestId={review.ReviewId}" );
+                await _emailSender.SendEmailAsync(user.Email, emailSubject, emailData.Emailbody + $"\n Link to review https://repute.hng.tech/request?requestId={review.ReviewId}");
                 return Ok("Success");
             }
             catch (SmtpCommandException ex)

@@ -70,7 +70,14 @@ public class AdminController : ControllerBase
             var user = await _userManager.FindByEmailAsync(userEmail);
 
             var userToPatch = _mapper.Map<CustomerUpdateDto>(user);
-            userDetails.ApplyTo(userToPatch);
+            try
+            {
+                userDetails.ApplyTo(userToPatch);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);  
+            }
 
             var _ = _mapper.Map(userToPatch, user);
             if (!ModelState.IsValid)

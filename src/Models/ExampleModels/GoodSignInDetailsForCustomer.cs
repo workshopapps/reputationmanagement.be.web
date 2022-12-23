@@ -1,4 +1,5 @@
-﻿using Swashbuckle.AspNetCore.Filters;
+﻿using src.Models.Auth;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace src.Models.ExampleModels
 {

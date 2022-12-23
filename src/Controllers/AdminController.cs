@@ -94,16 +94,6 @@ public class AdminController : ControllerBase
         return BadRequest("unsuccessful");
     }
 
-    //[SwaggerOperation(Summary = "Create a Review with this endpoint")]
-    //[HttpPost("create")]
-    //[Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    //public ActionResult CreateReview([FromBody] Review reviewForCreation)
-    //{
-    //    // use this to get user Id From request and
-    //    var review = _reviewRepo.CreateReview(reviewForCreation);
-    //    return Ok(review);
-    //}
-
     [SwaggerOperation(Summary = "Get all reviews for Admin")]
     [Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
     [HttpGet("reviews")]
@@ -252,19 +242,6 @@ public class AdminController : ControllerBase
         { return Ok(customerToDisplay); }
         return BadRequest($"user with Id \"{userId}\" does not exist or is not a customer");
     }
-
-    //[SwaggerOperation(Summary = "Gets customer by email")]
-    //[HttpGet("user/{userEmail}")]
-    //[Authorize(Roles = "Administrator", AuthenticationSchemes = "Bearer")]
-    //public async Task<ActionResult<UserForDisplayDto>> GetCustomerByEmail(string userEmail)
-    //{
-    //    var customer = await _userManager.FindByEmailAsync(userEmail);
-    //    var customerToDisplay = _mapper.Map<UserForDisplayDto>(customer);
-    //    var customerIsInRoleResult = await _userManager.IsInRoleAsync(customer, "Customer");
-    //    if (customerToDisplay is not null && customerIsInRoleResult)
-    //    { return Ok(customerToDisplay); }
-    //    return BadRequest($"user with email \"{userEmail}\" does not exist or is not a customer");
-    //}
 
     [SwaggerOperation(Summary = "Gets reviews by a user email")]
     [HttpGet("reviews/{userEmail}")]

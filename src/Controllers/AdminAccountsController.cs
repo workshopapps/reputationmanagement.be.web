@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using src.Entities;
-using src.Models;
+using src.Models.Auth;
 using src.Models.Dtos;
+using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace src.Controllers;
@@ -34,61 +35,19 @@ public class AdminAccountsController : ControllerBase
     private readonly IConfigurationSection _jwtSettings;
     private readonly IEmailSender _emailSender;
 
+    private readonly ITokenService _tokenService;
     /// <summary>
     /// constructor <c>AdminAccountController</c> initializes an AdminAccount instance
     /// (<paramref name="userManager"/>,<paramref name="configuration"/>).
     /// </summary>
-    public AdminAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration, IEmailSender emailSender)
+    public AdminAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration, IEmailSender emailSender, ITokenService tokenService)
     {
         _mapper = mapper;
         _userManager = userManager;
         _jwtSettings = configuration.GetSection("JwtSettings");
         _emailSender = emailSender;
+        _tokenService = tokenService;
     }
-
-    /// <summary>
-    /// This endpoint allows for creation of an admin
-    /// </summary>
-    /// <param name="adminRegisterModel">Lawyer registeration details sent as a request</param>
-    /// <returns code="200">if account creation is successful</returns>
-    /// <returns code="400">If create account fails</returns>
-    [SwaggerOperation(Summary = "Create an admin account")]
-    [HttpPost("create_account")]
-    public async Task<IActionResult> Register([FromBody, SwaggerRequestBody("Account details payload", Required = true)] LawyerAccountForCreationDto adminRegisterModel)
-    {
-        string EMAIL_BODY = StringTemplates.AdminAccountTemplate;
-
-
-        var existingAdmin = await _userManager.FindByEmailAsync(adminRegisterModel.Email);
-
-        if(existingAdmin == null)
-        {
-            var admin = _mapper.Map<ApplicationUser>(adminRegisterModel);
-            var result = await _userManager.CreateAsync(admin, adminRegisterModel.Password);
-
-            if(!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, result.Errors);
-            }
-
-            await _userManager.AddToRoleAsync(admin, "Administrator");
-            await _emailSender.SendEmailAsync(adminRegisterModel.Email, "Negative Reviews Inquiry", EMAIL_BODY);
-            var newAdmin = await _userManager.FindByEmailAsync(adminRegisterModel.Email);
-            if(newAdmin != null && await _userManager.CheckPasswordAsync(newAdmin, adminRegisterModel.Password))
-            {
-                var signingCredentials = GetSigningCredentials();
-                var claims = GetClaims(admin);
-                var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
-                var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-                return Ok(token);
-            }
-            return StatusCode(201);
-        }
-
-        return BadRequest("Email already in use");
-    }
-
-
     /// <summary>
     /// Endpoint responsible for authenticating and login a lawyer.
     /// Achievable through token generation 
@@ -97,7 +56,7 @@ public class AdminAccountsController : ControllerBase
     /// <returns>JWT Token for the lawyer, used for authorization</returns>
     [SwaggerOperation(Summary = "Login for an admin")]
     [HttpPost("Login")]
-    public async Task<IActionResult> Login([FromBody, SwaggerRequestBody("Account details payload", Required = true)] UserLoginModel adminLogin)
+    public async Task<ActionResult<AuthenticatedResponse>> Login([FromBody, SwaggerRequestBody("Account details payload", Required = true)] UserLoginModel adminLogin)
     {
         var user = await _userManager.FindByEmailAsync(adminLogin.Email);
         if (user is null) { return BadRequest($"User with email {adminLogin.Email} does not exist"); }
@@ -106,19 +65,20 @@ public class AdminAccountsController : ControllerBase
         {
             if (await _userManager.CheckPasswordAsync(user, adminLogin.Password))
             {
-                var signingCredentials = GetSigningCredentials();
-                var claims = GetClaims(user);
-                var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
-                var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-
-                return Ok(token);
+                var claims = await _tokenService.GetClaims(user);
+                var token = _tokenService.GenerateAccessToken(claims);
+                var refreshToken = _tokenService.GenerateRefreshToken();
+                user.RefreshToken = refreshToken;
+                user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(5);
+                await _userManager.UpdateAsync(user);
+                return Ok(new AuthenticatedResponse() { Token = token, RefreshToken = refreshToken });
             }
             else
             {
-                return BadRequest("Username and password don't match");
+                return Unauthorized("Username and password don't match");
             }
         }
-        return BadRequest("Invalid Authentication");
+        return Unauthorized("Invalid Authentication");
     }
 
     #region DeleteUsersAccount
@@ -160,43 +120,4 @@ public class AdminAccountsController : ControllerBase
     }
     #endregion
 
-
-    /// <summary>
-    /// Generates digital signing and signature for admin
-    /// </summary>
-    /// <returns>Digiitally signed key for account login operation</returns>
-    private SigningCredentials GetSigningCredentials()
-        {
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.GetSection("securityKey").Value);
-            var secret = new SymmetricSecurityKey(key);
-            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-        }
-
-    /// <summary>
-    /// Generates digital signing and signature for admin
-    /// </summary>
-    /// <returns>Digiitally signed key for account login operation</returns>
-    private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
-        {
-            var tokenOptions = new JwtSecurityToken(
-            issuer: _jwtSettings.GetSection("ValidIssuer").Value,
-            audience: _jwtSettings.GetSection("validAudience").Value,
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings.GetSection("expiryInMinutes").Value)),
-            signingCredentials: signingCredentials);
-            return tokenOptions;
-        }
-        private async Task<List<Claim>> GetClaims(ApplicationUser user)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Email)
-            };
-            var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-            return claims;
-        }
 }

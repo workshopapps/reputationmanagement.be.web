@@ -1,4 +1,4 @@
-﻿using src.Models;
+﻿using src.Models.Auth;
 using src.Models.Dtos;
 using Swashbuckle.AspNetCore.Filters;
 

@@ -3,17 +3,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using src.Entities;
 using src.Models;
+using src.Models.Auth;
 using src.Models.Dtos;
 using src.Models.ExampleModels;
+using src.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
-using System.Web;
 
 namespace src.Controllers
 {
@@ -28,11 +26,12 @@ namespace src.Controllers
         private readonly IPasswordValidator<ApplicationUser> _passwordValidator;
         private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
         private readonly IEmailSender _emailSender;
+        private readonly ITokenService _tokenService;
 
         public UserAccountsController(IMapper mapper, UserManager<ApplicationUser> userManager, IConfiguration configuration,
              IPasswordValidator<ApplicationUser> passwordValidator,
                 IPasswordHasher<ApplicationUser> passwordHasher,
-            IEmailSender emailSender)
+            IEmailSender emailSender, ITokenService tokenService)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -40,6 +39,7 @@ namespace src.Controllers
             _passwordValidator = passwordValidator;
             _passwordHasher = passwordHasher;
             _emailSender = emailSender;
+            _tokenService = tokenService;
         }
 
         /// <returns>User's Auth token if successful.</returns>
@@ -52,7 +52,7 @@ namespace src.Controllers
         [SwaggerResponseExample(400, typeof(BadCustomerAccountForCreationExample))]
         [SwaggerResponseExample(200, typeof(GoodCustomerAccountForCreationExample))]
         [HttpPost("create_account")]
-        public async Task<ActionResult> Register([FromBody] CustomerAccountForCreationDto userModel)
+        public async Task<ActionResult<AuthenticatedResponse>> Register([FromBody] CustomerAccountForCreationDto userModel)
         {
             var user = _mapper.Map<ApplicationUser>(userModel);
             var result = await _userManager.CreateAsync(user, userModel.Password);
@@ -69,10 +69,10 @@ namespace src.Controllers
                 }
                 else
                 {
-                    return BadRequest(result.Errors.First().Description);
+                    return Unauthorized(result.Errors.First().Description);
                 }
 
-                return BadRequest(badResponse);
+                return Unauthorized(badResponse);
             }
             else
             {
@@ -80,50 +80,51 @@ namespace src.Controllers
                 var newuser = await _userManager.FindByEmailAsync(userModel.Email);
                 if (newuser != null && await _userManager.CheckPasswordAsync(newuser, userModel.Password))
                 {
-                    var signingCredentials = GetSigningCredentials();
-                    var claims = GetClaims(user);
-                    var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
-                    var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-
-                    string email_title = "Support From Repute";
-                    string email_body = StringTemplates.AdminAccountTemplate;
-                    await _emailSender.SendEmailAsync(userModel.Email, email_title, email_body);
-                    return Ok(token);
+                    var claims = await _tokenService.GetClaims(user);
+                    var token = _tokenService.GenerateAccessToken(claims);
+                    var refreshToken = _tokenService.GenerateRefreshToken();
+                    user.RefreshToken = refreshToken;
+                    user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(_tokenService.ExpiryInMinutes);
+                    await _userManager.UpdateAsync(user);
+                    return Ok(new AuthenticatedResponse() { Token = token, RefreshToken = refreshToken });
                 }
             }
-            return Ok();
+            return Unauthorized();
         }
 
         /// <returns>Use bearer auth token</returns>
         /// <response code="200">Returns OK with the raw auth token as the only content.</response>
         /// <response code="400">If the authentication was unsuccessful.</response>
-        [SwaggerOperation(Summary = "Signs in the user")]
+        [SwaggerOperation(Summary = "Signs in the customer")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerResponseExample(400, typeof(BadSignInDetailsForCustomer))]
         [SwaggerResponseExample(200, typeof(GoodSignInDetailsForCustomer))]
         [HttpPost("sign_in")]
-        public async Task<IActionResult> Login([FromBody] UserLoginModel userModel)
+        public async Task<ActionResult<AuthenticatedResponse>> Login([FromBody] UserLoginModel userModel)
         {
             var user = await _userManager.FindByEmailAsync(userModel.Email);
-            
+
             if (user is null) { return BadRequest($"User with email {userModel.Email} does not exist"); }
-            if (await _userManager.IsInRoleAsync(user, "Customer"))
+            var isInRoleResult = _userManager.IsInRoleAsync(user, "Customer");
+            if (isInRoleResult.Result == true)
             {
                 if (await _userManager.CheckPasswordAsync(user, userModel.Password))
                 {
-                    var signingCredentials = GetSigningCredentials();
-                    var claims = GetClaims(user);
-                    var tokenOptions = GenerateTokenOptions(signingCredentials, await claims);
-                    var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-                    return Ok(token);
+                    var claims = await _tokenService.GetClaims(user);
+                    var token = _tokenService.GenerateAccessToken(claims);
+                    var refreshToken = _tokenService.GenerateRefreshToken();
+                    user.RefreshToken = refreshToken;
+                    user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(5);
+                    await _userManager.UpdateAsync(user);
+                    return Ok(new AuthenticatedResponse() { Token = token, RefreshToken = refreshToken });
                 }
                 else
                 {
-                    return BadRequest("Username and password don't match");
+                    return Unauthorized("Username and password don't match");
                 }
             }
-            return BadRequest("Invalid Authentication");
+            return Unauthorized("Invalid Authentication");
         }
 
         /// <returns>Use bearer auth token</returns>
@@ -162,38 +163,6 @@ namespace src.Controllers
             return BadRequest();
         }
 
-        private SigningCredentials GetSigningCredentials()
-        {
-            var key = Encoding.UTF8.GetBytes(_jwtSettings.GetSection("securityKey").Value);
-            var secret = new SymmetricSecurityKey(key);
-            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-        }
-
-        private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
-        {
-            var tokenOptions = new JwtSecurityToken(
-            issuer: _jwtSettings.GetSection("ValidIssuer").Value,
-            audience: _jwtSettings.GetSection("validAudience").Value,
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(_jwtSettings.GetSection("expiryInMinutes").Value)),
-            signingCredentials: signingCredentials);
-            return tokenOptions;
-        }
-
-        private async Task<List<Claim>> GetClaims(ApplicationUser user)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Email)
-            };
-            var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-            return claims;
-        }
-
         [SwaggerOperation(Summary = "send a password reset token to user that is not logged in")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -207,12 +176,12 @@ namespace src.Controllers
                 return BadRequest("No user with this email exists");
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            string link = $"https://repute.hng.tech/password-recovery/change?"+
+            string link = $"https://repute.hng.tech/password-recovery/change?" +
                    $"token={token}";
 
-           await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this <a href=\"{link}\">link</a>");
+            await _emailSender.SendEmailAsync(dataModel.EmailAddress, "Forgot Password", $"Seems you have forgoten your password, to reset your password please use this <a href=\"{link}\">link</a>");
 
-           return Ok("Please check your email for the password reset link");
+            return Ok("Please check your email for the password reset link");
         }
 
         [SwaggerOperation(Summary = "reset users password.")]
@@ -278,6 +247,53 @@ namespace src.Controllers
             await _userManager.UpdateNormalizedUserNameAsync(signedInUser);
 
             return Ok();
+        }
+
+        [HttpPost("ExternalLogin")]
+        public async Task<IActionResult> ExternalLogin([FromBody] ExternalAuthDto externalAuth)
+        {
+            var payload = await _tokenService.VerifyGoogleToken(externalAuth);
+            if (payload == null)
+                return BadRequest("Invalid External Authentication.");
+
+            var info = new UserLoginInfo(externalAuth.Provider, payload.Subject, externalAuth.Provider);
+
+            var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            if (user == null)
+            {
+                user = await _userManager.FindByEmailAsync(payload.Email);
+
+                if (user == null)
+                {
+                    //user = new ApplicationUser { Email = payload.Email, UserName = payload.Email };
+                    //await _userManager.CreateAsync(user);
+
+                    ////prepare and send an email for the email confirmation
+
+                    //await _userManager.AddToRoleAsync(user, "Customer");
+                    //await _userManager.AddLoginAsync(user, info);
+
+                    return BadRequest("Invalid auth");
+                }
+                else
+                {
+                    await _userManager.AddLoginAsync(user, info);
+                }
+            }
+
+            if (user == null)
+                return BadRequest("Invalid External Authentication.");
+
+            //check for the Locked out account
+
+            var claims = await _tokenService.GetClaims(user);
+            var token = _tokenService.GenerateAccessToken(claims);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(5);
+            await _userManager.UpdateAsync(user);
+            return Ok(new AuthenticatedResponse() { Token = token, RefreshToken = refreshToken });
+
         }
     }
 }

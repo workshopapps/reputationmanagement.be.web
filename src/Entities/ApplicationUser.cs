@@ -19,5 +19,8 @@ namespace src.Entities
         public string? FullName { get; set; }
         public string? BusinessWebsite { get; set; }
         public string? BusinessDescription { get; set; }
+
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
     }
 }

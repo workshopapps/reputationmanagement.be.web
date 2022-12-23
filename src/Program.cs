@@ -43,22 +43,30 @@ builder.Services.AddAuthentication(opt =>
     opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
-{
+    {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+
+            ValidateIssuer = true,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.GetSection("validIssuer").Value,
+            ValidAudience = jwtSettings.GetSection("validAudience").Value,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.GetSection("securityKey").Value))
+        };
+    }).AddGoogle("google", opt =>
     {
-        
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = false,
-        ClockSkew = TimeSpan.Zero,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings.GetSection("validIssuer").Value,
-        ValidAudience = jwtSettings.GetSection("validAudience").Value,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.GetSection("securityKey").Value))
-    };
-});
+        var googleAuth = builder.Configuration.GetSection("Authentication:Google");
+
+        opt.ClientId = googleAuth["ClientId"];
+        opt.ClientSecret = googleAuth["ClientSecret"];
+        opt.SignInScheme = IdentityConstants.ExternalScheme;
+    });
+;
 
 // only return json.
 builder.Services.AddControllers(setupAction =>
@@ -161,6 +169,8 @@ builder.Services.Configure<MailKitEmailSenderOptions>(
 builder.Configuration.GetSection(nameof(MailKitEmailSenderOptions)));
 builder.Services.AddResponseCaching();
 
+
+builder.Services.AddTransient<ITokenService, TokenService>();
 
 var app = builder.Build();
 

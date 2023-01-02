@@ -84,7 +84,7 @@ namespace src.Services
                 ValidateIssuer = _validateIssuer,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securityKey)),
-                ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
+                ValidateLifetime = true
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken securityToken;

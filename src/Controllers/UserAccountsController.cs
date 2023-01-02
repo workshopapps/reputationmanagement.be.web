@@ -256,7 +256,7 @@ namespace src.Controllers
             if (payload == null)
                 return BadRequest("Invalid External Authentication.");
 
-            var info = new UserLoginInfo(externalAuth.Provider, payload.Subject, externalAuth.Provider);
+            var info = new UserLoginInfo(externalAuth.Provider, payload.Subject, externalAuth.BusinessName);
 
             var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
             if (user == null)

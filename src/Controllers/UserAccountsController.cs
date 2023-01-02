@@ -115,7 +115,7 @@ namespace src.Controllers
                     var token = _tokenService.GenerateAccessToken(claims);
                     var refreshToken = _tokenService.GenerateRefreshToken();
                     user.RefreshToken = refreshToken;
-                    user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(5);
+                    user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(2 * 60);
                     await _userManager.UpdateAsync(user);
                     return Ok(new AuthenticatedResponse() { Token = token, RefreshToken = refreshToken });
                 }

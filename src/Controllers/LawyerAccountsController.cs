@@ -58,11 +58,12 @@ namespace src.Controllers
                 var newuser = await _userManager.FindByEmailAsync(userModel.Email);
                 if (newuser != null && await _userManager.CheckPasswordAsync(newuser, userModel.Password))
                 {
+                    var refreshTokenExpiryInHours = 24;
                     var claims = await _tokenService.GetClaims(user);
                     var token = _tokenService.GenerateAccessToken(claims);
                     var refreshToken = _tokenService.GenerateRefreshToken();
                     user.RefreshToken = refreshToken;
-                    user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(5);
+                    user.RefreshTokenExpiryTime = DateTime.Now.AddHours(refreshTokenExpiryInHours);
                     await _userManager.UpdateAsync(user);
                     return Ok(new AuthenticatedResponse() { Token = token, RefreshToken = refreshToken });
                 }

@@ -30,7 +30,7 @@ namespace src.Controllers
         }
 
         [HttpPost("create_account")]
-        public async Task<ActionResult<AuthenticatedResponse>> Register([FromBody] CustomerAccountForCreationDto userModel)
+        public async Task<ActionResult<AuthenticatedResponse>> Register([FromBody] LawyerAccountForCreationDto userModel)
         {
             var user = _mapper.Map<ApplicationUser>(userModel);
             var result = await _userManager.CreateAsync(user, userModel.Password);

@@ -1,6 +1,6 @@
 ﻿using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.IdentityModel.Tokens;
 using src.Entities;
 using src.Models.Dtos;
@@ -21,6 +21,7 @@ namespace src.Services
         private readonly bool _validateIssuer;
         private readonly bool _validAudience;
         private readonly IConfigurationSection _googleSettings;
+        private readonly IConfigurationSection _externalAuthenticationSettings;
         private readonly IConfigurationSection _jwtSettings;
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -28,7 +29,8 @@ namespace src.Services
         {
             _configuration = config;
             _jwtSettings = _configuration.GetSection("JwtSettings");
-            _googleSettings = _jwtSettings.GetSection("GoogleAuthSettings");
+            _externalAuthenticationSettings = _configuration.GetSection("ExternalAuthentication");
+            _googleSettings = _externalAuthenticationSettings.GetSection("Google");
             _issuer = _jwtSettings.GetSection("validIssuer").Value;
             _audience = _jwtSettings.GetSection("validAudience").Value;
             _securityKey = _jwtSettings.GetSection("securityKey").Value;
@@ -101,7 +103,8 @@ namespace src.Services
             {
                 var settings = new GoogleJsonWebSignature.ValidationSettings()
                 {
-                    Audience = new List<string>() { _googleSettings.GetSection("clientId").Value }
+                    Audience = new List<string>() { _googleSettings.GetValue<string>("ClientId")},
+                    
                 };
                 var payload = await GoogleJsonWebSignature.ValidateAsync(externalAuth.IdToken, settings);
                 return payload;

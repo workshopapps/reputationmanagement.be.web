@@ -51,6 +51,8 @@
     <Folder Include="Migrations\AppIdentityDb\" />
   </ItemGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/ava.json" /></VisualStudio></ProjectExtensions>
+
   <!--<ItemGroup>
     <InternalsVisibleTo Include="..\src.IntegrationTests"/>
   </ItemGroup>-->

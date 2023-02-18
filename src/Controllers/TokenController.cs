@@ -61,8 +61,8 @@ namespace src.Controllers
             });
         }
 
-        [HttpPost, Authorize]
-        [Route("revoke")]
+        [HttpPost("revoke")]
+        [Authorize(Roles = "Customer,Lawyer,Admin", AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> Revoke()
         {
             var userEmail = HttpContext.User.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;

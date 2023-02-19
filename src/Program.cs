@@ -210,6 +210,9 @@ app.UseResponseCaching();
 
 app.MapControllers();
 
+
+await ClearDbsProg.ClearDbs(app, app.Configuration);
+await ClearDbsProg.CreateDbs(app, app.Configuration);
 await SeedDb.Seed(app, app.Configuration);
 
 app.Run();

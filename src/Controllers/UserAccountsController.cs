@@ -266,15 +266,13 @@ namespace src.Controllers
 
                 if (user == null)
                 {
-                    //user = new ApplicationUser { Email = payload.Email, UserName = payload.Email };
-                    //await _userManager.CreateAsync(user);
+                    user = new ApplicationUser { Email = payload.Email, UserName = payload.Email };
+                    await _userManager.CreateAsync(user);
 
-                    ////prepare and send an email for the email confirmation
+                    //prepare and send an email for the email confirmation
 
-                    //await _userManager.AddToRoleAsync(user, "Customer");
-                    //await _userManager.AddLoginAsync(user, info);
-
-                    return BadRequest("Invalid auth");
+                    await _userManager.AddToRoleAsync(user, "Customer");
+                    await _userManager.AddLoginAsync(user, info);
                 }
                 else
                 {
